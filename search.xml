@@ -1,6 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>vue组件之间的通信</title>
+    <url>/vue%E7%BB%84%E4%BB%B6%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1/</url>
+    <content><![CDATA[<blockquote>
+<p>组件是 vue.js最强大的功能之一，而组件实例的作用域是相互独立的，这就意味着不同组件之间的数据无法相互引用。针对不同的使用场景，如何选择行之有效的通信方式？本文总结了vue组件间通信的几种方式，希望对看官们有些许帮助。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="父子组件之间的通信"><a href="#父子组件之间的通信" class="headerlink" title="父子组件之间的通信"></a>父子组件之间的通信</h2><div class="note info">
+            <p>下面我们来介绍一下父子通信的几种方式</p>
+          </div>
+
+<h3 id="props"><a href="#props" class="headerlink" title="props"></a>props</h3><blockquote>
+<p><code>props</code> 的通信方式，可以说是最常用的父子组件的通信方式了。父组件通过 <code>props</code> 的方式向子组件传递，由子组件进行接收，这样我们就可以在子组件中拿到从父组件传递过来的参数了。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeNum"</span>&gt;点击修改子组件的值&lt;/el-button&gt;</span><br><span class="line">    &lt;chlid :num=<span class="string">"num"</span>&gt;&lt;/chlid&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Chlid from <span class="string">'./Child'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Parent'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Chlid</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      num: 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">changeNum</span></span>() &#123;</span><br><span class="line">      this.num += 1</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 子组件</span><br><span class="line">&lt;template style=<span class="string">"margin-top: 30px;"</span>&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    子组件中的num: &#123;&#123; num &#125;&#125;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child'</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">    num: &#123;</span><br><span class="line">      <span class="built_in">type</span>: Number,</span><br><span class="line">      default: () =&gt; 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述代码运行效果如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/Video_2020-03-27_103633.gif" alt=""></p>
+<div class="note warning">
+            <p>使用 <code>props</code> 需要注意，不应该在一个子组件内部改变 prop，这样会破坏单向的数据绑定，导致数据流难以理解。如果有这样的需要，可以通过 data 属性接收或使用 computed 属性进行转换。</p>
+          </div>
+
+<h3 id="emit"><a href="#emit" class="headerlink" title="$emit"></a>$emit</h3><blockquote>
+<p>那么，子组件如何向父组件通信呢，这时我们就需要用到 <code>$emit</code> 了，通过 <code>$emit</code> 发射一个事件，然后由父组件用 <code>v-on</code> 接收子组件传递过来的参数，我们把上面的代码稍微改造一下。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div style=<span class="string">"margin-top: 30px;"</span>&gt;</span><br><span class="line">    子组件中的num: &#123;&#123; num &#125;&#125;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeParentNum"</span>&gt;点击修改父组件的值&lt;/el-button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child'</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">    num: &#123;</span><br><span class="line">      <span class="built_in">type</span>: Number,</span><br><span class="line">      default: () =&gt; 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    // 事件发射</span><br><span class="line">    <span class="function"><span class="title">changeParentNum</span></span>() &#123;</span><br><span class="line">      const num = this.num + 1</span><br><span class="line">      // 定义一个事件名，并传递参数</span><br><span class="line">      this.<span class="variable">$emit</span>(<span class="string">'changeParentNum'</span>, num)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeNum"</span>&gt;点击修改子组件的值&lt;/el-button&gt;</span><br><span class="line">    &lt;chlid :num=<span class="string">"num"</span> @changeParentNum=<span class="string">"changeParentNum"</span>&gt;&lt;/chlid&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Chlid from <span class="string">'./Child'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Parent'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Chlid</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      num: 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">changeNum</span></span>() &#123;</span><br><span class="line">      this.num += 1</span><br><span class="line">    &#125;,</span><br><span class="line">    // 接收从子组件传递过来的参数</span><br><span class="line">    changeParentNum(val) &#123;</span><br><span class="line">      this.num = val</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述代码运行效果如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/Video_2020-03-27_105652.gif" alt=""></p>
+<div class="note info">
+            <p>这样我们就通过了 <code>props</code> 和 <code>$emit</code> 实现了一个简单的数据双向绑定</p>
+          </div>
+
+<h3 id="sync"><a href="#sync" class="headerlink" title=".sync"></a>.sync</h3><blockquote>
+<p>或许我们会觉得这样发射事件过于繁琐了，所以我们再稍微改造一下，使用 <code>.sync</code> 修饰符进行子组件向父组件通信并实现数据双向绑定。同样，我们还是改造上面的代码。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div style=<span class="string">"margin-top: 30px;"</span>&gt;</span><br><span class="line">    子组件中的num: &#123;&#123; num &#125;&#125;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeParentNum"</span>&gt;点击修改父组件的值&lt;/el-button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child'</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">    num: &#123;</span><br><span class="line">      <span class="built_in">type</span>: Number,</span><br><span class="line">      default: () =&gt; 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    // 事件发射</span><br><span class="line">    <span class="function"><span class="title">changeParentNum</span></span>() &#123;</span><br><span class="line">      const num = this.num + 1</span><br><span class="line">      // 使用 .sync 修饰符，需要使用 update，告诉父组件，我需要更新哪个值</span><br><span class="line">      this.<span class="variable">$emit</span>(<span class="string">'update:num'</span>, num)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeNum"</span>&gt;点击修改子组件的值&lt;/el-button&gt;</span><br><span class="line">    &lt;!-- 使用.sync修饰符进行数据接收并更新 --&gt;</span><br><span class="line">    &lt;chlid :num.sync=<span class="string">"num"</span>&gt;&lt;/chlid&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Chlid from <span class="string">'./Child'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Parent'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Chlid</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      num: 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">changeNum</span></span>() &#123;</span><br><span class="line">      this.num += 1</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述代码运行效果如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/Video_2020-03-27_105652.gif" alt=""></p>
+<h2 id="非父子组件之间的通信"><a href="#非父子组件之间的通信" class="headerlink" title="非父子组件之间的通信"></a>非父子组件之间的通信</h2><div class="note info">
+            <p>讲完父子组件的几种通信方式，我们来在讲讲非父子组件之间的通信方式。也可以叫做兄弟组件的通信方式</p>
+          </div>
+
+<h3 id="eventBus"><a href="#eventBus" class="headerlink" title="eventBus"></a>eventBus</h3><blockquote>
+<p>对于比较小型的项目，可以使用 <code>eventBus</code>。可以实现任意两个组件间的通信。它的实现思想也很好理解，在要相互通信的两个组件中，都引入同一个新的 <code>vue</code> 实例，然后在两个组件中通过分别调用这个实例的事件触发和监听来实现通信。对于 <code>eventBus</code> 我们可以自己手动创建，也可以通过引入插件的方式。这里我们主要讲插件的这种方式。</p>
+</blockquote>
+<blockquote>
+<p>首先我们需要安装下 <code>vue-bus</code> 这个插件</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install vue-bus --save</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>然后在 <code>main.js</code> 里面引入，这样我们在任意的 <code>vue</code> 实例中都能直接调用了。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">import VueBus from <span class="string">'vue-bus'</span> // bus总线</span><br><span class="line">Vue.use(VueBus)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// brother1组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeNum"</span>&gt;点击修改brother2组件的值&lt;/el-button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Brother1'</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      num: 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">beforeDestroy</span></span>() &#123;</span><br><span class="line">    // 组件销毁之前需要清除bus</span><br><span class="line">    this.<span class="variable">$bus</span>.<span class="variable">$off</span>(<span class="string">'changeNum'</span>)</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">changeNum</span></span>() &#123;</span><br><span class="line">      this.<span class="variable">$bus</span>.<span class="variable">$emit</span>(<span class="string">'changeNum'</span>, this.num += 1)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// brother2组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    brother1传递过来的值：&#123;&#123; num &#125;&#125;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Brother2'</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      num: 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">created</span></span>() &#123;</span><br><span class="line">    // 声明接收事件</span><br><span class="line">    this.<span class="variable">$bus</span>.<span class="variable">$on</span>(<span class="string">'changeNum'</span>, (val) =&gt; &#123;</span><br><span class="line">      this.num = val</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述代码运行效果如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/Video_2020-03-27_122023.gif" alt=""></p>
+<div class="note warning">
+            <p>使用 <code>eventBus</code> 需要注意的是在组件销毁的时候，需要关闭接收事件。</p>
+          </div>
+
+<h3 id="vuex"><a href="#vuex" class="headerlink" title="vuex"></a>vuex</h3><div class="note info">
+            <p>如果不是特别必要的，可以不引入vuex，所以我们这里也不讲vuex是如何进行组件通信的，有兴趣的看官可以自行百度。</p>
+          </div>
+
+<h2 id="嵌套组件之间的通信"><a href="#嵌套组件之间的通信" class="headerlink" title="嵌套组件之间的通信"></a>嵌套组件之间的通信</h2><div class="note info">
+            <p>在实际项目中，我们还有可能会遇到过深层次的嵌套组件之间的通信，如果使用 <code>props</code> 一直传递接收下去，未免显得太过沉重了，所以我们可以使用以下几个方法进行嵌套组件的通信。</p>
+          </div>
+
+<h3 id="attrs-listeners"><a href="#attrs-listeners" class="headerlink" title="$attrs / $listeners"></a>$attrs / $listeners</h3><blockquote>
+<p>可能很多人都对这两个属性不了解，我们来看下官方的解释：</p>
+</blockquote>
+<ul>
+<li>$attrs</li>
+</ul>
+<blockquote>
+<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (class 和 style 除外)，并且可以通过 v-bind=”$attrs” 传入内部组件——在创建高级别的组件时非常有用。</p>
+</blockquote>
+<ul>
+<li>$listeners</li>
+</ul>
+<blockquote>
+<p>包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on=”$listeners” 传入内部组件——在创建更高层次的组件时非常有用。</p>
+</blockquote>
+<blockquote>
+<p>以下例子，我们准备了几个参数传递下去，并且准备了两个方法，一个加了 <code>native</code> 原生修饰符，一个是非原生事件，然后看看嵌套组件之间的参数传递结果</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;child-com-1</span><br><span class="line">      :params1=<span class="string">"params1"</span></span><br><span class="line">      :params2=<span class="string">"params2"</span></span><br><span class="line">      :params3=<span class="string">"params3"</span></span><br><span class="line">      :params4=<span class="string">"params4"</span></span><br><span class="line">      @event1.native=<span class="string">"event1"</span></span><br><span class="line">      @event2=<span class="string">"event2"</span></span><br><span class="line">    &gt;&lt;/child-com-1&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import ChildCom1 from <span class="string">'./components/com-3/ChildCom1'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Corresponded'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    ChildCom1</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      params1: <span class="string">'javaScript'</span>,</span><br><span class="line">      params2: <span class="string">'html'</span>,</span><br><span class="line">      params3: <span class="string">'css'</span>,</span><br><span class="line">      params4: <span class="string">'vue'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">event1</span></span>() &#123;</span><br><span class="line">      console.log(<span class="string">'我是有native原生事件修饰符的event1事件'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">event2</span></span>() &#123;</span><br><span class="line">      console.log(<span class="string">'我是非原生事件event2'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>然后在第一级的子组件里面，用 <code>props</code> 来接收一下传递过来的 <code>params1</code> 参数</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 第一级子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;嵌套组件传递过来的参数：&#123;&#123; <span class="variable">$attrs</span> &#125;&#125;&lt;/div&gt;</span><br><span class="line">    &lt;child-com-2 v-bind=<span class="string">"<span class="variable">$attrs</span>"</span> v-on=<span class="string">"<span class="variable">$listeners</span>"</span>&gt;&lt;/child-com-2&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import ChildCom2 from <span class="string">'./ChildCom2'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'ChildCom1'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    ChildCom2</span><br><span class="line">  &#125;,</span><br><span class="line">  inheritAttrs: <span class="literal">false</span>, // 可以关闭自动挂载到组件根元素上的没有在props声明的属性</span><br><span class="line">  // 用props接收params1参数</span><br><span class="line">  props: &#123;</span><br><span class="line">    params1: &#123;</span><br><span class="line">      <span class="built_in">type</span>: String,</span><br><span class="line">      default: () =&gt; <span class="string">''</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">created</span></span>() &#123;</span><br><span class="line">    console.log(this.<span class="variable">$attrs</span>)</span><br><span class="line">    console.log(this.<span class="variable">$listeners</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们可以在 <code>child-com-1</code> 组件看到，用 <code>props</code> 接收的属性和  <code>native</code> 修饰的事件是没有在 <code>this.$attrs</code> 和 <code>this.$listeners</code> 里面的</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/DA6B1A8E-7DC1-4a64-8E15-D58B7323E183.png" alt=""></p>
+<blockquote>
+<p>之后我们就可以直接使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 把属性和事件继续传递下去，并且在子组件用 <code>props</code> 接收一下 <code>params2</code> 这个属性</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 第二级子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;嵌套组件传递过来的参数：&#123;&#123; <span class="variable">$attrs</span> &#125;&#125;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'ChildCom2'</span>,</span><br><span class="line">  inheritAttrs: <span class="literal">false</span>, // 可以关闭自动挂载到组件根元素上的没有在props声明的属性</span><br><span class="line">  props: &#123;</span><br><span class="line">    params2: &#123;</span><br><span class="line">      <span class="built_in">type</span>: String,</span><br><span class="line">      default: () =&gt; <span class="string">''</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">created</span></span>() &#123;</span><br><span class="line">    console.log(this.<span class="variable">$attrs</span>)</span><br><span class="line">    console.log(this.<span class="variable">$listeners</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/DDEEDE7C-392C-45d9-915F-986C0A755002.png" alt=""></p>
+<blockquote>
+<p>我们也同样可以在 <code>child-com-2</code> 组件看到，用 <code>props</code> 接收的属性和  <code>native</code> 修饰的事件是没有在 <code>this.$attrs</code> 和 <code>this.$listeners</code> 里面的</p>
+</blockquote>
+<div class="note info">
+            <p>我觉得 <code>$attrs</code> 和 <code>$listeners</code> 属性像两个收纳箱，一个负责收纳属性，一个负责收纳事件，都是以对象的形式来保存数据。</p>
+          </div>
+
+<h3 id="provide-inject"><a href="#provide-inject" class="headerlink" title="provide / inject"></a>provide / inject</h3><div class="note info">
+            <p>很多看官们肯定对这两个属性更加的陌生吧，让我们看来看看官方的解释。</p>
+          </div>
+
+<blockquote>
+<p><code>provide</code> 和 <code>inject</code> 主要为高阶插件/组件库提供用例。并不推荐直接用于应用程序代码中。并且这对选项需要一起使用，以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效。</p>
+</blockquote>
+<blockquote>
+<p>我们可以在根组件定义一下 <code>provide</code></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;son&gt;&lt;/son&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Son from <span class="string">'./components/com-4/Son'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Corresponded'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Son</span><br><span class="line">  &#125;,</span><br><span class="line">  provide: &#123;</span><br><span class="line">    params1: <span class="string">'javaScript'</span>,</span><br><span class="line">    params2: <span class="string">'html'</span>,</span><br><span class="line">    params3: <span class="string">'css'</span>,</span><br><span class="line">    params4: <span class="string">'vue'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 嵌套组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; params1 &#125;&#125;&lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Son'</span>,</span><br><span class="line">  inject: [<span class="string">'params1'</span>]</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>执行上面代码之后，我们就可以发现，只有我们在子组件使用 <code>jnject</code> 注入了父组件 <code>provide</code> 提供的属性，就可以直接在页面使用了，不管是嵌套多少级组件。我们都可以通过 <code>jnject</code> 去拿到我们想要的父组件 <code>provide</code> 提供属性值。</p>
+</blockquote>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>以上，就是我自己总结出来的一些组件之间的通信，除了以上这些还有其他办法可以进行组件通信，有兴趣的看官可以自行再去研究一下，我这里就不在多做阐述。本文章只是列出了自己觉得比较有用的组件通信方式。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>vue</category>
+      </categories>
+      <tags>
+        <tag>vue</tag>
+        <tag>组件</tag>
+        <tag>通信</tag>
+        <tag>组件通信</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>git-cz初使用</title>
     <url>/git-cz%E5%88%9D%E4%BD%BF%E7%94%A8/</url>
     <content><![CDATA[<blockquote>
