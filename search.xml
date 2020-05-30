@@ -1,6 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>vue-cli3.0多环境配置</title>
+    <url>/vue-cli3-0%E5%A4%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[<blockquote>
+<p>在日常开发中，我们通常会遇到不同环境的发包，所以在这里记录一下如何进行多环境配置。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="新建环境配置文件"><a href="#新建环境配置文件" class="headerlink" title="新建环境配置文件"></a>新建环境配置文件</h2><blockquote>
+<p>我们需要在项目的根目录下新建环境配置文件，在这里我们以 <code>development</code> 开发环境、 <code>production</code> 生产环境 <code>test</code> 测试环境为例</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200530174258.png" alt=""></p>
+<blockquote>
+<p>之后我们在每个文件中添加以下代码</p>
+</blockquote>
+<h3 id="开发环境"><a href="#开发环境" class="headerlink" title="开发环境"></a>开发环境</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NODE_ENV = <span class="string">'development'</span></span><br><span class="line">VUE_APP_CURENV = <span class="string">'dev'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="生产环境"><a href="#生产环境" class="headerlink" title="生产环境"></a>生产环境</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NODE_ENV = <span class="string">'production'</span></span><br><span class="line">VUE_APP_CURENV = <span class="string">'pro'</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="测试环境"><a href="#测试环境" class="headerlink" title="测试环境"></a>测试环境</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NODE_ENV = <span class="string">'test'</span></span><br><span class="line">VUE_APP_CURENV = <span class="string">'test'</span></span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>配置完多环境文件之后，具体需要进行什么操作由各位看官们根据项目自行决定，这里不做过多的阐述。接下来我们还需要在 <code>package.json</code> 进行修改</p>
+          </div>
+
+<h2 id="修改-package-json-文件"><a href="#修改-package-json-文件" class="headerlink" title="修改 package.json 文件"></a>修改 package.json 文件</h2><p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200530175026.png" alt=""></p>
+<blockquote>
+<p>以上修改为多环境的打包命令，如果需要发包 <code>测试环境</code> 只需执行以下命令：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm run <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>其他环境同理，如果嫌一个个输入命令比较麻烦，可以像我一样，使用 <code>npm run all</code> 进行三个环境的打包。</p>
+          </div>
+
+<h2 id="不同环境的包名"><a href="#不同环境的包名" class="headerlink" title="不同环境的包名"></a>不同环境的包名</h2><blockquote>
+<p>因为默认打包都是 <code>dist</code> 包名，所以不是很好区分是哪个环境的包，所以我们在 <code>vue.config.js</code> 里面进行配置</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">outputDir: `dist-<span class="variable">$&#123;process.env.VUE_APP_CURENV&#125;</span>-<span class="variable">$&#123;formatTime(new Date(), 'yyyyMMddHHmmss')&#125;</span>`,</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>可根据自己的实际情况进行修改设置，这里只提供一个例子。这样，我们每次打包出来，就很好的区分了是哪个环境的包了。</p>
+          </div>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>在日常开发中，多环境配置还是很实用的，有兴趣的可以去实践一下。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>vue</category>
+      </categories>
+      <tags>
+        <tag>vue</tag>
+        <tag>vue-cli</tag>
+        <tag>多环境</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>vue插槽详解</title>
+    <url>/vue%E6%8F%92%E6%A7%BD%E8%AF%A6%E8%A7%A3/</url>
+    <content><![CDATA[<blockquote>
+<p>插槽：简单理解就是组件内部留一个或多个的插槽位置，可供组件传对应的模板代码进去。插槽的出现，让组件变的更加灵活。今天就来记录一下插槽的一些用法。</p>
+</blockquote>
+<a id="more"></a>
+
+<div class="note info">
+            <p>本文章的内容是基于 <code>vue &gt;= 2.6.0</code>，在 <code>2.6.0</code> 中，官方为具名插槽和作用域插槽引入了一个新的统一的语法 (即 v-slot 指令)。它取代了 <code>slot</code> 和 <code>slot-scope</code> 这两个目前已被废弃但未被移除且仍在文档中的 <code>attribute</code>。所以，旧语法我们这里就不演示了，有兴趣的看官们可以自行百度一下。</p>
+          </div>
+
+<h2 id="匿名插槽"><a href="#匿名插槽" class="headerlink" title="匿名插槽"></a>匿名插槽</h2><blockquote>
+<p>匿名插槽简单点理解就是，在组件中设置一个默认插槽入口，在组件的使用中，填充的内容将会自动填充在默认插槽中。</p>
+</blockquote>
+<blockquote>
+<p>接下来我们来定义一个组件，在组件里面只有一个 <code>slot</code> 标签，也就是我们上面所说的匿名插槽，用来接收外部传进来的模版进行渲染。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 定义一个组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;slot&gt;&lt;/slot&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child1'</span></span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 使用组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;child-1&gt;</span><br><span class="line">      &lt;div&gt;&#123;&#123; name &#125;&#125;&lt;/div&gt;</span><br><span class="line">    &lt;/child-1&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child1 from <span class="string">'./components/Child1'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Slot'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child1</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      name: <span class="string">'我是name'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述代码运行效果如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200330094934.png" alt=""></p>
+<blockquote>
+<p>这样我们就实现了一个简单的匿名插槽用法。</p>
+</blockquote>
+<h2 id="具名插槽"><a href="#具名插槽" class="headerlink" title="具名插槽"></a>具名插槽</h2><blockquote>
+<p>顾名思义就是带名字的插槽，假如需要在组件内部预留多个插槽位置，就需要为插槽定义名字，指定插入的位置。</p>
+</blockquote>
+<blockquote>
+<p>首先我们来改造下之前的代码，在组件内部新增 <code>name</code> 分别为 <code>header</code> 和 <code>footer</code> 的插槽。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"header"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"footer"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child1'</span></span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 使用组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;child-1&gt;</span><br><span class="line">      &lt;div&gt;&#123;&#123; name &#125;&#125;&lt;/div&gt;</span><br><span class="line">      &lt;div v-slot=<span class="string">"header"</span>&gt;&#123;&#123; header &#125;&#125;&lt;/div&gt;</span><br><span class="line">      &lt;div v-slot=<span class="string">"footer"</span>&gt;&#123;&#123; footer &#125;&#125;&lt;/div&gt;</span><br><span class="line">    &lt;/child-1&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child1 from <span class="string">'./components/Child1'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Slot'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child1</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      name: <span class="string">'我是name'</span>,</span><br><span class="line">      header: <span class="string">'我是header'</span>,</span><br><span class="line">      footer: <span class="string">'我是footer'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述代码运行效果如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200330100151.png" alt=""></p>
+<div class="note warning">
+            <p>需要注意的是，如果使用了 <code>v-slot</code> 就必须配合着 <code>template</code> 来使用，不然会报错。</p>
+          </div>
+
+<h2 id="作用域插槽"><a href="#作用域插槽" class="headerlink" title="作用域插槽"></a>作用域插槽</h2><blockquote>
+<p>在实际项目中，我们有可能要在父组件中访问子组件内部的数据，改如何去做呢？首席我们再来改造下上面的代码。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot v-bind:user=<span class="string">"user"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"header"</span> v-bind:age=<span class="string">"age"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"footer"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child1'</span>,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      user: <span class="string">'我是子组件的user'</span>,</span><br><span class="line">      age: <span class="string">'我是子组件的age'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;child-1&gt;</span><br><span class="line">      &lt;template v-slot:default=<span class="string">"user"</span>&gt;&#123;&#123; user.user &#125;&#125;&lt;/template&gt;</span><br><span class="line">      &lt;template v-slot:header=<span class="string">"header"</span>&gt;&#123;&#123; header.age &#125;&#125;&lt;/template&gt;</span><br><span class="line">      &lt;template v-slot:footer&gt;&#123;&#123; footer &#125;&#125;&lt;/template&gt;</span><br><span class="line">    &lt;/child-1&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Child1 from <span class="string">'./components/Child1'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Slot'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Child1</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      name: <span class="string">'我是name'</span>,</span><br><span class="line">      header: <span class="string">'我是header'</span>,</span><br><span class="line">      footer: <span class="string">'我是footer'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上述代码运行效果如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200330102929.png" alt=""></p>
+<blockquote>
+<p>这样我们就实现了让插槽内容能够访问子组件中数据，进行模版渲染。</p>
+</blockquote>
+<div class="note warning">
+            <p>需要注意的是，匿名插槽传值只能使用 <code>default</code> 进行接收。具名插槽传值，接收的名字要跟子组件那边定义的一样。</p>
+          </div>
+
+<h2 id="缩写"><a href="#缩写" class="headerlink" title="缩写"></a>缩写</h2><blockquote>
+<p>跟 <code>v-on</code> 和 <code>v-bind</code> 一样，v-slot 也有缩写，即把参数之前的所有内容 (v-slot:) 替换为字符 #。例如 <code>v-slot:header</code> 可以被重写为 <code>#header：</code></p>
+</blockquote>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>关于 <code>vue</code> 插槽的作用，本文章基本上已经概述得差不多了，各位看官们可以自己在项目中去实践下。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>vue</category>
+      </categories>
+      <tags>
+        <tag>vue</tag>
+        <tag>slot</tag>
+        <tag>vue插槽</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vue组件之间的通信</title>
     <url>/vue%E7%BB%84%E4%BB%B6%E4%B9%8B%E9%97%B4%E7%9A%84%E9%80%9A%E4%BF%A1/</url>
     <content><![CDATA[<blockquote>
@@ -212,6 +350,89 @@
       </tags>
   </entry>
   <entry>
+    <title>vue如何实现路由权限控制</title>
+    <url>/vue%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E8%B7%AF%E7%94%B1%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>在实际的开发过程中，我们通常会涉及到权限的问题，不同的用户进来只能看到他对应的菜单权限，页面上的菜单渲染是比较好实现的，这里就不多提，唯一比较难的就是路由的权限控制。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="解决思路"><a href="#解决思路" class="headerlink" title="解决思路"></a>解决思路</h2><blockquote>
+<p>目前大概有两种思路可以实现路由的权限控制：</p>
+</blockquote>
+<ul>
+<li>通过 <code>router.beforeEach()</code> 路由拦截的方式实现。</li>
+<li>通过 <code>vue-router</code> 官方提供的  <code>addRoutes()</code> 来进行动态路由注入，注意 该方法只有 <code>vue-router</code> 的版本 <code>&gt;= 2.2</code> 才有效。</li>
+</ul>
+<h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="路由拦截"><a href="#路由拦截" class="headerlink" title="路由拦截"></a>路由拦截</h3><blockquote>
+<p>这种方式依赖于我们项目的路由表都是事先配置好的，假设我们的路由表有：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const router = new Router(&#123;</span><br><span class="line">  routes: [</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/'</span>,</span><br><span class="line">      redirect: <span class="string">'/index1'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/index1'</span>,</span><br><span class="line">      name: <span class="string">'Index1'</span>,</span><br><span class="line">      component: Index1</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/index2'</span>,</span><br><span class="line">      name: <span class="string">'Index2'</span>,</span><br><span class="line">      component: Index2</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/index3'</span>,</span><br><span class="line">      name: <span class="string">'Index3'</span>,</span><br><span class="line">      component: Index3</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default router</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在 <code>router/index</code> 中，通过  <code>router.beforeEach()</code> 路由拦截去进行权限判断：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">router.beforeEach((to, from, next) =&gt; &#123;</span><br><span class="line">  // to: 从哪个路由来</span><br><span class="line">  // from: 去哪个路由</span><br><span class="line">  // next：是一个方法，使用路由拦截，必须在后面添加next()，否则路由无法跳转</span><br><span class="line"></span><br><span class="line">  // 假设我们从后台获取的权限为：</span><br><span class="line">  const list = [<span class="string">'index1'</span>, <span class="string">'index2'</span>]</span><br><span class="line"></span><br><span class="line">  // 如果没有匹配到，证明没有权限</span><br><span class="line">  <span class="keyword">if</span> (list.indexOf(to.name) === -1) &#123;</span><br><span class="line">    // next(<span class="string">'/login'</span>);</span><br><span class="line"></span><br><span class="line">    ... //或者执行其他操作</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  //路由拦截可根据项目返回的权限自行调整，这里只是做了一个简单的例子</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>这种方式我个人是觉得比较low的。不是很推荐看官们使用，当然，如果是业务没那么复杂的，这种方式其实也够用了。</p>
+          </div>
+
+<h3 id="动态路由"><a href="#动态路由" class="headerlink" title="动态路由"></a>动态路由</h3><blockquote>
+<p>假设我们在登录的时候，后端返回的权限列表如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// leaf: 是我们用来判断是否唯一的</span><br><span class="line">// component：一般来说后端返回给我们的就是一个路径而已，所以我们需要自行的去加载组件</span><br><span class="line"><span class="built_in">export</span> const routers = [</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/main'</span>,</span><br><span class="line">    name: <span class="string">'main'</span>,</span><br><span class="line">    leaf: <span class="literal">false</span>,</span><br><span class="line">    component: <span class="string">'pages/main'</span>,</span><br><span class="line">    children: [</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index1'</span>,</span><br><span class="line">        name: <span class="string">'index1'</span>,</span><br><span class="line">        component: <span class="string">'pages/index1'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index2'</span>,</span><br><span class="line">        name: <span class="string">'index2'</span>,</span><br><span class="line">        component: <span class="string">'pages/index2'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index3'</span>,</span><br><span class="line">        name: <span class="string">'index3'</span>,</span><br><span class="line">        component: <span class="string">'pages/index3'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index4'</span>,</span><br><span class="line">        name: <span class="string">'index4'</span>,</span><br><span class="line">        component: <span class="string">'pages/index4'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'*'</span>,</span><br><span class="line">    component: <span class="string">'pages/noFind'</span>,</span><br><span class="line">    leaf: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>因为后端返回的 <code>component</code> 一般是个字符串，所以我们需要写个方法解析一下路径。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param routers 初始数据，为数组格式，一般来说是个空数组</span><br><span class="line"> * @param data 后端返回的路由列表数据</span><br><span class="line"> */</span><br><span class="line"><span class="keyword">function</span> generaMenu(routers, data) &#123;</span><br><span class="line">  data.forEach((item)=&gt;&#123;</span><br><span class="line">    <span class="built_in">let</span> menu = Object.assign(&#123;&#125;,item)</span><br><span class="line">    menu.component = import(`@/<span class="variable">$&#123;menu.component&#125;</span>.vue`)</span><br><span class="line">    <span class="keyword">if</span>(!item.leaf) &#123;</span><br><span class="line">      menu.children = []</span><br><span class="line">      generaMenu(menu.children,item.children)</span><br><span class="line">      menu.redirect = menu.children[0].path // 如果需要重定向的话，可以根据自己的需求进行选择</span><br><span class="line">    &#125;</span><br><span class="line">    routers.push(menu)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div class="note warning">
+            <p>注意：如果有用到404的路由话，需要把404这个路由放到整个路由表的最后一个，否则，因为一开始我们是没有对应的动态路由，默认就跳转到了404页面了，所以静态路由表不配置404路由，与动态路由一起注入到路由表中。</p>
+          </div>
+
+<blockquote>
+<p>这样我们最终就得到了符合路由规则的路由表了。然后通过 <code>addRoutes()</code> 这个方法把路由给注入到路由表里面</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">this.<span class="variable">$route</span>.addRoutes(data)</span><br></pre></td></tr></table></figure>
+
+<div class="note warning">
+            <p>注意：因为使用了 <code>addRoutes()</code> 这个方法之后，路由表已经可以认为是不可控的了，也就是说，已经注入的路由，没办法在通过官方给的api删除掉(当然，目前官方也没有提供相应的api)。那当我们A帐号退出之后，B帐号登录进来，也会执行 <code>addRoutes()</code> 这个方法，会一直累加上去，然后控制台上也会有警告，出现了重复的路由，然后我们访问A帐号有，B帐号没有的路由时，发现是可以进行访问的。这显然不符合我们的需求。</p>
+          </div>
+
+<blockquote>
+<p>那么，我们该如何解决这个问题呢？</p>
+</blockquote>
+<ul>
+<li>一种是在用户退出的时候，进行项目的重载：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">location.href = <span class="string">'/'</span> //这种相对来说体验就非常差了，相当于重新刷新了页面，显然也是不符合我们的需求</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>还有一种就是重新初始化静态路由表： 首先，我们要对 <code>router/index</code> 进行改造一下：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const createRouter = () =&gt; new Router(&#123;</span><br><span class="line">  routes: [</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/'</span>,</span><br><span class="line">      redirect: <span class="string">'/login'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/login'</span>,</span><br><span class="line">      name: <span class="string">'login'</span>,</span><br><span class="line">      component: Login</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">const router = createRouter()</span><br><span class="line"></span><br><span class="line">//重新实例化一个新的路由表，替换之前的路由表，然后将这个方法导出</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> <span class="function"><span class="title">resetRouter</span></span>() &#123;</span><br><span class="line">  const newRouter = createRouter()</span><br><span class="line">  router.matcher = newRouter.matcher // the relevant part</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>然后，我们在用户退出的时候，重新执行下 <code>resetRouter()</code> 这个方法就可以重新初始化静态路由表，同时也发现B账号进来之后，只能访问对应的路由权限而已。A账号的权限路由已经不存在了。</p>
+</blockquote>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>以上就是我对路由权限的一点理解，如果看官们有更好的方案可以评论留言交流一下。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>vue</category>
+      </categories>
+      <tags>
+        <tag>vue</tag>
+        <tag>router</tag>
+        <tag>动态路由</tag>
+        <tag>路由权限</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>git创建分支并提交远程分支的步骤</title>
     <url>/git%E5%88%9B%E5%BB%BA%E5%88%86%E6%94%AF%E5%B9%B6%E6%8F%90%E4%BA%A4%E8%BF%9C%E7%A8%8B%E5%88%86%E6%94%AF%E7%9A%84%E6%AD%A5%E9%AA%A4/</url>
     <content><![CDATA[<blockquote>
@@ -234,8 +455,6 @@
 <h2 id="添加本地修改"><a href="#添加本地修改" class="headerlink" title="添加本地修改"></a>添加本地修改</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git add .</span><br></pre></td></tr></table></figure>
 
 <h2 id="commit修改"><a href="#commit修改" class="headerlink" title="commit修改"></a>commit修改</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git commit -m <span class="string">'XXXX'</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="当前分支关联远程分支"><a href="#当前分支关联远程分支" class="headerlink" title="当前分支关联远程分支"></a>当前分支关联远程分支</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git push --<span class="built_in">set</span>-upstream origin newbranch</span><br></pre></td></tr></table></figure>
 
 <h2 id="切换到主分支"><a href="#切换到主分支" class="headerlink" title="切换到主分支"></a>切换到主分支</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git checkout master</span><br></pre></td></tr></table></figure>
 
