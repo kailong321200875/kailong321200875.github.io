@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="baidu-site-verification" content="5pQM9dB1uO" />
+<meta name="google-site-verification" content="dY4Uxh6geXuXnQR_3mASUgoRCnXG4gmKcISzY0_3vNM" />
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chenkl.vip","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在vue项目中，我们通常使用axios与后台进行数据交互，axios是一款基于promise封装的库，可以运行在浏览器端和node环境中。它有很多优秀的特性，例如拦截请求和响应、取消请求、转换json、客户端防御XSRF等。所以vue官方开发组放弃了对其官方库vue-resource的维护，直接推荐我们使用axios库。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="如何基于axios实现请求拦截器">
+<meta property="og:url" content="https://www.chenkl.vip/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8Eaxios%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E6%8B%A6%E6%88%AA%E5%99%A8/index.html">
+<meta property="og:site_name" content="小小前端搬运工">
+<meta property="og:description" content="在vue项目中，我们通常使用axios与后台进行数据交互，axios是一款基于promise封装的库，可以运行在浏览器端和node环境中。它有很多优秀的特性，例如拦截请求和响应、取消请求、转换json、客户端防御XSRF等。所以vue官方开发组放弃了对其官方库vue-resource的维护，直接推荐我们使用axios库。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-04-20T08:41:02.000Z">
+<meta property="article:modified_time" content="2020-07-25T07:19:35.458Z">
+<meta property="article:author" content="Archer">
+<meta property="article:tag" content="axios请求">
+<meta property="article:tag" content="axios二次封装">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chenkl.vip/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8Eaxios%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E6%8B%A6%E6%88%AA%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>如何基于axios实现请求拦截器 | 小小前端搬运工</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="小小前端搬运工" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小小前端搬运工</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">40</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">22</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.chenkl.vip/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8Eaxios%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E6%8B%A6%E6%88%AA%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Archer">
+      <meta itemprop="description" content="种一棵树最好的时间是十年前，其次就是现在。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小小前端搬运工">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          如何基于axios实现请求拦截器
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-04-20 08:41:02" itemprop="dateCreated datePublished" datetime="2019-04-20T08:41:02Z">2019-04-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/axios/" itemprop="url" rel="index"><span itemprop="name">axios</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>在vue项目中，我们通常使用<code>axios</code>与后台进行数据交互，<code>axios</code>是一款基于promise封装的库，可以运行在浏览器端和node环境中。它有很多优秀的特性，例如拦截请求和响应、取消请求、转换json、客户端防御XSRF等。所以vue官方开发组放弃了对其官方库<code>vue-resource</code>的维护，直接推荐我们使用<code>axios</code>库。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>页面发送<code>http</code>请求，很多情况我们要对请求和其响应进行特定的处理；例如每个请求都附带后端返回的<code>token</code>，以及对返回的结果进行统一拦截处理等。如果请求数非常多，这样处理起来会非常的麻烦，程序的优雅性也会大打折扣。在这种情况下，<code>axios</code>为开发者提供了这样一个API：拦截器。拦截器分为<code>请求（request）拦截器</code>和<code>响应（response）拦截器</code>。</p>
+</blockquote>
+<h2 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h2><blockquote>
+<p>我们需要在src底下新建一个名为<code>api</code>的文件夹，里面就是放置一些<code>axios</code>的配置和<code>请求api</code>，具体结构如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">├── src                        </span><br><span class="line">│   ├── api                    <span class="comment"># axios配置及api请求</span></span><br><span class="line">│   │   ├── modules            <span class="comment"># 模块化的api请求</span></span><br><span class="line">│   │   │   ├── common.js      <span class="comment"># 对应每个模块的api请求，这里只是一个实例，可根据实际情况自行改造。</span></span><br><span class="line">│   │   ├── methods.js         <span class="comment"># 封装axios请求</span></span><br><span class="line">│   │   ├── index.js           <span class="comment"># 对外抛的方法</span></span><br><span class="line">│   │   ├── request.js         <span class="comment"># axios配置</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="request-js"><a href="#request-js" class="headerlink" title="request.js"></a>request.js</h2><blockquote>
+<p>首先，我们需要在<code>request.js</code>创建一个<code>axios</code>实例，并且实现<code>请求（request）拦截器</code>和<code>响应（response）拦截器</code>。具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">import axios from <span class="string">'axios'</span> // 引入axios插件</span><br><span class="line">import qs from <span class="string">'qs'</span> // 引入qs进行序列化</span><br><span class="line"></span><br><span class="line">// 创建axios实例</span><br><span class="line">const service = axios.create(&#123;</span><br><span class="line">  baseURL: <span class="string">'http://xxx.xxx.xxx.xxx'</span>, // api 的 请求前缀</span><br><span class="line">  timeout: 30000 // 请求超时时间</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// request 拦截器 -- 请求之前</span><br><span class="line">service.interceptors.request.use(</span><br><span class="line">  config =&gt; &#123;</span><br><span class="line">    // Do something</span><br><span class="line">    // 如：添加token，参数序列化操作。</span><br><span class="line">    </span><br><span class="line">    config.headers[<span class="string">'token'</span>] = <span class="string">'xxxxxx'</span></span><br><span class="line">    <span class="keyword">if</span> (config.method === <span class="string">'post'</span> &amp;&amp; config.headers[<span class="string">'Content-Type'</span>] === <span class="string">'application/x-www-form-urlencoded'</span>) &#123;</span><br><span class="line">      config.data = qs.stringify(config.data)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> config</span><br><span class="line">  &#125;,</span><br><span class="line">  error =&gt; &#123;</span><br><span class="line">    // Do something with request error</span><br><span class="line">    console.log(error) // <span class="keyword">for</span> debug</span><br><span class="line">    Promise.reject(error)</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// response 拦截器 -- 请求之后</span><br><span class="line">service.interceptors.response.use(</span><br><span class="line">  response =&gt; &#123;</span><br><span class="line">    // Do something</span><br><span class="line">    // 如 状态码为 0 的时候，<span class="built_in">return</span> 请求结果</span><br><span class="line">    <span class="keyword">if</span> (response.data.code === 0) &#123;</span><br><span class="line">      <span class="built_in">return</span> response.data</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  error =&gt; &#123;</span><br><span class="line">    console.log(<span class="string">'err'</span> + error) // <span class="keyword">for</span> debug</span><br><span class="line">    <span class="built_in">return</span> Promise.reject(error)</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// 抛出axios实例</span><br><span class="line"><span class="built_in">export</span> default service</span><br></pre></td></tr></table></figure>
+
+<h2 id="methods-js"><a href="#methods-js" class="headerlink" title="methods.js"></a>methods.js</h2><blockquote>
+<p>之后，我们需要在<code>methods.js</code>使用<code>request.js</code>中抛出的实例，进行请求的二次封装，具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">import request from <span class="string">'./request'</span></span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @param &#123;Object&#125; params 需要请求携带的参数</span><br><span class="line"> * @param &#123;String&#125; url 请求的接口地址</span><br><span class="line"> */</span><br><span class="line"><span class="keyword">function</span> get(params, url) &#123;</span><br><span class="line">  <span class="built_in">return</span> request(&#123;</span><br><span class="line">    url: url +`?timestamp=<span class="variable">$&#123;new Date().getTime()&#125;</span>`, // 处理IE请求缓存的问题。</span><br><span class="line">    method: <span class="string">'get'</span>,</span><br><span class="line">    params</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @param &#123;Object&#125; params 需要请求携带的参数</span><br><span class="line"> * @param &#123;String&#125; url 请求的接口地址</span><br><span class="line"> * @param &#123;String&#125; headersType 请求类型</span><br><span class="line"> * @param &#123;String&#125; responseType 请求返回结果类型</span><br><span class="line"> */</span><br><span class="line"><span class="keyword">function</span> post(params, url, headersType, responseType) &#123;</span><br><span class="line">  <span class="built_in">return</span> request(&#123;</span><br><span class="line">    url: url +`?timestamp=<span class="variable">$&#123;new Date().getTime()&#125;</span>`, // 处理IE请求缓存的问题。</span><br><span class="line">    method: <span class="string">'post'</span>,</span><br><span class="line">    data: params,</span><br><span class="line">    responseType: responseType,</span><br><span class="line">    headers: &#123;</span><br><span class="line">      <span class="string">'Content-Type'</span>: headersType || <span class="string">'application/x-www-form-urlencoded'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 对外抛出方法</span><br><span class="line"><span class="built_in">export</span> &#123;</span><br><span class="line">  get,</span><br><span class="line">  post</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="接口api规范化管理"><a href="#接口api规范化管理" class="headerlink" title="接口api规范化管理"></a>接口api规范化管理</h2><blockquote>
+<p>在中大型项目中，我们需要涉及到的接口可是说是非常多的，那么如何把接口给管理起来，就是我们前端的必经之路了，以下是我自认为比较有效管理的一种方法，有兴趣的看官可以借鉴。</p>
+</blockquote>
+<blockquote>
+<p>我们可以根据项目的模块来创建管理 api请求接口 ，如，我们有个用户管理模块，那么我们可以在<code>api/modules/</code>底下，新建一个<code>user.js</code>文件，里面具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">import &#123; get, post &#125; from <span class="string">'../axios'</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  getUserList: <span class="keyword">function</span>(params) &#123;</span><br><span class="line">    <span class="built_in">return</span> get(params, <span class="string">'/rat/api/client/list'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  setUserInfo: <span class="keyword">function</span>(params) &#123;</span><br><span class="line">    <span class="built_in">return</span> post(params, <span class="string">'/rat/api/modelPrice/update'</span>, <span class="string">'application/json'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="对外抛出api请求"><a href="#对外抛出api请求" class="headerlink" title="对外抛出api请求"></a>对外抛出api请求</h2><blockquote>
+<p>上述几个文件创建完之后，基本上就算大功告成了，接下来就是如何使用的问题了，我们还有一个<code>index.js</code>未使用，他的具体用法就是对外抛出所有的<code>api</code>请求，具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 有兴趣的看官可以自行百度一下 require.context 的用法，这里不做过多的阐述。</span><br><span class="line">const modulesFiles = require.context(<span class="string">'./modules'</span>, <span class="literal">true</span>, /\.js$/)</span><br><span class="line"></span><br><span class="line">const modules = modulesFiles.keys().reduce((modules, modulePath) =&gt; &#123;</span><br><span class="line">  const moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, <span class="string">'$1'</span>)</span><br><span class="line">  const value = modulesFiles(modulePath)</span><br><span class="line">  modules[moduleName] = value.default</span><br><span class="line">  <span class="built_in">return</span> modules</span><br><span class="line">&#125;, &#123;&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  ...modules</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><blockquote>
+<p>我们可以把所有请求全部挂在到<code>Vue.prototype</code>底下，便于全局使用，也可以局部引入，这里主要介绍全局使用的方法：</p>
+</blockquote>
+<blockquote>
+<p>在入口文件<code>main.js</code>中引入：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import api from <span class="string">'@/api'</span> // 引入api</span><br><span class="line">Vue.prototype.<span class="variable">$api</span> = api</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>之后，我们就可以愉快的进行使用了，完整的使用例子如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 获取列表数据</span><br><span class="line">async <span class="function"><span class="title">getUserList</span></span>() &#123;</span><br><span class="line">  try &#123;</span><br><span class="line">    const res = await this.<span class="variable">$api</span>.user.getUserList(&#123;</span><br><span class="line">      pageNum: 1,</span><br><span class="line">      pageSize: 10</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">if</span> (res.data) &#123;</span><br><span class="line">      Do something</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; catch (err) &#123;</span><br><span class="line">    console.log(err)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">
+            <p>在日常开发中，一个api请求的规范化管理，可以很好的体现出整个项目组的水平，各位看官们，有兴趣的话可以在自己的项目中进行实践推广起来。</p>
+          </div>
+    </div>
+
+    <div>
+      
+        <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:20px;">------------- 本 文 结 束 <i class="fa fa-paw"></i> 感 谢 您 的 阅 读 -------------</div>
+  
+</div>
+      
+    </div>
+    
+    
+    
+    
+        <div class="reward-container">
+  <div>只是为了好玩罢了~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Archer 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Archer 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Archer
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.chenkl.vip/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8Eaxios%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E6%8B%A6%E6%88%AA%E5%99%A8/" title="如何基于axios实现请求拦截器">https://www.chenkl.vip/如何基于axios实现请求拦截器/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/axios%E8%AF%B7%E6%B1%82/" rel="tag"><i class="fa fa-tag"></i> axios请求</a>
+              <a href="/tags/axios%E4%BA%8C%E6%AC%A1%E5%B0%81%E8%A3%85/" rel="tag"><i class="fa fa-tag"></i> axios二次封装</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/npm%E5%A6%82%E4%BD%95%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8F%92%E4%BB%B6/" rel="prev" title="npm如何上传自定义插件">
+      <i class="fa fa-chevron-left"></i> npm如何上传自定义插件
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E6%95%B4%E7%90%86%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E7%B1%BB%E6%96%B9%E6%B3%95/" rel="next" title="整理的一些常用工具类方法">
+      整理的一些常用工具类方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件结构"><span class="nav-number">2.</span> <span class="nav-text">文件结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#request-js"><span class="nav-number">3.</span> <span class="nav-text">request.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#methods-js"><span class="nav-number">4.</span> <span class="nav-text">methods.js</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#接口api规范化管理"><span class="nav-number">5.</span> <span class="nav-text">接口api规范化管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对外抛出api请求"><span class="nav-number">6.</span> <span class="nav-text">对外抛出api请求</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">7.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">8.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Archer"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Archer</p>
+  <div class="site-description" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kailong321200875" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kailong321200875" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:502431556@qq.com" title="E-Mail → mailto:502431556@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/meng-shou-kong-cheng-43/activities" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;meng-shou-kong-cheng-43&#x2F;activities" rel="noopener" target="_blank"><i class="fa fa-fw fa-ioxhost"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-fas fa-heartbeat"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Archer</span>
+  <span class="post-meta-divider">|</span>
+  <span class="post-meta-item-icon">
+    <i class="fa fa-area-chart"></i>
+  </span>
+  <span class="post-count">站点总字数：23.7k字</span>
+</div>
+  
+  
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      访客数<span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>人次
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      总访问量<span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>次
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'e6f2f10abe388d591867',
+      clientSecret: '580aea9e3da136ac529a71232367d1fdf3591926',
+      repo        : 'blogTalk',
+      owner       : 'kailong321200875',
+      admin       : ['kailong321200875'],
+      id          : '65f48a1b855a30ce0199996e638ff7cf',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
+
+<!-- 页面鼠标点击样式 -->
+
+  
+    <script src="/js/src/fireworks.js"></script>
+  
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/kailong321200875/live2d-widget@1.0.1/autoload.js"></script>
+

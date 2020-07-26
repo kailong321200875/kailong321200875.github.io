@@ -1,6 +1,863 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>前端基础进阶学习(七)--this</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%83)--this/</url>
+    <content><![CDATA[<blockquote>
+<p>我们在学习js的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于<code>this</code>指向理解中，有一种说法：谁调用它，<code>this</code>就指向谁。</p>
+</blockquote>
+<a id="more"></a>
+
+<blockquote>
+<p>我们回顾一下执行上下文</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png" alt=""></p>
+<blockquote>
+<p>执行上下文的创建阶段，会分别生成变量对象，建立作用于，确定<code>this</code>指向。其中变量对象与作用于链我们都已经明白了。本文的关键，就是确定<code>this</code>指向。</p>
+</blockquote>
+<blockquote>
+<p>首先，我们需要得出一个非常重要的，并且一定要牢记于心的结论，<code>this的指向，是在函数被调用的时候确定的</code>。也就是执行上下文被创建时确定的。</p>
+</blockquote>
+<blockquote>
+<p>因此，一个函数中的<code>this</code>指向，可以非常灵活。比如下面的例子中，同一个函数由于调用的方式不同，<code>this</code>指向了不一样的对象。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a = 10</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn() // 10</span><br><span class="line">fn.call(obj) // 20</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>除此之外，<code>在函数执行过程中，this一旦被确定，就不可更改了。</code></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a = 10</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  this = obj // 这句话试图修改this，运行后会报错</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+
+<h2 id="全局对象中的this"><a href="#全局对象中的this" class="headerlink" title="全局对象中的this"></a>全局对象中的this</h2><blockquote>
+<p>关于全局对象的<code>this</code>，它是一个比较特殊的存在。全局环境中的<code>this</code>，指向它本身。因此，这也相对简单，没有那么多复杂的情况需要考虑。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 通过this绑定到全局对象</span><br><span class="line">this.a2 = 20</span><br><span class="line"></span><br><span class="line">// 通过声明绑定到变量对象，但在全局环境中，变量对象就是它自身</span><br><span class="line">// var a1 = 10</span><br><span class="line"></span><br><span class="line">// 仅仅只有赋值操作，标识符会隐式绑定到全局对象</span><br><span class="line">a3 = 10</span><br><span class="line"></span><br><span class="line">// 输出结果会全部符合预期</span><br><span class="line">console.log(a1)</span><br><span class="line">console.log(a2)</span><br><span class="line">console.log(a3)</span><br></pre></td></tr></table></figure>
+
+<h2 id="函数中的this"><a href="#函数中的this" class="headerlink" title="函数中的this"></a>函数中的this</h2><blockquote>
+<p>我们有必要通过一些奇怪的例子，来感受一下函数中<code>this</code>的捉摸不定。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo01</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo02</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    console.log(this.a)</span><br><span class="line">  &#125;</span><br><span class="line">  foo()</span><br><span class="line">&#125;</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo03</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  c: this.a + 20,</span><br><span class="line">  fn: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.a</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(obj.c)</span><br><span class="line">console.log(obj.fn())</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>分析之前，我们直接了当抛出结论</p>
+</blockquote>
+<blockquote>
+<p>在一个函数上下文中，<code>this</code>由调用者提供，由调用函数的方式来决定。<code>如果调用者函数，被一个对象用有，那么该函数在调用时，内部的this指向该对象。如果函数独立调用，那么该函数内部的this，则指向undefined</code>。但在非严格模式中，当<code>this</code>指向<code>undefined</code>时，它会被自动指向全局对象。</p>
+</blockquote>
+<blockquote>
+<p>想要准确确定<code>this</code>指向，找到函数的调用者以及区分他是否是独立调用十分关键。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 为了能够准确判定，我们在函数内部使用严格模式，因为非严格模式会自动指向全局</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  <span class="string">'use strict'</span></span><br><span class="line">  console.log(this)</span><br><span class="line">&#125;</span><br><span class="line">fn() // fn 是调用者，独立调用</span><br><span class="line">window.fn() // fn是调用者，被window所拥有</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上面的简单例子中，<code>fn()</code>作为独立调用者，按照定义的理解，它内部的<code>this</code>指向就是<code>undefined</code>。而<code>window.fn()</code>则因为<code>fn</code>被<code>window</code>所拥有，内部的<code>this</code>就指向了<code>window</code>对象。</p>
+</blockquote>
+<blockquote>
+<p>掌握了这个规则，现在回过头去看看上面的三个例子，通过添加/去除严格模式，你就会发现，原来<code>this</code>已经变得不那么虚无缥缈了。</p>
+</blockquote>
+<blockquote>
+<p>但是我们需要特别注意的是<code>demo03</code>，在里面，对象obj中的c属性使用<code>this.a + 20</code>来计算。这里我们需要明确的一点是，单独的{}不会行程新的作用域，因此这里的<code>this.a</code>，由于并没有作用域的限制，它仍然处于全局作用域中，所以这里的<code>this</code>其实是指向的<code>window对象</code>。</p>
+</blockquote>
+<blockquote>
+<p>那么我们修改一下<code>demo03</code>的代码</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="string">'use strict'</span>;</span><br><span class="line">var a = 20</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">  var a = 1</span><br><span class="line">  var obj = &#123;</span><br><span class="line">    a: 10,</span><br><span class="line">    c: this.a + 20,</span><br><span class="line">    fn: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      <span class="built_in">return</span> this.a</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> obj.c</span><br><span class="line">&#125;</span><br><span class="line">console.log(foo()) // ?</span><br><span class="line">console.log(window.foo()) // ?</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们可以在浏览器中看到，控制台直接报错。</p>
+</blockquote>
+<div class="note warning">
+            <p>实际开发中，并不推荐这样使用this</p><p>上面多次提到的严格模式，需要大家认真对象，因为实际开发中，现在基本上已经全部采用严格模式了，而最新的ES6，也是默认支持严格模式的。</p>
+          </div>
+
+<blockquote>
+<p>再来看一些容易理解错误的例子，加深一下对调用者与是否独立运行的理解。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a = 20</span><br><span class="line">var foo = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.a</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(foo.getA()) // 10</span><br><span class="line"></span><br><span class="line">var <span class="built_in">test</span> = foo.getA</span><br><span class="line">console.log(<span class="built_in">test</span>()) // 20</span><br></pre></td></tr></table></figure>
+
+<p><code>foo.getA()</code>中，<code>getA</code>是调用者，他不是独立调用，被对象<code>foo</code>所拥有，因此它的<code>this</code>指向了<code>foo</code>。而<code>test()</code>作为调用者，尽管它与<code>foo.getA</code>的引用相同，但它是独立调用的，因此<code>this</code>指向<code>undefined</code>，在非严格模式下，自动转向全局<code>window</code>。</p>
+<blockquote>
+<p>稍微修改一下代码</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a = 20</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">getA</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.a</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var foo = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  getA: getA</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(foo.getA()) // 10</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>再来一个例子</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> active(fn) &#123;</span><br><span class="line">  fn() // 真实调用者，为独立调用</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  getA: foo</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">active(obj.getA) // 20</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用call，apply显示指定this"><a href="#使用call，apply显示指定this" class="headerlink" title="使用call，apply显示指定this"></a>使用call，apply显示指定this</h2><blockquote>
+<p>js内部提供了一种机制，让我们可以自行手动设置<code>this</code>的指向。它们就是<code>call</code>与<code>apply</code>。所有的函数都具有这两个方法。它们除了参数略有不同之外，其功能完全一样。它们的第一个参数都为<code>this</code>将要指向的对象。</p>
+</blockquote>
+<blockquote>
+<p>如下例子所示。<code>fn</code>并非属于对象<code>obj</code>的方法，但是通过<code>call</code>，我们将<code>fn</code>内部的<code>this</code>绑定为<code>obj</code>，因此就可以使用<code>this.a</code>访问<code>obj</code>的a属性。这就是<code>call/apply</code>的用法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  console.log(this.a) // 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn.call(obj)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>call</code>与<code>apply</code>后面的参数，都是向将要执行的函数传递参数。其中<code>call</code>以一个一个的形式传递，<code>apply</code>以数组的形式传递。这是他们唯一的不同。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> fn(num1, num2) &#123;</span><br><span class="line">  console.log(this.a + num1 + num2)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn.call(obj, 100, 10) // 130</span><br><span class="line">fn.apply(obj, [20, 10]) // 50</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因为<code>call/apply</code>的存在，js变得更加灵活。也因此他们的使用场景就多种多样。</p>
+</blockquote>
+<h3 id="将类数组对象转为数组"><a href="#将类数组对象转为数组" class="headerlink" title="将类数组对象转为数组"></a>将类数组对象转为数组</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> exam(a, b, c, d, e) &#123;</span><br><span class="line">  // 先看看函数的自带属性 arguments 什么是样子的</span><br><span class="line">  console.log(arguments)</span><br><span class="line">  </span><br><span class="line">  // 使用call/apply将arguments转为数组，返回结果为数组，arguments自身不会改变</span><br><span class="line">  var arg = [].slice.call(arguments)</span><br><span class="line">  </span><br><span class="line">  console.log(arg)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">exam(2, 8, 9, 10, 3)</span><br><span class="line"></span><br><span class="line">/ result:</span><br><span class="line">// &#123; <span class="string">'0'</span>: 2, <span class="string">'1'</span>: 8, <span class="string">'2'</span>: 9, <span class="string">'3'</span>: 10, <span class="string">'4'</span>: 3 &#125;</span><br><span class="line">// [ 2, 8, 9, 10, 3 ]</span><br><span class="line"></span><br><span class="line">// 也常常使用该方法将DOM中的nodelist转换为数组</span><br><span class="line">// [].slice.call(document.getElementsByTagName(<span class="string">'li'</span>))</span><br></pre></td></tr></table></figure>
+
+<h3 id="根据自己的需要灵活修改this指向"><a href="#根据自己的需要灵活修改this指向" class="headerlink" title="根据自己的需要灵活修改this指向"></a>根据自己的需要灵活修改this指向</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var foo = &#123;</span><br><span class="line">  name: <span class="string">'haha'</span>,</span><br><span class="line">  showName: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(this.name)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var bar = &#123;</span><br><span class="line">  name: <span class="string">'hehe'</span></span><br><span class="line">&#125;</span><br><span class="line">foo.showName.call(bar)</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现继承"><a href="#实现继承" class="headerlink" title="实现继承"></a>实现继承</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 定义父级的构造函数</span><br><span class="line">var Person = <span class="keyword">function</span>(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">  this.gender = [<span class="string">'man'</span>, <span class="string">'woman'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 定义子类的构造函数</span><br><span class="line">var Student = <span class="keyword">function</span>(name, age, high) &#123;</span><br><span class="line">  // use call</span><br><span class="line">  Person.call(this, name, age)</span><br><span class="line">  this.high = high</span><br><span class="line">&#125;</span><br><span class="line">Student.prototype.message = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'name:'</span> + this.name + <span class="string">', age:'</span> + this.age + <span class="string">', high:'</span> + this.high + <span class="string">', gender:'</span> + this.gender[0] + <span class="string">';'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">new Student(<span class="string">'xiaoming'</span>, 12, <span class="string">'180cm'</span>).message() // name:xiaoming, age:12, high:180cm, gender:man;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在向其他执行上下文的传递中，确保this的指向保持不变"><a href="#在向其他执行上下文的传递中，确保this的指向保持不变" class="headerlink" title="在向其他执行上下文的传递中，确保this的指向保持不变"></a>在向其他执行上下文的传递中，确保this的指向保持不变</h3><blockquote>
+<p>如下面例子中，我们期待的是getA被obj调用时，this指向obj，但是由于匿名函数的存在导致了this指向的丢失，在这个匿名函数中this指向了全局，因此我们需要想一些办法找回正确的this指向。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      console.log(this.a)</span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.getA()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>常规的解决办法很简单，就是使用一个变量，将this的引用保存起来。我们常常会用到这个办法，但是我们也要借助上面将到的只是，来判断this是否是在传递中被修改了，如果没有被修改，就没有必要这样使用了。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">    var self = this</span><br><span class="line">    setTimeout(<span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      console.log(self.a)</span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>另外就是借助闭包与apply方法，封装一个bind方法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="built_in">bind</span>(fn, obj) &#123;</span><br><span class="line">  <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> fn.apply(obj, arguments)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">    setTimeout(<span class="built_in">bind</span>(<span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      console.log(this.a)</span><br><span class="line">    &#125;, this), 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.getA()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当然，也可以使用ES5中已经自带的bind方法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      console.log(this.a)</span><br><span class="line">    &#125;.<span class="built_in">bind</span>(this), 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>ES6中也常常使用箭头函数的方式来替代这种方案</p>
+          </div>
+
+<h2 id="构造函数与原型方法上的this"><a href="#构造函数与原型方法上的this" class="headerlink" title="构造函数与原型方法上的this"></a>构造函数与原型方法上的this</h2><blockquote>
+<p>在封装对象的时候，我们几乎都会用到this，但是，只有少数人搞明白了在这个过程中的this指向，就算我们理解了原型，也不一定理解到了this。</p>
+</blockquote>
+<blockquote>
+<p>结合下面的例子，几个问题可以思考下。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  // 这里的this指向了谁</span><br><span class="line">  console.log(this)</span><br><span class="line">  </span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  // 这里的this又指向了谁</span><br><span class="line">  console.log(this)</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 上面的2个this，是同一个吗，他们是否指向了原型对象</span><br><span class="line"></span><br><span class="line">var p1 = new Person(<span class="string">'哈哈'</span>, 20)</span><br><span class="line">p1.getName()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们已经知道this是在函数调用过程中确定的，因此，搞明白了new的过程中到底发生了什么就变得十分重要</p>
+</blockquote>
+<blockquote>
+<p>通过new操作符调用构造函数，会经历以下4个阶段</p>
+</blockquote>
+<ol>
+<li>创建一个新的对象</li>
+<li>将构造函数的this指向这个新对象</li>
+<li>指向构造函数的代码，为这个对象添加属性，方法等</li>
+<li>返回新对象</li>
+</ol>
+<blockquote>
+<p>因此，当new操作符调用构造函数时，this其实指向的是这个新创建的对象，最后又将这个对象返回出来，被实例对象p1接收。因此，我们可以说，这个时候，构造函数的this，指向了新的实例对象：p1。</p>
+</blockquote>
+<blockquote>
+<p>而原型上的this就好理解多了，根据上边对函数中this的定义，p1.getName()中的getName为调用者，它被p1所拥有，因此getName中的this，也是指向了p1。</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><blockquote>
+<p>this的指向是非常重要的，不管是在实际开发中还是面试中，出现的概率都是非常高的。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>this</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端基础进阶学习(六)--setTimeout与循环闭包</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%85%AD)--setTimeout%E4%B8%8E%E5%BE%AA%E7%8E%AF%E9%97%AD%E5%8C%85/</url>
+    <content><![CDATA[<blockquote>
+<p>初学<code>setTimeout</code>，我们很容易知道<code>setTimeout</code>有两个参数，第一个参数为一个函数，我们通过该函数定义将要执行的操作。第二个参数为一个时间毫秒数，标识延迟执行的时间。</p>
+</blockquote>
+<a id="more"></a>
+
+<blockquote>
+<p>每一个<code>setTimeout</code>在执行的时候，会返回一个唯一的ID，我们在使用时，常常会使用一个变量讲这个唯一ID保存起来，用以传入<code>clearTimeout</code>来清除定时器。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var timer = setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'setTimeout actions'</span>)</span><br><span class="line">&#125;, 0)</span><br><span class="line"></span><br><span class="line">console.log(<span class="string">'other actions'</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>思考一下，当<code>setTimeout</code>的延迟时间设置为0时，上面的执行顺序会是什么？</p>
+</blockquote>
+<blockquote>
+<p>在浏览器中的console中运行我们很快就能够知道答案。在这里，将会介绍另外一个特殊的<code>队列</code>结构，页面中所有由<code>setTimeout</code>定义的操作，都讲放在同一个队列中一次执行。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200726101242.png" alt=""></p>
+<blockquote>
+<p>而这个队列执行的时间，需要等待到函数调用栈清空之后才执行，即所有可执行代码执行完毕之后，才会开始执行由<code>setTimeout</code>定义的操作。而这些操作进入队列的顺序，则有设定的延迟时间来决定。</p>
+</blockquote>
+<blockquote>
+<p>因此在上面的例子中，即使我们将延迟时间设置为0，它定义的操作仍然需要等待所有代码执行完毕之后才开始执行。这里的延迟时间，并非相对于<code>setTimeout</code>执行这一刻，而是相对于其他代码执行完毕这一刻。所以上面的例子执行结果就非常容易理解了。</p>
+</blockquote>
+<blockquote>
+<p>我们在来看一下一个复杂的例子。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(0)</span><br><span class="line">&#125;, 0)</span><br><span class="line"></span><br><span class="line">var a = 10</span><br><span class="line"></span><br><span class="line">console.log(b)</span><br><span class="line">console.log(fn)</span><br><span class="line"></span><br><span class="line">var b = 20</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'setTimeout 10ms'</span>)</span><br><span class="line">  &#125;, 10)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn.toString = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> 30</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'setTimeout 20ms'</span>)</span><br><span class="line">&#125;, 20)</span><br><span class="line"></span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>执行结果如图所示</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200726102702.png" alt=""></p>
+<blockquote>
+<p>关于<code>setTimeout</code>就暂时介绍到这里，我们可以来看看循环闭包的思考题。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (var i = 1; i &lt;= 5; i ++) &#123;</span><br><span class="line">  setTimeout(<span class="keyword">function</span> <span class="function"><span class="title">timer</span></span>() &#123;</span><br><span class="line">    console.log(i)</span><br><span class="line">  &#125;, i * 1000)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果我们直接这样写，根据<code>setTimeout</code>定义的操作在函数调用栈清空之后才会执行的特点，for循环里定义了5个<code>setTimeout</code>操作。而当这些操作开始执行时，for循环的值，已经先一步变成了6。因此输出结果总为6。而我们想要让输出结果依次执行的话，就必须借助闭包的特性，每次循环时，讲值保存在一个闭包中，当<code>setTimeout</code>中定义的操作执行时，则访问对应闭包保存的值即可。</p>
+</blockquote>
+<blockquote>
+<p>而我们知道在函数中闭包判定的准则，即执行时是否在内部定义的函数中访问了上层作用于的变量。我们需要包裹一层自执行函数为闭包的形成提供条件。</p>
+</blockquote>
+<blockquote>
+<p>因此，我们只需要2个操作就可以完成题目需求，一是使用自执行函数提供闭包条件，二是传入i值并保存在闭包中。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (var i = 1; i &lt;= 5; i ++) &#123;</span><br><span class="line">  (<span class="keyword">function</span> (i) &#123;</span><br><span class="line">    setTimeout(<span class="keyword">function</span> <span class="function"><span class="title">timer</span></span>() &#123;</span><br><span class="line">      console.log(i)</span><br><span class="line">    &#125;, i * 1000)</span><br><span class="line">  &#125;)(i)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当然，也可以在<code>setTimeout</code>的第一个参数处利用闭包。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">for</span> (var i = 1; i &lt;= 5; i ++) &#123;</span><br><span class="line">  setTimeout((<span class="keyword">function</span>(i) &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      console.log(i)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)(i), i * 1000)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>setTimeout与循环闭包</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端基础进阶学习(五)--闭包</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%BA%94)--%E9%97%AD%E5%8C%85/</url>
+    <content><![CDATA[<blockquote>
+<p>前端面试，必问闭包。面试官们常常用对闭包的了解程度来判定面试者的基础水平，保守估计，10个面试者，至少5个会死在闭包上。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h2><blockquote>
+<p>闭包是一种特殊的对象</p>
+</blockquote>
+<blockquote>
+<p>它由两部分组成。执行上下文（代号A），以及在该执行上下文中创建的函数（代号B）。</p>
+</blockquote>
+<blockquote>
+<p>当B执行时，如果访问了A中变量对象中的值，那么闭包就会产生。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo01</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">  var a = 20</span><br><span class="line">  var b = 30</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">bar</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> a + b</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span> bar</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var bar = foo()</span><br><span class="line">bar()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>上面的例子中，首先有执行上下文<code>foo</code>，在<code>foo</code>中定义了函数<code>bar</code>，而通过对外返回<code>bar</code>的方式让<code>bar</code>得以执行。当<code>bar</code>执行时，访问了<code>foo</code>内部的变量a，b。因此这个时候闭包产生了。</p>
+</blockquote>
+<blockquote>
+<p>在之前，我们总结了js的垃圾回收机制，关于垃圾回收机制，有一个重要的行为，那就是，当一个值，在内存中失去引用时，垃圾回收机制会根据特殊的算法找到它，并将其回收，释放内存。</p>
+</blockquote>
+<blockquote>
+<p>而我们知道，函数的执行上下文，在执行完毕之后，生命周期结束，那么该函数的执行上下文就会失去引用，其占用的内存空间很快就会被垃圾回收器释放。可是闭包的存在，会阻止这一过程。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var fn = null</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">  var a = 2</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">innerFoo</span></span>() &#123;</span><br><span class="line">    console.log(a)</span><br><span class="line">  &#125;</span><br><span class="line">  fn = innerFoo // 将 innerFoo 的引用，赋值给全局变量中的fn</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">bar</span></span>() &#123;</span><br><span class="line">  fn() // 此处保留innerFoo的引用</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">foo()</span><br><span class="line">bar() // 2</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上面的例子中，<code>foo()</code>执行完毕之后，按照常理，其执行环境生命周期会结束，所占北村被垃圾收集器释放。但是用过<code>fn = innerFoo</code>，函数<code>innerFoo</code>的引用别保留了下来，复制给了全局变量<code>fn</code>。这个行为，导致了<code>foo</code>的变量对象也被保留了下来。于是，函数<code>fn</code>在函数<code>bar</code>内部执行时，依然可以访问这个被保留下来的变量对象，所以此刻仍然能够访问到变量a的值。这样，我们就可以称<code>foo</code>为<code>闭包</code>。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200722111606.png" alt=""></p>
+<h2 id="闭包的应用场景"><a href="#闭包的应用场景" class="headerlink" title="闭包的应用场景"></a>闭包的应用场景</h2><blockquote>
+<p>闭包有两个非常重要的应用场景，他们分别是<code>模块化</code>和<code>柯里化</code>。</p>
+</blockquote>
+<h3 id="柯里化"><a href="#柯里化" class="headerlink" title="柯里化"></a>柯里化</h3><blockquote>
+<p>在函数式编程中，利用闭包能够实现很多炫酷的功能，柯里化便是其中很重要的一种。</p>
+</blockquote>
+<h3 id="模块化"><a href="#模块化" class="headerlink" title="模块化"></a>模块化</h3><blockquote>
+<p>模块化是闭包最强大的一个应用场景。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  var a = 10</span><br><span class="line">  var b = 20</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">function</span> add(num1, num2) &#123;</span><br><span class="line">    var num1 = !!num1 ? num1 : a</span><br><span class="line">    var num2 = !!num2 ? num2 : b</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">return</span> num1 + num2</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  window.add = add</span><br><span class="line">&#125;)()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上面例子中，使用了函数自执行的方式，创建了一个模块。<code>add</code>是模块对外暴露的一个公共方法。而变量a，b被作为私有变量。在面向对象的开发中，我们常常需要考虑是将变量作为私有变量，还是放在构造函数中的<code>this</code>中，因此理解闭包，以及原型链是一个非常重要的事情。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>闭包</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端基础进阶学习(四)--作用域与作用域链</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%9B%9B)--%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE/</url>
+    <content><![CDATA[<blockquote>
+<p><code>作用域与作用域链</code>本应该是一个非常简单的概念，但是很多人又会感到困惑。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="词法环境（Lexical-Environments）"><a href="#词法环境（Lexical-Environments）" class="headerlink" title="词法环境（Lexical Environments）"></a>词法环境（Lexical Environments）</h2><blockquote>
+<p>官方规范对<code>词法环境</code>的说明是<code>词法环境（Lexical Environments）</code>是一种规范类型，用于根据<code>ECMAScript</code>代码的词法嵌套结构来定义标识符与特定变量和函数的关联。（讲道理。。太复杂专业了）</p>
+</blockquote>
+<blockquote>
+<p>简单的来说，<code>词法环境</code>就是一套约定好的规则。我们写代码，应该按照这个规则来。js引擎对js源码进行词法分析，也是按照这个规则来。</p>
+</blockquote>
+<blockquote>
+<p>因此，<code>词法环境</code>，在我们写代码的时候就已经确定了，明白这一点，对于区分<code>词法环境</code>与<code>执行上下文</code>有非常关键的意义。</p>
+</blockquote>
+<div class="note info">
+            <p>词法环境，其实就是作用域，有的人叫词法作用域等等。</p>
+          </div>
+
+<blockquote>
+<p>因此，我们可以得出以下结论：</p>
+</blockquote>
+<ol>
+<li>在js中，我们可以将作用域定义为一套规则，这套规则用来管理js引擎如何在当前作用域以及嵌套的子作用域中根据标识符名称进行变量查找。<code>（这里的标识符，指的是变量名或者函数名）</code></li>
+<li>js中有全局作用域与函数作用域（因为eval我们平时开发中几乎不会用到它，这里不讨论）</li>
+</ol>
+<blockquote>
+<p>除此之外，一个词法环境，由<code>环境记录(Environment Records)</code>与一个外部指向<code>outer</code>组成。</p>
+</blockquote>
+<blockquote>
+<p>环境记录如果非要细分的话，又可以分为<code>函数环境记录</code>与<code>声明性的环境记录</code>，<code>环境记录</code>对应的其实就是<code>变量对象</code>，<code>outer</code>对应的就是上文中出现过，但是没有引起重视的<code>scopeChain</code>。</p>
+</blockquote>
+<h2 id="作用域链"><a href="#作用域链" class="headerlink" title="作用域链"></a>作用域链</h2><blockquote>
+<p>首先，我们要明确一点，作用域和作用域链是不同的。作用域是一套规则，而作用域链则是在代码执行过程中，会动态变化的一条索引路径。</p>
+</blockquote>
+<blockquote>
+<p>我们知道函数在调用激活时，会开始创建对应<code>执行上下文</code>，在执行上下文生成的过程中，<code>变量对象</code>，<code>作用域链</code>，以及<code>this</code>的值会被分别确定。</p>
+</blockquote>
+<div class="note info">
+            <p>作用域链，是当前环境与上层环境的一系列变量对象组成，它保证了当前执行环境对符合访问权限的变量和函数的有序访问。</p>
+          </div>
+
+<blockquote>
+<p>为了方便大家理解，我们结合一个例子，以及相应的图示来说明。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a = 20</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">test</span></span>() &#123;</span><br><span class="line">  var b = a + 10</span><br><span class="line">  </span><br><span class="line">  functuon <span class="function"><span class="title">innerTest</span></span>() &#123;</span><br><span class="line">    var c = 10</span><br><span class="line">    <span class="built_in">return</span> b + c</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> innerTest()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span>()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上面例子中，全局，函数test，函数innerTest的执行上下文先后创建。我们设定他们的变量对象分别为<code>VO(global)</code>，<code>VO(test)</code>，<code>VO(innerTest)</code>。而<code>innerTest</code>的作用域链，则同时包含了这三个变量对象。所以<code>innerTest</code>的执行上下文可如下表示。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">innerTestEC = &#123;</span><br><span class="line">  VO: &#123;...&#125;, // 变量对象</span><br><span class="line">  scopeChain: [VO(innerTest), VO(<span class="built_in">test</span>), VO(global)] // 作用域链</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这里使用一个数组来模拟作用域链，数组的第一项scopeChain[0]为作用域链的最前端，而数组的最后一项，为作用域链的最末端，所有的最末端都为全局变量对象。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200722095813.png" alt=""></p>
+<div class="note warning">
+            <p>注意，因为变量对象在执行上下文进入执行阶段时，就变成了活动对象，所以使用了AO来表示。</p>
+          </div>
+
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>作用域链是由一些列变量对象组成，我们可以在这个单向通道中，查询变量对象中的标识符，这样，就能访问到上一层作用域的变量了。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>作用域与作用域链</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端基础进阶学习(三)--变量对象</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%89)--%E5%8F%98%E9%87%8F%E5%AF%B9%E8%B1%A1/</url>
+    <content><![CDATA[<blockquote>
+<p>在js中，肯定不可避免的需要声明变量和函数，js编译器是如何找到这些变量的呢？我们还得对执行上下文有一个进一步的了解。</p>
+</blockquote>
+<a id="more"></a>
+
+<blockquote>
+<p>我们知道，当调用一个函数时（激活），一个新的执行上下文就会被创建。一个执行上下文的生命周期可以分为两个阶段。</p>
+</blockquote>
+<ul>
+<li>创建阶段</li>
+</ul>
+<blockquote>
+<p>在这个阶段中，执行上下文会分别创建<code>变量对象</code>，建立<code>作用域链</code>，以及确定<code>this</code>指向。</p>
+</blockquote>
+<ul>
+<li>代码执行阶段</li>
+</ul>
+<blockquote>
+<p>创建完之后，就会开始执行代码，会完成变量赋值，函数引用，以及执行其他代码。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png" alt=""></p>
+<blockquote>
+<p>从这里我们可以详细的了解执行上下文的重要性，因为其中涉及到了<code>变量对象</code>，<code>作用域链</code>，<code>this</code>等很多极为重要的概念。</p>
+</blockquote>
+<h2 id="变量对象（Variable-Object）"><a href="#变量对象（Variable-Object）" class="headerlink" title="变量对象（Variable Object）"></a>变量对象（Variable Object）</h2><blockquote>
+<p>变量对象的创建，依次经历了几下几个过程。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 这里a为属性名，20是属性值</span><br><span class="line">&#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>建立<code>arguments</code>对象：检查当前上下文中的参数，建立该对象下的属性与属性值。</li>
+<li>检查当前上下文的函数声明，也就是使用<code>function</code>关键字声明的函数。在变量对象中以函数名建立一个属性，属性值为指向该函数所在内存地址的引用。</li>
+<li>检查当前上下文中的变量声明，每找到一个变量声明，就在变量对象中以变量名建立一个属性，属性值为<code>undefined</code></li>
+</ol>
+<div class="note warning">
+            <p>注意：如果变量与函数同名，则在这个阶段，以函数值为准</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">console.log(foo) // ƒ <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line">var foo = 20</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 上面的执行顺序为：</span><br><span class="line"></span><br><span class="line">// 首先将所有函数声明放入变量对象中</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line"></span><br><span class="line">// 其次将所有变量声明放入变量对象中，但是因为foo已经存在同名函数，此时以函数值为准，而不会被undefined覆盖</span><br><span class="line">// var foo = undefined</span><br><span class="line"></span><br><span class="line">// 然后开始执行阶段代码的执行</span><br><span class="line">console.log(foo) // ƒ <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line">foo = 200</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720165744.png" alt=""></p>
+<blockquote>
+<p>根据这个规则，理解变量提升就变得十分简单了，在上面规则中我们可以看出，<code>function</code>声明会比<code>var</code>声明优先级更高一点，为了帮助大家更好的理解变量对象，我们结合一些简单的例子来进行探讨。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo01</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">test</span></span>() &#123;</span><br><span class="line">  console.log(a)</span><br><span class="line">  console.log(foo())</span><br><span class="line">  </span><br><span class="line">  var a = 1</span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> 2</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span>()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上例中，我们直接从<code>test()</code>的执行上下文开始理解，全局作用域中运行<code>test()</code>时，<code>test()</code>的执行上下文开始创建，为了方便理解，我们用如下的形式来表示：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 创建过程</span><br><span class="line">testEC = &#123;</span><br><span class="line">  // 变量对象</span><br><span class="line">  VO: &#123;&#125;,</span><br><span class="line">  </span><br><span class="line">  // 作用域链</span><br><span class="line">  scopeChain: &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 因为本文暂时不想起解释作用域链，所以把变量对象专门提出来说明</span><br><span class="line"></span><br><span class="line">// VO 为 Variable Object的缩写，即变量对象</span><br><span class="line">VO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;, // 注：在浏览器的展示中，函数的参数可能并不是放在arguments对象中，这里为了方便理解，我做了这样的处理</span><br><span class="line">  foo: &lt;foo reference&gt; // 表示foo的地址引用</span><br><span class="line">  a: undefined</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>未进入执行阶段之前，变量对象中的属性都不能访问，但是进入执行阶段之后，<code>变量对象</code>转变为了<code>活动对象</code>，里面的属性都能被访问了，然后开始进行执行阶段的操作。</p>
+</blockquote>
+<div class="note info">
+            <p>我们可以简单理解，<code>变量对象</code>和<code>活动对象</code>其实都是同一个对象，只是处于执行上下文的不同生命周期，不过只有处于函数调用栈栈顶的执行上下文的<code>变量对象</code>，才会变成<code>活动对象</code>。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 执行阶段</span><br><span class="line">OV -&gt; AO // Active Object</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;,</span><br><span class="line">  foo: &lt;foo reference&gt;,</span><br><span class="line">  a: 1,</span><br><span class="line">  this: Window</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因此上面的<code>demo01</code>的执行顺序就变成了这样</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">test</span></span>() &#123;</span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> 2</span><br><span class="line">  &#125;</span><br><span class="line">  var a</span><br><span class="line">  console.log(a)</span><br><span class="line">  console.log(foo())</span><br><span class="line">  a = 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span>()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在来一个例子，巩固一下我们的理解</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo02</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">test</span></span>() &#123;</span><br><span class="line">  console.log(foo)</span><br><span class="line">  console.log(bar)</span><br><span class="line">  </span><br><span class="line">  var foo = <span class="string">'Hello'</span></span><br><span class="line">  console.log(foo)</span><br><span class="line">  var bar = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'world'</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'hello'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span>()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 创建阶段</span><br><span class="line">VO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;,</span><br><span class="line">  foo: &lt;foo reference&gt;,</span><br><span class="line">  bar: undefined</span><br><span class="line">&#125;</span><br><span class="line">// 这里有一个需要注意的地方，var声明的变量与函数同名，以函数为准</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 执行阶段</span><br><span class="line">VO -&gt; AO</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;,</span><br><span class="line">  foo: <span class="string">'Hello'</span>,</span><br><span class="line">  bar: &lt;bar reference&gt;,</span><br><span class="line">  this: Window</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>需要结合上面的知识，仔细对比这个例子中的变量对象从创建阶段到执行阶段的变化，如果你已经理解了，说明变量对象相关的东西都已经难不倒你了。</p>
+</blockquote>
+<h2 id="全局上下文的变量对象"><a href="#全局上下文的变量对象" class="headerlink" title="全局上下文的变量对象"></a>全局上下文的变量对象</h2><blockquote>
+<p>以浏览器中为例，全局对象为<code>window</code>。</p>
+</blockquote>
+<blockquote>
+<p>全局上下文有一个特殊的地方，它的变量对象，就是<code>window</code>对象。而这个特殊，在<code>this</code>指向上也同样使用，<code>this</code>也是指向<code>window</code>。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 以浏览器中为例，全局对象为window</span><br><span class="line">// 全局上下文</span><br><span class="line"></span><br><span class="line">windowEC = &#123;</span><br><span class="line">  VO: window,</span><br><span class="line">  scopeChain: &#123;&#125;,</span><br><span class="line">  this: window</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div class="note warning">
+            <p>除此之外，全局上下文的生命周期，与程序的生命周期一致，只要程序运行不结束，比如关闭掉浏览器窗口，全局上下文就会一直存在。其他所有的上下文环境，都能直接访问全局上下文的属性。</p>
+          </div>
+
+<h2 id="let-const"><a href="#let-const" class="headerlink" title="let/const"></a>let/const</h2><blockquote>
+<p><code>ES6</code>中，新增了使用<code>let/const</code>来声明变量。那么，<code>let/const</code>是否存在变量提升呢？</p>
+</blockquote>
+<blockquote>
+<p>我们来做个试验</p>
+</blockquote>
+<ol>
+<li>我们直接使用一个未定义的变量</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">console.log(e) // Uncaught ReferenceError: e is not defined</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>我们在let之前调用变量</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">console.log(a) // Uncaught ReferenceError: Cannot access <span class="string">'a'</span> before initialization (不能在初始化之前访问a)</span><br><span class="line"><span class="built_in">let</span> a = 10</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这个报错说明了，变量定义了，但是没有初始化</p>
+</blockquote>
+<blockquote>
+<p>所以我们可以得出结论：<code>let/const</code>声明的变量，仍然会提前被收集到变量对象中，但和<code>var</code>不同的是，<code>let/const</code>定义的变量，不会再这个时候给它赋值<code>undefined</code>。因为完全没有赋值，即使变量提升了，我们也不能在赋值之前调用它。这就是我们常说的<code>暂时性死区</code>。</p>
+</blockquote>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>变量提升的现象确实会对我们的代码造成一些负面影响，因此，开发中的好习惯，就是尽量将变量声明放在最前面来写。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>变量对象</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端基础进阶学习(二)--执行上下文</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%BA%8C)--%E6%89%A7%E8%A1%8C%E4%B8%8A%E4%B8%8B%E6%96%87/</url>
+    <content><![CDATA[<blockquote>
+<p>我们在js学习初期，或者在面试的时候通常会遇到<code>执行上下文</code>相关的思考题，今天，我们就来学习一下什么是<code>执行上下文</code>。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="执行上下文（Execution-Context）"><a href="#执行上下文（Execution-Context）" class="headerlink" title="执行上下文（Execution Context）"></a>执行上下文（Execution Context）</h2><blockquote>
+<p>每次当控制器转到可执行代码的时候，就会进入一个<code>执行上下文</code>。<code>执行上下文</code>可以理解为当前代码的执行环境，它会形成一个作用域。js中的运行环境大概包括三种情况：</p>
+</blockquote>
+<ul>
+<li>全局环境：js代码运行起来会首先进入该环境</li>
+<li>函数环境：当函数被调用执行时，会进入当前函数执行代码</li>
+<li>eval（不建议使用，可忽略）</li>
+</ul>
+<blockquote>
+<p>因此在一个js程序中，必定会产生多个执行上下文，js引擎会以栈的方式来处理它们，这个栈，我们称其为<code>函数调用栈(call stack)</code>。栈底永远都是全局上下文，而栈顶就是当前正在执行的上下文。</p>
+</blockquote>
+<blockquote>
+<p>当代码在执行过程中，遇到以上三种情况，都会产生一个<code>执行上下文</code>，放入栈中，而处于栈顶的上下文执行完毕之后，就会自动出栈。为了更加清晰的理解这个过程，根据下面的例子，结合图示给大家展示。</p>
+</blockquote>
+<div class="note info">
+            <p>执行上下文可以理解为函数执行的环境，每一个函数执行的时候，都会给对应的函数创建这样一个执行环境。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var color = <span class="string">'blue'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">changeColor</span></span>() &#123;</span><br><span class="line">  var anotherColor = <span class="string">'red'</span></span><br><span class="line">  </span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">swapColors</span></span>() &#123;</span><br><span class="line">    var tempColor = anotherColor</span><br><span class="line">    anotherColor = color</span><br><span class="line">    color = tempColor</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  swapColors()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">changeColor()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们用<code>ECStack</code>来表示处理执行上下文组的堆栈。我们很容易知道，第一步，首先是全局上下文入栈。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720113015.png" alt=""></p>
+<blockquote>
+<p>全局上下文入栈之后，其中可执行代码开始执行，直到遇到了<code>changeColor()</code>，这一句激活函数<code>changeColor</code>创建它自己的执行上下文，因此第二步就是<code>changeColor</code>的执行上下文入栈。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720135901.png" alt=""></p>
+<blockquote>
+<p><code>changeColor</code>的上下文入栈之后，控制器开始执行其中的可执行代码，遇到<code>swapColors()</code>之后又激活了一个执行上下文。因此第三步是<code>swapColors</code>的执行上下文入栈。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720140128.png" alt=""></p>
+<blockquote>
+<p>在<code>swapColors</code>的可执行代码中，再没有遇到其他能生成执行上下文的情况，因此这段代码顺利执行完毕，<code>swapColors</code>的上下文从栈中弹出。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720141357.png" alt=""></p>
+<blockquote>
+<p><code>swapColors</code>的执行上下文弹出之后，继续执行<code>changeColor</code>的可执行代码，也没有在遇到其他执行上下文，顺利执行完毕之后弹出。这样，<code>ECStack</code>中就只剩下全局上下文了。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720113015.png" alt=""></p>
+<blockquote>
+<p>之后，全局上下文在浏览器窗口关闭后出栈。</p>
+</blockquote>
+<div class="note warning">
+            <p>注意：函数中，遇到<code>return</code>能直接终止可执行代码的执行，因此会直接将当前的上下文弹出栈。</p>
+          </div>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720143216.png" alt=""></p>
+<blockquote>
+<p>详细了解这个过程之后，我们就可以对执行上下文总结一些结论了</p>
+</blockquote>
+<ol>
+<li>单线程</li>
+<li>同步执行，只有栈顶的上下文处于执行中，其他上下文需要等待</li>
+<li>全局上下文只有唯一的一个，它在浏览器关闭时出栈</li>
+<li>函数的执行上下文的个数没有限制</li>
+<li>每次某个函数被调用，就会有个新的执行上下文为其创建，即使是调用的自身函数，也是如此</li>
+</ol>
+<blockquote>
+<p>为了巩固一下<code>执行上下文</code>的理解，我们来绘制一个简单的闭包例子。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">f1</span></span>() &#123;</span><br><span class="line">  var n = 999</span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">f2</span></span>() &#123;</span><br><span class="line">    alert(n)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> f2</span><br><span class="line">&#125;</span><br><span class="line">var result = f1()</span><br><span class="line">result()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因为<code>f1</code>中的函数<code>f2</code>在<code>f1</code>的可执行代码中，并没有被调用执行，因此执行<code>f1</code>时，<code>f2</code>不会创建新的上下文，而直到<code>result</code>执行时，才创建了一个新的。具体演变过程如下。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720144635.png" alt=""></p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p><code>执行上下文</code>在我们日常中是经常遇到的，想要让自己的技术更上一层的话，理解<code>执行上下文</code>是必不可少的一步。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>执行上下文</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端基础进阶学习(一)--内存空间</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%80)--%E5%86%85%E5%AD%98%E7%A9%BA%E9%97%B4/</url>
+    <content><![CDATA[<blockquote>
+<p>因为<code>JavaScript</code>具有自动垃圾回收机制，所以对于我们前端来讲，内存空间并不是一个经常提及的概念，久而久之，我们会认为内存空间的概念在js的学习中并不是那么重要，导致了许多知识理解并不明白。在学习内存空间之前，我们需要对三种数据结构有一个清晰的理解，分别是<code>堆(heap)</code>、<code>栈(stack)</code>以及<code>队列(queue)</code></p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="栈数据结构"><a href="#栈数据结构" class="headerlink" title="栈数据结构"></a>栈数据结构</h2><blockquote>
+<p>js中并没有严格意义上区分栈内存和堆内存，因为我们可以简单的理解为js的所有数据都存在堆内存中。但是在一些特定场景下，我们仍然需要基于栈数据结构的思维来实现一些功能，比如js的执行上下文，执行上下文的执行顺序借用了栈数据结构的存取方式。因此理解栈数据结构的原理与特点十分重要。</p>
+</blockquote>
+<blockquote>
+<p>要简单理解栈的存取方式，我们可以通过类比乒乓球盒子来分析，如下图：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200706165813.png" alt=""></p>
+<blockquote>
+<p>图中可以很详细的解释了栈空间的存储原理，处于盒子中最顶层的乒乓球5，它一定是最后被放进去的，但可以最先被使用。而我们想要使用乒乓球1，就必须将上面的4个乒乓球取出来，这就是栈空间的<code>先进先出，后进后出</code>的特点。</p>
+</blockquote>
+<h2 id="堆数据结构"><a href="#堆数据结构" class="headerlink" title="堆数据结构"></a>堆数据结构</h2><blockquote>
+<p>对数据结构是一种树状结构，它的存取数据的方式，则与书架与书非常相似。</p>
+</blockquote>
+<blockquote>
+<p>比如，书虽然也整齐的放在书架上，但是我们只要知道了书的名字，就可以很方便的取出我们想要的书，而不用像取乒乓球一样，非得讲上面的所有球都拿出来才能取到中间某个我们想要的乒乓球。就好比在json格式的数据中，我们存储的<code>key-value</code>是可以无序的，因为顺序的不同并不影响我们使用。</p>
+</blockquote>
+<h2 id="队列"><a href="#队列" class="headerlink" title="队列"></a>队列</h2><blockquote>
+<p>在js中，理解队列数据结构的目的主要是为了清晰的明白事件循环的机智到底是怎么回事。</p>
+</blockquote>
+<blockquote>
+<p>队列是一种先进先出(FIFO)的数据结构，正如排队过安检的一样，排在队伍前面的人一定是最先过安检的人。用下图可以清楚的理解队列的原理：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200708105534.png" alt=""></p>
+<h2 id="变量对象与基础数据类型"><a href="#变量对象与基础数据类型" class="headerlink" title="变量对象与基础数据类型"></a>变量对象与基础数据类型</h2><blockquote>
+<p>js的执行上下文生成之后，会创建一个叫做变量对象的特殊对象，js的基础数据类型往往都会保存在变量对象中。</p>
+</blockquote>
+<blockquote>
+<p>严格意义上来说，变量对象也是存放在堆内存中，但是由于变量对象的特殊职能，我们在理解时仍然需要将其与堆内存区分开来。</p>
+</blockquote>
+<blockquote>
+<p>基础数据类型都是一些简单的数据段，在<code>ES6</code>之前，js中有五种基础数据类型，分别是<code>Undefined</code>、<code>Null</code>、<code>Boolean</code>、<code>Number</code>、<code>String</code>。基础数据类型都是按照值访问，我们可以直接操作保存在变量中的实际值。</p>
+</blockquote>
+<h2 id="引用数据类型与堆内存"><a href="#引用数据类型与堆内存" class="headerlink" title="引用数据类型与堆内存"></a>引用数据类型与堆内存</h2><blockquote>
+<p>js的引用数据类型，比如数据<code>Array</code>，它们值的大小是不固定的，引用数据类型的值是保存在堆内存中的对象。js不允许直接访问堆内存中的数据，因为我们不能直接操作对象的堆内存空间，在操作对象时，实际上是在操作对象的引用而不是实际对象。因此，引用类型的值都是按引用访问的。这里的引用，我们可以理解为保存在变量对象中的一个地址，该地址与堆内存的实际值有相关联。</p>
+</blockquote>
+<blockquote>
+<p>为了更好的搞懂变量对象与堆内存，我们可以结合以下例子与图解进行理解：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a1 = 0;   // 变量对象</span><br><span class="line">var a2 = <span class="string">'this is string'</span>; // 变量对象</span><br><span class="line">var a3 = null; // 变量对象</span><br><span class="line"></span><br><span class="line">var b = &#123; m: 20 &#125;; // 变量b存在于变量对象中，&#123;m: 20&#125; 作为对象存在于堆内存中</span><br><span class="line">var c = [1, 2, 3]; // 变量c存在于变量对象中，[1, 2, 3] 作为对象存在于堆内存中</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200708110717.png" alt=""></p>
+<blockquote>
+<p>当我们要访问堆内存中的引用数据类型时，实际上我们首先是从变量对象中获取了该对象的地址引用(或者地址指针)，然后再从堆内存中取得我们需要的数据。</p>
+</blockquote>
+<blockquote>
+<p>理解了js的内存空间，我们就可以借助内存空间的特性来验证一下引用类型的一些特点</p>
+</blockquote>
+<blockquote>
+<p>在前端面试中我们常常会遇到这样一个类似的题目</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo01.js</span><br><span class="line">var a = 20;</span><br><span class="line">var b = a;</span><br><span class="line">b = 30;</span><br><span class="line"></span><br><span class="line">// 这时a的值是多少？</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo02.js</span><br><span class="line">var m = &#123; a: 10, b: 20 &#125;</span><br><span class="line">var n = m;</span><br><span class="line">n.a = 15;</span><br><span class="line"></span><br><span class="line">// 这时m.a的值是多少</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在变量对象中的数据发生复制行为时，系统会自动为新的变量分配一个新值。<code>var b = a</code>执行之后，a与b虽然值都等于20，但是他们其实已经是相互独立互不影响的值了，如下图：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200708111314.png" alt=""></p>
+<blockquote>
+<p>所以我们修改了b的值以后，a的值并不会发生变化。</p>
+</blockquote>
+<blockquote>
+<p>在demo02中，我们通过<code>var n = m</code>执行一次复制引用类型的操作，引用类型的复制同样也会为新的变量自动分配一个新的值保存在变量对象中，但不同的是，这个新的值，仅仅只是引用类型的一个地址指针，当地址指针向相同时，尽管他们相互独立，但是在变量对象中访问到的具体对象实际上是同一个：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200708111913.png" alt=""></p>
+<h2 id="内存空间管理"><a href="#内存空间管理" class="headerlink" title="内存空间管理"></a>内存空间管理</h2><blockquote>
+<p>因为js具有自动垃圾收集机制，所以我们在开发时好像不用关心内存的使用问题，内存的分配与回收都完全实现了自动管理，但是根据以往的开发经验，了解内存机制有助于自己的清晰的认识到自己写的代码在执行过程中发生过什么，从而写出性能更加优秀的代码。</p>
+</blockquote>
+<blockquote>
+<p>js的内存生命周期</p>
+</blockquote>
+<ol>
+<li>分配到你需要的内存</li>
+<li>使用分配到的内存(读、写)</li>
+<li>不需要时将其释放、归还</li>
+</ol>
+<blockquote>
+<p>为了便于理解，我们可以看看以下例子</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a = 20;  // 在内存中给数值变量分配空间</span><br><span class="line">alert(a + 100);  // 使用内存</span><br><span class="line">a = null; // 使用完毕之后，释放内存空间</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>第一步和第二步我们都很好理解，js在定义变量时就完成了内存分配，第三步释放内存空间则是我们需要重点理解的一个点。</p>
+</blockquote>
+<blockquote>
+<p>js有自动垃圾收集机制，那么这个自动垃圾收集机制的原理是什么？其实很简单，就是找出那些不在继续使用的值，然后释放其占用的内存。垃圾收集器会每隔固定时间段就执行一次释放操作。</p>
+</blockquote>
+<blockquote>
+<p>在js中，最常用的是通过<code>标记清除</code>的算法来找到哪些对象不再继续使用，因为<code>a = null</code>其实仅仅只是做了一个释放引用的操作，让a原本对应的值失去引用，脱离执行环境，这个值会在下一次的垃圾收集器执行操作的时候被找到并释放，而在适当的时候解除引用，是为页面获得更好的性能提升。</p>
+</blockquote>
+<div class="note warning">
+            <p>需要注意的是，在局部作用域中，当函数执行完毕，局部变量也就没有存在的必要了，因此垃圾收集器很容易做出判断并回收。但是全局变量什么时候需要释放内存空间则很难判断，因此在我们的开发中，原则上应该避免使用全局变量。</p>
+          </div>]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>内存空间</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Gitlab如何配置邮件服务</title>
+    <url>/Gitlab%E5%A6%82%E4%BD%95%E9%85%8D%E7%BD%AE%E9%82%AE%E4%BB%B6%E6%9C%8D%E5%8A%A1/</url>
+    <content><![CDATA[<blockquote>
+<p>本篇文章主要记录了如何配置<code>gitlab</code>的邮件服务（以QQ个人邮箱为例）。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="开通授权码"><a href="#开通授权码" class="headerlink" title="开通授权码"></a>开通授权码</h2><blockquote>
+<p>设置–&gt;账户–&gt;smtp–&gt;密保验证–&gt;验证成功后返回授权码。保存好授权码</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200619155223.png" alt=""></p>
+<h2 id="修改配置文件"><a href="#修改配置文件" class="headerlink" title="修改配置文件"></a>修改配置文件</h2><blockquote>
+<p>打开<code>/etc/gitlab/gitlab.rb</code>，在文件最底下添加以下内容，或者也可以找到对应位置进行修改：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">gitlab_rails[<span class="string">'smtp_enable'</span>] = <span class="literal">true</span></span><br><span class="line">gitlab_rails[<span class="string">'smtp_address'</span>] = <span class="string">"smtp.qq.com"</span></span><br><span class="line">gitlab_rails[<span class="string">'smtp_port'</span>] = 465</span><br><span class="line">gitlab_rails[<span class="string">'smtp_user_name'</span>] = <span class="string">"xxxxx@qq.com"</span> // 个人QQ邮箱</span><br><span class="line">gitlab_rails[<span class="string">'smtp_password'</span>] = <span class="string">"xxxxxx"</span> // 16位授权码</span><br><span class="line">gitlab_rails[<span class="string">'smtp_domain'</span>] = <span class="string">"qq.com"</span></span><br><span class="line">gitlab_rails[<span class="string">'smtp_authentication'</span>] = <span class="string">"login"</span></span><br><span class="line">gitlab_rails[<span class="string">'smtp_enable_starttls_auto'</span>] = <span class="literal">true</span></span><br><span class="line">gitlab_rails[<span class="string">'smtp_tls'</span>] = <span class="literal">true</span></span><br><span class="line">user[<span class="string">'git_user_email'</span>] = <span class="string">"xxxxx@qq.com"</span> // 个人QQ邮箱</span><br><span class="line">gitlab_rails[<span class="string">'gitlab_email_from'</span>] = <span class="string">"xxxxx@qq.com"</span> // 个人QQ邮箱</span><br></pre></td></tr></table></figure>
+
+<h2 id="更新配置"><a href="#更新配置" class="headerlink" title="更新配置"></a>更新配置</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">gitlab-ctl reconfigure</span><br></pre></td></tr></table></figure>
+
+<h2 id="测试邮件服务是否正常"><a href="#测试邮件服务是否正常" class="headerlink" title="测试邮件服务是否正常"></a>测试邮件服务是否正常</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 这步可能需要等待一点时间。</span></span><br><span class="line">gitlab-rails console</span><br><span class="line"></span><br><span class="line">Notify.test_email(<span class="string">'接收方邮件地址'</span>,<span class="string">'邮件标题'</span>,<span class="string">'邮件内容'</span>).deliver_now</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>发送成功之后，我们就可以收到邮件了：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200619155949.png" alt=""></p>
+<blockquote>
+<p>到此我们就可以愉快的使用邮件服务了。</p>
+</blockquote>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">
+            <p>如果邮件发送失败，要么就是465端口未开放，要么就是授权码不正确，需要看官们自行去解决一下。</p>
+          </div>
+]]></content>
+      <categories>
+        <category>gitlab</category>
+      </categories>
+      <tags>
+        <tag>gitlab</tag>
+        <tag>邮件配置</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Gitlab私有化仓库如何汉化</title>
+    <url>/Gitlab%E7%A7%81%E6%9C%89%E5%8C%96%E4%BB%93%E5%BA%93%E5%A6%82%E4%BD%95%E6%B1%89%E5%8C%96/</url>
+    <content><![CDATA[<blockquote>
+<p>之前讲到了如何基于<code>gitlab</code>搭建公司内部私有仓库，这篇文章主要讲如何进行<code>gitlab</code>的汉化操作。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>对于如何搭建<code>gitlab</code>的私有仓库，可以参考我之前写的 <a href="https://www.chenkl.vip/%E5%9F%BA%E4%BA%8EGitlab%E6%90%AD%E5%BB%BA%E5%85%AC%E5%8F%B8%E7%BA%A7%E5%86%85%E9%83%A8%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/#more">基于Gitlab搭建公司级内部私有仓库</a>，本篇文章主要讲如何进行<code>gitlab</code>的汉化。</p>
+</blockquote>
+<h2 id="准备环境"><a href="#准备环境" class="headerlink" title="准备环境"></a>准备环境</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 如何没有当前目录，可以自行创建一个，或者可以放到自己想放的地方</span></span><br><span class="line"><span class="built_in">cd</span> /data/src/</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://gitlab.com/xhang/gitlab.git</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果提示<code>git: command not found</code>，我们需要先进行安装<code>git</code></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum -y install git</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://gitlab.com/xhang/gitlab.git</span><br></pre></td></tr></table></figure>
+
+<h2 id="停止gitlab"><a href="#停止gitlab" class="headerlink" title="停止gitlab"></a>停止gitlab</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">gitlab-ctl stop</span><br></pre></td></tr></table></figure>
+
+<h2 id="汉化操作"><a href="#汉化操作" class="headerlink" title="汉化操作"></a>汉化操作</h2><h3 id="查看改汉化补丁版本"><a href="#查看改汉化补丁版本" class="headerlink" title="查看改汉化补丁版本"></a>查看改汉化补丁版本</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">cat gitlab/VERSION</span><br><span class="line"></span><br><span class="line"><span class="comment"># 10.7.3</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="获取gitlab汉化包"><a href="#获取gitlab汉化包" class="headerlink" title="获取gitlab汉化包"></a>获取gitlab汉化包</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> gitlab/</span><br><span class="line"></span><br><span class="line">git diff origin/10-7-stable origin/10-7-stable-zh &gt; /tmp/10.7.diff</span><br></pre></td></tr></table></figure>
+
+<h3 id="更新补丁到gitlab中"><a href="#更新补丁到gitlab中" class="headerlink" title="更新补丁到gitlab中"></a>更新补丁到gitlab中</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum -y install patch</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /tmp/</span><br><span class="line"></span><br><span class="line">patch -d/opt/gitlab/embedded/service/gitlab-rails -p1 &lt; 10.7.diff</span><br></pre></td></tr></table></figure>
+
+<h3 id="重新配置gitlab"><a href="#重新配置gitlab" class="headerlink" title="重新配置gitlab"></a>重新配置gitlab</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">gitlab-ctl reconfigure</span><br><span class="line"></span><br><span class="line">gitlab-ctl start</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>不出意外的话，我们重新打开<code>gitlab地址</code>，出现以下页面，就说明我们汉化成功了。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200619152022.png" alt=""></p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">
+            <p><code>gitlab</code>的汉化操作算是比较简单的，有兴趣的看官可以自行去实践一下。一般来说不会遇到什么大问题的。</p>
+          </div>]]></content>
+      <categories>
+        <category>gitlab</category>
+      </categories>
+      <tags>
+        <tag>gitlab</tag>
+        <tag>gitlab汉化</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>基于Gitlab搭建公司级内部私有仓库</title>
+    <url>/%E5%9F%BA%E4%BA%8EGitlab%E6%90%AD%E5%BB%BA%E5%85%AC%E5%8F%B8%E7%BA%A7%E5%86%85%E9%83%A8%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/</url>
+    <content><![CDATA[<blockquote>
+<p>一个比较有规模的公司，实际上是需要有一个公司内部私有化的仓库来管理源码。所以在这里记录一下如何搭建一个公司内部的gitlab平台，供公司内部人员使用。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><div class="note warning">
+            <ol><li>本篇文章是以<code>centos 7</code>和<code>gitlab 10</code>为搭建基础来编写的。</li><li>观看本篇文章，需要对<code>linux</code>系统有一定的基础知识。</li><li>如需实践，需要有一台<code>linux</code>服务器，这里我自己使用的是<code>腾讯云</code>1核2G的云服务器（该服务器只是为了实践用的，不代表安装使用<code>gitlab</code>的最低配置）。</li></ol>
+          </div>
+
+<h2 id="安装依赖包"><a href="#安装依赖包" class="headerlink" title="安装依赖包"></a>安装依赖包</h2><blockquote>
+<p>GitLab 10.x之后添加多了一些依赖，并且要启动sshd服务，所以我们先添加依赖，启动sshd，为防火墙添加服务。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install -y curl policycoreutils-python openssh-server openssh-clients</span><br><span class="line"></span><br><span class="line">systemctl <span class="built_in">enable</span> sshd</span><br><span class="line"></span><br><span class="line">systemctl start sshd</span><br><span class="line"></span><br><span class="line"><span class="comment"># 防火墙这2步可以不用管</span></span><br><span class="line"><span class="comment"># firewall-cmd –permanent –add-service=http</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># systemctl reload firewalld</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>gitlab配置需要用到邮件发送，所以还要再安装postfix。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum -y install postfix</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装完之后启动</span></span><br><span class="line">systemctl start postfix</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>启动过程中如果报错：Job for postfix.service failed because the control process exited with error code. See “systemctl status postfix.service” and “journalctl -xe” for details.</p><p>解决办法，<code>/etc/postfix/main.cf</code>，修改以下两处地方：</p>
+          </div>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200619133102.png" alt=""></p>
+<blockquote>
+<p>修改完成后，再次启动，就不会报错了，设置<code>postfix</code>为开机自启动。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">systemctl <span class="built_in">enable</span> postfix</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看启动状态,看到 Active: active (running) 就是已经正常启动了</span></span><br><span class="line">systemctl status postfix</span><br></pre></td></tr></table></figure>
+
+<h2 id="gitlab安装"><a href="#gitlab安装" class="headerlink" title="gitlab安装"></a>gitlab安装</h2><blockquote>
+<p>下载rpm包并安装。可根据实际需要安装指定版本。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wget https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm</span><br><span class="line"></span><br><span class="line">mkdir /usr/<span class="built_in">local</span>/gitlab</span><br><span class="line"></span><br><span class="line">mv gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm /usr/<span class="built_in">local</span>/gitlab/</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/gitlab/</span><br><span class="line"></span><br><span class="line">rpm -i gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>warning: gitlab-ce-11.6.3-ce.0.el7.x86_64.rpm: Header V4 RSA/SHA1 Signature, key ID f27eab47: NOKEY<br>error: Failed dependencies:<br>    policycoreutils-python is needed by gitlab-ce-10.0.0-ce.0.el7.x86_64.rpm<br>如果出现上面这个报错就执行：</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">yum install policycoreutils-python</span><br><span class="line"></span><br><span class="line"><span class="comment"># 之后重新运行</span></span><br><span class="line">rpm -i gitlab-ce-11.6.3-ce.0.el7.x86_64.rpm</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果不出意外的话，到这里我们就可以在控制台上看到以下提示，这说明我们已经安装成功了：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">It looks like GitLab has not been configured yet; skipping the upgrade script.</span><br><span class="line"></span><br><span class="line">       *.                  *.</span><br><span class="line">      ***                 ***</span><br><span class="line">     *****               *****</span><br><span class="line">    .******             *******</span><br><span class="line">    ********            ********</span><br><span class="line">   ,,,,,,,,,***********,,,,,,,,,</span><br><span class="line">  ,,,,,,,,,,,*********,,,,,,,,,,,</span><br><span class="line">  .,,,,,,,,,,,*******,,,,,,,,,,,,</span><br><span class="line">      ,,,,,,,,,*****,,,,,,,,,.</span><br><span class="line">         ,,,,,,,****,,,,,,</span><br><span class="line">            .,,,***,,,,</span><br><span class="line">                ,*,.</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">     _______ __  __          __</span><br><span class="line">    / ____(_) /_/ /   ____ _/ /_</span><br><span class="line">   / / __/ / __/ /   / __`/ __ \</span><br><span class="line">  / /_/ / / /_/ /___/ /_/ / /_/ /</span><br><span class="line">  \____/_/\__/_____/\__,_/_.___/</span><br><span class="line">  </span><br><span class="line"></span><br><span class="line">Thank you <span class="keyword">for</span> installing GitLab!</span><br><span class="line">GitLab was unable to detect a valid hostname <span class="keyword">for</span> your instance.</span><br><span class="line">Please configure a URL <span class="keyword">for</span> your GitLab instance by setting`external_url`</span><br><span class="line">configuration <span class="keyword">in</span> /etc/gitlab/gitlab.rb file.</span><br><span class="line">Then, you can start your GitLab instance by running the following <span class="built_in">command</span>:</span><br><span class="line">  sudo gitlab-ctl reconfigure</span><br><span class="line"></span><br><span class="line">For a comprehensive list of configuration options please see the Omnibus GitLab readme</span><br><span class="line">https://gitlab.com/gitlab-org/omnibus-gitlab/blob/master/README.md</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置并启动gitlab-ce"><a href="#配置并启动gitlab-ce" class="headerlink" title="配置并启动gitlab-ce"></a>配置并启动gitlab-ce</h2><blockquote>
+<p><code>gitlab</code>安装完成后，需要设置一个访问地址（或域名），打开<code>/etc/gitlab/gitlab.rb</code>，将默认的<code>external_url = &#39;http://git.example.com&#39;</code>修改为自己的IP地址:<code>http://xxx.xx.xxx.xx</code></p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200619134650.png" alt=""></p>
+<blockquote>
+<p>保存之后，执行以下命令，让配置生效</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">gitlab-ctl reconfigure</span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动Gitlab</span></span><br><span class="line">gitlab-ctl start</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>启动完成后，在浏览器输入上面修改的IP,就是<code>gitlab</code>的登录首页了，如果出现<code>502</code>页面，就是端口被占用了或者端口为开放。需要自行去设置或者开放端口。</p>
+</blockquote>
+<blockquote>
+<p>当IP地址生效后，我们打开之后就可以看到以下的页面，证明我们<code>gitlab</code>安装并启动成功了。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/1070438-20190116110755861-1754218775.png" alt=""></p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">
+            <p>以上就是我自己实践并记录的一些踩坑之路，搭建完之后，我们就可以愉快的进行玩耍了。后续还会专门写如何<code>汉化</code>以及如何配置<code>邮件服务</code>。</p>
+          </div>
+]]></content>
+      <categories>
+        <category>gitlab</category>
+      </categories>
+      <tags>
+        <tag>gitlab</tag>
+        <tag>私有仓库</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vue-cli3.0多环境配置</title>
     <url>/vue-cli3-0%E5%A4%9A%E7%8E%AF%E5%A2%83%E9%85%8D%E7%BD%AE/</url>
     <content><![CDATA[<blockquote>
@@ -9,7 +866,7 @@
 <a id="more"></a>
 
 <h2 id="新建环境配置文件"><a href="#新建环境配置文件" class="headerlink" title="新建环境配置文件"></a>新建环境配置文件</h2><blockquote>
-<p>我们需要在项目的根目录下新建环境配置文件，在这里我们以 <code>development</code> 开发环境、 <code>production</code> 生产环境 <code>test</code> 测试环境为例</p>
+<p>我们需要在项目的根目录下新建环境配置文件，在这里我们以<code>development</code>开发环境、<code>production</code>生产环境<code>test</code>测试环境为例</p>
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200530174258.png" alt=""></p>
 <blockquote>
@@ -22,23 +879,23 @@
 <h3 id="测试环境"><a href="#测试环境" class="headerlink" title="测试环境"></a>测试环境</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">NODE_ENV = <span class="string">'test'</span></span><br><span class="line">VUE_APP_CURENV = <span class="string">'test'</span></span><br></pre></td></tr></table></figure>
 
 <div class="note info">
-            <p>配置完多环境文件之后，具体需要进行什么操作由各位看官们根据项目自行决定，这里不做过多的阐述。接下来我们还需要在 <code>package.json</code> 进行修改</p>
+            <p>配置完多环境文件之后，具体需要进行什么操作由各位看官们根据项目自行决定，这里不做过多的阐述。接下来我们还需要在<code>package.json</code>进行修改</p>
           </div>
 
 <h2 id="修改-package-json-文件"><a href="#修改-package-json-文件" class="headerlink" title="修改 package.json 文件"></a>修改 package.json 文件</h2><p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200530175026.png" alt=""></p>
 <blockquote>
-<p>以上修改为多环境的打包命令，如果需要发包 <code>测试环境</code> 只需执行以下命令：</p>
+<p>以上修改为多环境的打包命令，如果需要发包<code>测试环境</code>只需执行以下命令：</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm run <span class="built_in">test</span></span><br></pre></td></tr></table></figure>
 
 <div class="note info">
-            <p>其他环境同理，如果嫌一个个输入命令比较麻烦，可以像我一样，使用 <code>npm run all</code> 进行三个环境的打包。</p>
+            <p>其他环境同理，如果嫌一个个输入命令比较麻烦，可以像我一样，使用<code>npm run all</code>进行三个环境的打包。</p>
           </div>
 
 <h2 id="不同环境的包名"><a href="#不同环境的包名" class="headerlink" title="不同环境的包名"></a>不同环境的包名</h2><blockquote>
-<p>因为默认打包都是 <code>dist</code> 包名，所以不是很好区分是哪个环境的包，所以我们在 <code>vue.config.js</code> 里面进行配置</p>
+<p>因为默认打包都是<code>dist</code>包名，所以不是很好区分是哪个环境的包，所以我们在<code>vue.config.js</code>里面进行配置</p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">outputDir: `dist-<span class="variable">$&#123;process.env.VUE_APP_CURENV&#125;</span>-<span class="variable">$&#123;formatTime(new Date(), 'yyyyMMddHHmmss')&#125;</span>`,</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">outputDir:`dist-<span class="variable">$&#123;process.env.VUE_APP_CURENV&#125;</span>-<span class="variable">$&#123;formatTime(new Date(), 'yyyyMMddHHmmss')&#125;</span>`,</span><br></pre></td></tr></table></figure>
 
 <div class="note info">
             <p>可根据自己的实际情况进行修改设置，这里只提供一个例子。这样，我们每次打包出来，就很好的区分了是哪个环境的包了。</p>
@@ -66,14 +923,14 @@
 <a id="more"></a>
 
 <div class="note info">
-            <p>本文章的内容是基于 <code>vue &gt;= 2.6.0</code>，在 <code>2.6.0</code> 中，官方为具名插槽和作用域插槽引入了一个新的统一的语法 (即 v-slot 指令)。它取代了 <code>slot</code> 和 <code>slot-scope</code> 这两个目前已被废弃但未被移除且仍在文档中的 <code>attribute</code>。所以，旧语法我们这里就不演示了，有兴趣的看官们可以自行百度一下。</p>
+            <p>本文章的内容是基于<code>vue &gt;= 2.6.0</code>，在<code>2.6.0</code>中，官方为具名插槽和作用域插槽引入了一个新的统一的语法 (即 v-slot 指令)。它取代了<code>slot</code>和<code>slot-scope</code>这两个目前已被废弃但未被移除且仍在文档中的<code>attribute</code>。所以，旧语法我们这里就不演示了，有兴趣的看官们可以自行百度一下。</p>
           </div>
 
 <h2 id="匿名插槽"><a href="#匿名插槽" class="headerlink" title="匿名插槽"></a>匿名插槽</h2><blockquote>
 <p>匿名插槽简单点理解就是，在组件中设置一个默认插槽入口，在组件的使用中，填充的内容将会自动填充在默认插槽中。</p>
 </blockquote>
 <blockquote>
-<p>接下来我们来定义一个组件，在组件里面只有一个 <code>slot</code> 标签，也就是我们上面所说的匿名插槽，用来接收外部传进来的模版进行渲染。</p>
+<p>接下来我们来定义一个组件，在组件里面只有一个<code>slot</code>标签，也就是我们上面所说的匿名插槽，用来接收外部传进来的模版进行渲染。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 定义一个组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;slot&gt;&lt;/slot&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child1'</span></span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
@@ -90,7 +947,7 @@
 <p>顾名思义就是带名字的插槽，假如需要在组件内部预留多个插槽位置，就需要为插槽定义名字，指定插入的位置。</p>
 </blockquote>
 <blockquote>
-<p>首先我们来改造下之前的代码，在组件内部新增 <code>name</code> 分别为 <code>header</code> 和 <code>footer</code> 的插槽。</p>
+<p>首先我们来改造下之前的代码，在组件内部新增<code>name</code>分别为<code>header</code>和<code>footer</code>的插槽。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"header"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"footer"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child1'</span></span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
@@ -101,7 +958,7 @@
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200330100151.png" alt=""></p>
 <div class="note warning">
-            <p>需要注意的是，如果使用了 <code>v-slot</code> 就必须配合着 <code>template</code> 来使用，不然会报错。</p>
+            <p>需要注意的是，如果使用了<code>v-slot</code>就必须配合着<code>template</code>来使用，不然会报错。</p>
           </div>
 
 <h2 id="作用域插槽"><a href="#作用域插槽" class="headerlink" title="作用域插槽"></a>作用域插槽</h2><blockquote>
@@ -119,14 +976,14 @@
 <p>这样我们就实现了让插槽内容能够访问子组件中数据，进行模版渲染。</p>
 </blockquote>
 <div class="note warning">
-            <p>需要注意的是，匿名插槽传值只能使用 <code>default</code> 进行接收。具名插槽传值，接收的名字要跟子组件那边定义的一样。</p>
+            <p>需要注意的是，匿名插槽传值只能使用<code>default</code>进行接收。具名插槽传值，接收的名字要跟子组件那边定义的一样。</p>
           </div>
 
 <h2 id="缩写"><a href="#缩写" class="headerlink" title="缩写"></a>缩写</h2><blockquote>
-<p>跟 <code>v-on</code> 和 <code>v-bind</code> 一样，v-slot 也有缩写，即把参数之前的所有内容 (v-slot:) 替换为字符 #。例如 <code>v-slot:header</code> 可以被重写为 <code>#header：</code></p>
+<p>跟<code>v-on</code>和<code>v-bind</code>一样，v-slot 也有缩写，即把参数之前的所有内容 (v-slot:) 替换为字符 #。例如<code>v-slot:header</code>可以被重写为<code>#header：</code></p>
 </blockquote>
 <h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
-<p>关于 <code>vue</code> 插槽的作用，本文章基本上已经概述得差不多了，各位看官们可以自己在项目中去实践下。</p>
+<p>关于<code>vue</code>插槽的作用，本文章基本上已经概述得差不多了，各位看官们可以自己在项目中去实践下。</p>
 </blockquote>
 ]]></content>
       <categories>
@@ -151,7 +1008,7 @@
           </div>
 
 <h3 id="props"><a href="#props" class="headerlink" title="props"></a>props</h3><blockquote>
-<p><code>props</code> 的通信方式，可以说是最常用的父子组件的通信方式了。父组件通过 <code>props</code> 的方式向子组件传递，由子组件进行接收，这样我们就可以在子组件中拿到从父组件传递过来的参数了。</p>
+<p><code>props</code>的通信方式，可以说是最常用的父子组件的通信方式了。父组件通过<code>props</code>的方式向子组件传递，由子组件进行接收，这样我们就可以在子组件中拿到从父组件传递过来的参数了。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeNum"</span>&gt;点击修改子组件的值&lt;/el-button&gt;</span><br><span class="line">    &lt;chlid :num=<span class="string">"num"</span>&gt;&lt;/chlid&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Chlid from <span class="string">'./Child'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Parent'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Chlid</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      num: 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">changeNum</span></span>() &#123;</span><br><span class="line">      this.num += 1</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
@@ -162,11 +1019,11 @@
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/Video_2020-03-27_103633.gif" alt=""></p>
 <div class="note warning">
-            <p>使用 <code>props</code> 需要注意，不应该在一个子组件内部改变 prop，这样会破坏单向的数据绑定，导致数据流难以理解。如果有这样的需要，可以通过 data 属性接收或使用 computed 属性进行转换。</p>
+            <p>使用<code>props</code>需要注意，不应该在一个子组件内部改变 prop，这样会破坏单向的数据绑定，导致数据流难以理解。如果有这样的需要，可以通过 data 属性接收或使用 computed 属性进行转换。</p>
           </div>
 
 <h3 id="emit"><a href="#emit" class="headerlink" title="$emit"></a>$emit</h3><blockquote>
-<p>那么，子组件如何向父组件通信呢，这时我们就需要用到 <code>$emit</code> 了，通过 <code>$emit</code> 发射一个事件，然后由父组件用 <code>v-on</code> 接收子组件传递过来的参数，我们把上面的代码稍微改造一下。</p>
+<p>那么，子组件如何向父组件通信呢，这时我们就需要用到<code>$emit</code>了，通过<code>$emit</code>发射一个事件，然后由父组件用<code>v-on</code>接收子组件传递过来的参数，我们把上面的代码稍微改造一下。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div style=<span class="string">"margin-top: 30px;"</span>&gt;</span><br><span class="line">    子组件中的num: &#123;&#123; num &#125;&#125;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeParentNum"</span>&gt;点击修改父组件的值&lt;/el-button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child'</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">    num: &#123;</span><br><span class="line">      <span class="built_in">type</span>: Number,</span><br><span class="line">      default: () =&gt; 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    // 事件发射</span><br><span class="line">    <span class="function"><span class="title">changeParentNum</span></span>() &#123;</span><br><span class="line">      const num = this.num + 1</span><br><span class="line">      // 定义一个事件名，并传递参数</span><br><span class="line">      this.<span class="variable">$emit</span>(<span class="string">'changeParentNum'</span>, num)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
@@ -177,11 +1034,11 @@
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/Video_2020-03-27_105652.gif" alt=""></p>
 <div class="note info">
-            <p>这样我们就通过了 <code>props</code> 和 <code>$emit</code> 实现了一个简单的数据双向绑定</p>
+            <p>这样我们就通过了<code>props</code>和<code>$emit</code>实现了一个简单的数据双向绑定</p>
           </div>
 
 <h3 id="sync"><a href="#sync" class="headerlink" title=".sync"></a>.sync</h3><blockquote>
-<p>或许我们会觉得这样发射事件过于繁琐了，所以我们再稍微改造一下，使用 <code>.sync</code> 修饰符进行子组件向父组件通信并实现数据双向绑定。同样，我们还是改造上面的代码。</p>
+<p>或许我们会觉得这样发射事件过于繁琐了，所以我们再稍微改造一下，使用<code>.sync</code>修饰符进行子组件向父组件通信并实现数据双向绑定。同样，我们还是改造上面的代码。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div style=<span class="string">"margin-top: 30px;"</span>&gt;</span><br><span class="line">    子组件中的num: &#123;&#123; num &#125;&#125;</span><br><span class="line">    &lt;el-button <span class="built_in">type</span>=<span class="string">"primary"</span> @click=<span class="string">"changeParentNum"</span>&gt;点击修改父组件的值&lt;/el-button&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child'</span>,</span><br><span class="line">  props: &#123;</span><br><span class="line">    num: &#123;</span><br><span class="line">      <span class="built_in">type</span>: Number,</span><br><span class="line">      default: () =&gt; 0</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    // 事件发射</span><br><span class="line">    <span class="function"><span class="title">changeParentNum</span></span>() &#123;</span><br><span class="line">      const num = this.num + 1</span><br><span class="line">      // 使用 .sync 修饰符，需要使用 update，告诉父组件，我需要更新哪个值</span><br><span class="line">      this.<span class="variable">$emit</span>(<span class="string">'update:num'</span>, num)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
@@ -196,15 +1053,15 @@
           </div>
 
 <h3 id="eventBus"><a href="#eventBus" class="headerlink" title="eventBus"></a>eventBus</h3><blockquote>
-<p>对于比较小型的项目，可以使用 <code>eventBus</code>。可以实现任意两个组件间的通信。它的实现思想也很好理解，在要相互通信的两个组件中，都引入同一个新的 <code>vue</code> 实例，然后在两个组件中通过分别调用这个实例的事件触发和监听来实现通信。对于 <code>eventBus</code> 我们可以自己手动创建，也可以通过引入插件的方式。这里我们主要讲插件的这种方式。</p>
+<p>对于比较小型的项目，可以使用<code>eventBus</code>。可以实现任意两个组件间的通信。它的实现思想也很好理解，在要相互通信的两个组件中，都引入同一个新的<code>vue</code>实例，然后在两个组件中通过分别调用这个实例的事件触发和监听来实现通信。对于<code>eventBus</code>我们可以自己手动创建，也可以通过引入插件的方式。这里我们主要讲插件的这种方式。</p>
 </blockquote>
 <blockquote>
-<p>首先我们需要安装下 <code>vue-bus</code> 这个插件</p>
+<p>首先我们需要安装下<code>vue-bus</code>这个插件</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install vue-bus --save</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>然后在 <code>main.js</code> 里面引入，这样我们在任意的 <code>vue</code> 实例中都能直接调用了。</p>
+<p>然后在<code>main.js</code>里面引入，这样我们在任意的<code>vue</code>实例中都能直接调用了。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">import VueBus from <span class="string">'vue-bus'</span> // bus总线</span><br><span class="line">Vue.use(VueBus)</span><br></pre></td></tr></table></figure>
 
@@ -217,7 +1074,7 @@
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/Video_2020-03-27_122023.gif" alt=""></p>
 <div class="note warning">
-            <p>使用 <code>eventBus</code> 需要注意的是在组件销毁的时候，需要关闭接收事件。</p>
+            <p>使用<code>eventBus</code>需要注意的是在组件销毁的时候，需要关闭接收事件。</p>
           </div>
 
 <h3 id="vuex"><a href="#vuex" class="headerlink" title="vuex"></a>vuex</h3><div class="note info">
@@ -225,7 +1082,7 @@
           </div>
 
 <h2 id="嵌套组件之间的通信"><a href="#嵌套组件之间的通信" class="headerlink" title="嵌套组件之间的通信"></a>嵌套组件之间的通信</h2><div class="note info">
-            <p>在实际项目中，我们还有可能会遇到过深层次的嵌套组件之间的通信，如果使用 <code>props</code> 一直传递接收下去，未免显得太过沉重了，所以我们可以使用以下几个方法进行嵌套组件的通信。</p>
+            <p>在实际项目中，我们还有可能会遇到过深层次的嵌套组件之间的通信，如果使用<code>props</code>一直传递接收下去，未免显得太过沉重了，所以我们可以使用以下几个方法进行嵌套组件的通信。</p>
           </div>
 
 <h3 id="attrs-listeners"><a href="#attrs-listeners" class="headerlink" title="$attrs / $listeners"></a>$attrs / $listeners</h3><blockquote>
@@ -244,30 +1101,30 @@
 <p>包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on=”$listeners” 传入内部组件——在创建更高层次的组件时非常有用。</p>
 </blockquote>
 <blockquote>
-<p>以下例子，我们准备了几个参数传递下去，并且准备了两个方法，一个加了 <code>native</code> 原生修饰符，一个是非原生事件，然后看看嵌套组件之间的参数传递结果</p>
+<p>以下例子，我们准备了几个参数传递下去，并且准备了两个方法，一个加了<code>native</code>原生修饰符，一个是非原生事件，然后看看嵌套组件之间的参数传递结果</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;child-com-1</span><br><span class="line">      :params1=<span class="string">"params1"</span></span><br><span class="line">      :params2=<span class="string">"params2"</span></span><br><span class="line">      :params3=<span class="string">"params3"</span></span><br><span class="line">      :params4=<span class="string">"params4"</span></span><br><span class="line">      @event1.native=<span class="string">"event1"</span></span><br><span class="line">      @event2=<span class="string">"event2"</span></span><br><span class="line">    &gt;&lt;/child-com-1&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import ChildCom1 from <span class="string">'./components/com-3/ChildCom1'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Corresponded'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    ChildCom1</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">data</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;</span><br><span class="line">      params1: <span class="string">'javaScript'</span>,</span><br><span class="line">      params2: <span class="string">'html'</span>,</span><br><span class="line">      params3: <span class="string">'css'</span>,</span><br><span class="line">      params4: <span class="string">'vue'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  methods: &#123;</span><br><span class="line">    <span class="function"><span class="title">event1</span></span>() &#123;</span><br><span class="line">      console.log(<span class="string">'我是有native原生事件修饰符的event1事件'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="function"><span class="title">event2</span></span>() &#123;</span><br><span class="line">      console.log(<span class="string">'我是非原生事件event2'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>然后在第一级的子组件里面，用 <code>props</code> 来接收一下传递过来的 <code>params1</code> 参数</p>
+<p>然后在第一级的子组件里面，用<code>props</code>来接收一下传递过来的<code>params1</code>参数</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 第一级子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;嵌套组件传递过来的参数：&#123;&#123; <span class="variable">$attrs</span> &#125;&#125;&lt;/div&gt;</span><br><span class="line">    &lt;child-com-2 v-bind=<span class="string">"<span class="variable">$attrs</span>"</span> v-on=<span class="string">"<span class="variable">$listeners</span>"</span>&gt;&lt;/child-com-2&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import ChildCom2 from <span class="string">'./ChildCom2'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'ChildCom1'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    ChildCom2</span><br><span class="line">  &#125;,</span><br><span class="line">  inheritAttrs: <span class="literal">false</span>, // 可以关闭自动挂载到组件根元素上的没有在props声明的属性</span><br><span class="line">  // 用props接收params1参数</span><br><span class="line">  props: &#123;</span><br><span class="line">    params1: &#123;</span><br><span class="line">      <span class="built_in">type</span>: String,</span><br><span class="line">      default: () =&gt; <span class="string">''</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">created</span></span>() &#123;</span><br><span class="line">    console.log(this.<span class="variable">$attrs</span>)</span><br><span class="line">    console.log(this.<span class="variable">$listeners</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>我们可以在 <code>child-com-1</code> 组件看到，用 <code>props</code> 接收的属性和  <code>native</code> 修饰的事件是没有在 <code>this.$attrs</code> 和 <code>this.$listeners</code> 里面的</p>
+<p>我们可以在<code>child-com-1</code>组件看到，用<code>props</code>接收的属性和 <code>native</code>修饰的事件是没有在<code>this.$attrs</code>和<code>this.$listeners</code>里面的</p>
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/DA6B1A8E-7DC1-4a64-8E15-D58B7323E183.png" alt=""></p>
 <blockquote>
-<p>之后我们就可以直接使用 <code>v-bind=&quot;$attrs&quot;</code> 和 <code>v-on=&quot;$listeners&quot;</code> 把属性和事件继续传递下去，并且在子组件用 <code>props</code> 接收一下 <code>params2</code> 这个属性</p>
+<p>之后我们就可以直接使用<code>v-bind=&quot;$attrs&quot;</code>和<code>v-on=&quot;$listeners&quot;</code>把属性和事件继续传递下去，并且在子组件用<code>props</code>接收一下<code>params2</code>这个属性</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 第二级子组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;嵌套组件传递过来的参数：&#123;&#123; <span class="variable">$attrs</span> &#125;&#125;&lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'ChildCom2'</span>,</span><br><span class="line">  inheritAttrs: <span class="literal">false</span>, // 可以关闭自动挂载到组件根元素上的没有在props声明的属性</span><br><span class="line">  props: &#123;</span><br><span class="line">    params2: &#123;</span><br><span class="line">      <span class="built_in">type</span>: String,</span><br><span class="line">      default: () =&gt; <span class="string">''</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="function"><span class="title">created</span></span>() &#123;</span><br><span class="line">    console.log(this.<span class="variable">$attrs</span>)</span><br><span class="line">    console.log(this.<span class="variable">$listeners</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/DDEEDE7C-392C-45d9-915F-986C0A755002.png" alt=""></p>
 <blockquote>
-<p>我们也同样可以在 <code>child-com-2</code> 组件看到，用 <code>props</code> 接收的属性和  <code>native</code> 修饰的事件是没有在 <code>this.$attrs</code> 和 <code>this.$listeners</code> 里面的</p>
+<p>我们也同样可以在<code>child-com-2</code>组件看到，用<code>props</code>接收的属性和 <code>native</code>修饰的事件是没有在<code>this.$attrs</code>和<code>this.$listeners</code>里面的</p>
 </blockquote>
 <div class="note info">
-            <p>我觉得 <code>$attrs</code> 和 <code>$listeners</code> 属性像两个收纳箱，一个负责收纳属性，一个负责收纳事件，都是以对象的形式来保存数据。</p>
+            <p>我觉得<code>$attrs</code>和<code>$listeners</code>属性像两个收纳箱，一个负责收纳属性，一个负责收纳事件，都是以对象的形式来保存数据。</p>
           </div>
 
 <h3 id="provide-inject"><a href="#provide-inject" class="headerlink" title="provide / inject"></a>provide / inject</h3><div class="note info">
@@ -275,17 +1132,17 @@
           </div>
 
 <blockquote>
-<p><code>provide</code> 和 <code>inject</code> 主要为高阶插件/组件库提供用例。并不推荐直接用于应用程序代码中。并且这对选项需要一起使用，以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效。</p>
+<p><code>provide</code>和<code>inject</code>主要为高阶插件/组件库提供用例。并不推荐直接用于应用程序代码中。并且这对选项需要一起使用，以允许一个祖先组件向其所有子孙后代注入一个依赖，不论组件层次有多深，并在起上下游关系成立的时间里始终生效。</p>
 </blockquote>
 <blockquote>
-<p>我们可以在根组件定义一下 <code>provide</code></p>
+<p>我们可以在根组件定义一下<code>provide</code></p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 父组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;son&gt;&lt;/son&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line">import Son from <span class="string">'./components/com-4/Son'</span></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Corresponded'</span>,</span><br><span class="line">  components: &#123;</span><br><span class="line">    Son</span><br><span class="line">  &#125;,</span><br><span class="line">  provide: &#123;</span><br><span class="line">    params1: <span class="string">'javaScript'</span>,</span><br><span class="line">    params2: <span class="string">'html'</span>,</span><br><span class="line">    params3: <span class="string">'css'</span>,</span><br><span class="line">    params4: <span class="string">'vue'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 嵌套组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;&#123;&#123; params1 &#125;&#125;&lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Son'</span>,</span><br><span class="line">  inject: [<span class="string">'params1'</span>]</span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>执行上面代码之后，我们就可以发现，只有我们在子组件使用 <code>jnject</code> 注入了父组件 <code>provide</code> 提供的属性，就可以直接在页面使用了，不管是嵌套多少级组件。我们都可以通过 <code>jnject</code> 去拿到我们想要的父组件 <code>provide</code> 提供属性值。</p>
+<p>执行上面代码之后，我们就可以发现，只有我们在子组件使用<code>jnject</code>注入了父组件<code>provide</code>提供的属性，就可以直接在页面使用了，不管是嵌套多少级组件。我们都可以通过<code>jnject</code>去拿到我们想要的父组件<code>provide</code>提供属性值。</p>
 </blockquote>
 <h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
 <p>以上，就是我自己总结出来的一些组件之间的通信，除了以上这些还有其他办法可以进行组件通信，有兴趣的看官可以自行再去研究一下，我这里就不在多做阐述。本文章只是列出了自己觉得比较有用的组件通信方式。</p>
@@ -312,7 +1169,7 @@
 <h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install -g git-cz</span><br></pre></td></tr></table></figure>
 
 <h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><blockquote>
-<p>在我们 <code>git add .</code> 之后，按照正常的流程是直接 <code>git commit</code>，现在我们安装完 <code>git-cz</code> 之后，就需要使用以下命令来代替 <code>git commit</code></p>
+<p>在我们<code>git add .</code>之后，按照正常的流程是直接<code>git commit</code>，现在我们安装完<code>git-cz</code>之后，就需要使用以下命令来代替<code>git commit</code></p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">git cz</span><br></pre></td></tr></table></figure>
 
@@ -332,10 +1189,10 @@
 <li>revert: 回滚到上一个版本</li>
 </ul>
 <blockquote>
-<p>选择完提交类型之后，就可以根据提示一步步操作，最后执行 <code>git push</code> 就可以把提交代码到远程仓库上了。</p>
+<p>选择完提交类型之后，就可以根据提示一步步操作，最后执行<code>git push</code>就可以把提交代码到远程仓库上了。</p>
 </blockquote>
 <blockquote>
-<p>最后就可以在仓库中看到规范化的 <code>commit</code> 记录了</p>
+<p>最后就可以在仓库中看到规范化的<code>commit</code>记录了</p>
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200326123920.png" alt=""></p>
 ]]></content>
@@ -350,6 +1207,371 @@
       </tags>
   </entry>
   <entry>
+    <title>整理的一些常用工具类方法</title>
+    <url>/%E6%95%B4%E7%90%86%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E7%B1%BB%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<blockquote>
+<p>在日常开发中，我们为了方便代码逻辑的处理，都会封装一些工具类方法来便于我们快速开发，本篇文章就记录了一些我自己整理的具类方法。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="oneOf（判断数组中是否存在某个值）"><a href="#oneOf（判断数组中是否存在某个值）" class="headerlink" title="oneOf（判断数组中是否存在某个值）"></a>oneOf（判断数组中是否存在某个值）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param &#123;String|Number&#125; value 要验证的字符串或数值</span><br><span class="line"> * @param &#123;Array&#125; validList 用来验证的列表</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> oneOf(value, validList) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="built_in">let</span> i = 0; i &lt; validList.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (value === validList[i]) &#123;</span><br><span class="line">      <span class="built_in">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="formatTime（时间格式转换）"><a href="#formatTime（时间格式转换）" class="headerlink" title="formatTime（时间格式转换）"></a>formatTime（时间格式转换）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param &#123;date&#125; time 需要转换的时间</span><br><span class="line"> * @param &#123;String&#125; fmt 需要转换的格式 如 yyyy-MM-dd、yyyy-MM-dd HH:mm:ss</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> formatTime(time, fmt) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!time) <span class="built_in">return</span> <span class="string">''</span></span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">    const date = new Date(time)</span><br><span class="line">    const o = &#123;</span><br><span class="line">      <span class="string">'M+'</span>: date.getMonth() + 1,</span><br><span class="line">      <span class="string">'d+'</span>: date.getDate(),</span><br><span class="line">      <span class="string">'H+'</span>: date.getHours(),</span><br><span class="line">      <span class="string">'m+'</span>: date.getMinutes(),</span><br><span class="line">      <span class="string">'s+'</span>: date.getSeconds(),</span><br><span class="line">      <span class="string">'q+'</span>: Math.floor((date.getMonth() + 3) / 3),</span><br><span class="line">      <span class="string">'S'</span>: date.getMilliseconds()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (/(y+)/.<span class="built_in">test</span>(fmt)) fmt = fmt.replace(RegExp.<span class="variable">$1</span>, (date.getFullYear() + <span class="string">''</span>).substr(4 - RegExp.<span class="variable">$1</span>.length))</span><br><span class="line">    <span class="keyword">for</span> (const k <span class="keyword">in</span> o) &#123;</span><br><span class="line">      <span class="keyword">if</span> (new RegExp(<span class="string">'('</span> + k + <span class="string">')'</span>).<span class="built_in">test</span>(fmt)) &#123;</span><br><span class="line">        fmt = fmt.replace(RegExp.<span class="variable">$1</span>, (RegExp.<span class="variable">$1</span>.length === 1) ? (o[k]) : ((</span><br><span class="line">          <span class="string">'00'</span> + o[k]).substr((<span class="string">''</span> + o[k]).length)))</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> fmt</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="toAnyString（生成随机字符串）"><a href="#toAnyString（生成随机字符串）" class="headerlink" title="toAnyString（生成随机字符串）"></a>toAnyString（生成随机字符串）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 生成随机字符串</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> <span class="function"><span class="title">toAnyString</span></span>() &#123;</span><br><span class="line">  const date = new Date()</span><br><span class="line">  const time = date.getTime()</span><br><span class="line">  const str = <span class="string">'xxxxx-xxxxx-4xxxx-yxxxx-xxxxx'</span>.replace(/[xy]/g, (c) =&gt; &#123;</span><br><span class="line">    const r = Math.random() * 16 | 0</span><br><span class="line">    const v = c === <span class="string">'x'</span> ? r : (r &amp; 0x3 | 0x8)</span><br><span class="line">    <span class="built_in">return</span> v.toString(16)</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="built_in">return</span> time + <span class="string">'-'</span> + str</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="deepClone（深拷贝）"><a href="#deepClone（深拷贝）" class="headerlink" title="deepClone（深拷贝）"></a>deepClone（深拷贝）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 对象数组深拷贝</span><br><span class="line"> * @param &#123;Array,Object&#125; <span class="built_in">source</span> 需要深拷贝的对象数组</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> deepClone(<span class="built_in">source</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="built_in">source</span> &amp;&amp; typeof <span class="built_in">source</span> !== <span class="string">'object'</span>) &#123;</span><br><span class="line">    throw new Error(<span class="string">'error arguments'</span>, <span class="string">'deepClone'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  const targetObj = source.constructor === Array ? [] : &#123;&#125;</span><br><span class="line">  Object.keys(<span class="built_in">source</span>).forEach(keys =&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">source</span>[keys] &amp;&amp; typeof <span class="built_in">source</span>[keys] === <span class="string">'object'</span>) &#123;</span><br><span class="line">      targetObj[keys] = deepClone(<span class="built_in">source</span>[keys])</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      targetObj[keys] = <span class="built_in">source</span>[keys]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="built_in">return</span> targetObj</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="findIndex（查找数组对象的某个下标）"><a href="#findIndex（查找数组对象的某个下标）" class="headerlink" title="findIndex（查找数组对象的某个下标）"></a>findIndex（查找数组对象的某个下标）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 查找数组对象的某个下标</span><br><span class="line"> * @param &#123;Array&#125; ary 查找的数组</span><br><span class="line"> * @param &#123;Functon&#125; fn 判断的方法</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> findIndex(ary, fn) &#123;</span><br><span class="line">  <span class="keyword">if</span> (ary.findIndex) &#123;</span><br><span class="line">    <span class="built_in">return</span> ary.findIndex(fn)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">let</span> index = -1</span><br><span class="line">  ary.some(<span class="keyword">function</span>(item, i, ary) &#123;</span><br><span class="line">    const ret = fn.call(this, item, i, ary)</span><br><span class="line">    <span class="keyword">if</span> (ret) &#123;</span><br><span class="line">      index = i</span><br><span class="line">      <span class="built_in">return</span> ret</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="built_in">return</span> index</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="exportFile（下载文件）"><a href="#exportFile（下载文件）" class="headerlink" title="exportFile（下载文件）"></a>exportFile（下载文件）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 下载文件</span><br><span class="line"> * @param &#123;Blob&#125; blobs 文件流</span><br><span class="line"> * @param &#123;name&#125; 文件名</span><br><span class="line"> * @param &#123;fileType&#125; 文件类型</span><br><span class="line"> * @param &#123;<span class="built_in">type</span>&#125; 后缀</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> exportFile(blobs, name, fileType, <span class="built_in">type</span>) &#123;</span><br><span class="line">  const blob = new Blob([blobs], &#123; <span class="built_in">type</span>: fileType &#125;)</span><br><span class="line">  <span class="keyword">if</span> (typeof window.navigator.msSaveBlob !== <span class="string">'undefined'</span>) &#123;</span><br><span class="line">    window.navigator.msSaveBlob(blob, name)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    const blobURL = window.URL.createObjectURL(blob) // 将blob对象转为一个URL</span><br><span class="line">    const tempLink = document.createElement(<span class="string">'a'</span>) // 创建一个a标签</span><br><span class="line">    tempLink.style.display = <span class="string">'none'</span></span><br><span class="line">    tempLink.href = blobURL</span><br><span class="line">    tempLink.setAttribute(<span class="string">'download'</span>, name) // 给a标签添加下载属性</span><br><span class="line">    <span class="keyword">if</span> (typeof tempLink.download === <span class="string">'undefined'</span>) &#123;</span><br><span class="line">      tempLink.setAttribute(<span class="string">'target'</span>, <span class="string">'_blank'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    document.body.appendChild(tempLink) // 将a标签添加到body当中</span><br><span class="line">    tempLink.click() // 启动下载</span><br><span class="line">    document.body.removeChild(tempLink) // 下载完毕删除a标签</span><br><span class="line">    window.URL.revokeObjectURL(blobURL)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="param2Obj（截取URL参数）"><a href="#param2Obj（截取URL参数）" class="headerlink" title="param2Obj（截取URL参数）"></a>param2Obj（截取URL参数）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 截取URL参数</span><br><span class="line"> * @param &#123;string&#125; url</span><br><span class="line"> * @returns &#123;Object&#125;</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> param2Obj(url) &#123;</span><br><span class="line">  const search = url.split(<span class="string">'?'</span>)[1]</span><br><span class="line">  <span class="keyword">if</span> (!search) &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> JSON.parse(</span><br><span class="line">    <span class="string">'&#123;"'</span> +</span><br><span class="line">      decodeURIComponent(search)</span><br><span class="line">        .replace(/<span class="string">"/g, '\\"</span><span class="string">')</span></span><br><span class="line"><span class="string">        .replace(/&amp;/g, '</span><span class="string">","</span><span class="string">')</span></span><br><span class="line"><span class="string">        .replace(/=/g, '</span><span class="string">":"</span><span class="string">')</span></span><br><span class="line"><span class="string">        .replace(/\+/g, '</span> <span class="string">') +</span></span><br><span class="line"><span class="string">      '</span><span class="string">"&#125;'</span></span><br><span class="line"><span class="string">  )</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="img2Base64（图片地址转base64）"><a href="#img2Base64（图片地址转base64）" class="headerlink" title="img2Base64（图片地址转base64）"></a>img2Base64（图片地址转base64）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 图片地址转base64</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> img2Base64(src) &#123;</span><br><span class="line">  const canvas = document.createElement(<span class="string">'canvas'</span>)</span><br><span class="line">  const ctx = canvas.getContext(<span class="string">'2d'</span>)</span><br><span class="line">  const img = document.createElement(<span class="string">'img'</span>)</span><br><span class="line">  img.crossOrigin = <span class="string">'*'</span></span><br><span class="line">  <span class="built_in">return</span> new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">    img.onload = () =&gt; &#123;</span><br><span class="line">      const &#123;</span><br><span class="line">        width,</span><br><span class="line">        height</span><br><span class="line">      &#125; = img</span><br><span class="line">      canvas.width = width</span><br><span class="line">      canvas.height = height</span><br><span class="line"></span><br><span class="line">      ctx.drawImage(img, 0, 0)</span><br><span class="line">      const base64 = canvas.toDataURL()</span><br><span class="line"></span><br><span class="line">      resolve(base64)</span><br><span class="line">    &#125;</span><br><span class="line">    img.src = src</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="IEVersion（获取IE浏览器版本）"><a href="#IEVersion（获取IE浏览器版本）" class="headerlink" title="IEVersion（获取IE浏览器版本）"></a>IEVersion（获取IE浏览器版本）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> <span class="function"><span class="title">IEVersion</span></span>() &#123;</span><br><span class="line">  const userAgent = navigator.userAgent // 取得浏览器的userAgent字符串</span><br><span class="line">  const isIE = userAgent.indexOf(<span class="string">'compatible'</span>) &gt; -1 &amp;&amp; userAgent.indexOf(<span class="string">'MSIE'</span>) &gt; -1 // 判断是否IE&lt;11浏览器</span><br><span class="line">  const isEdge = userAgent.indexOf(<span class="string">'Edge'</span>) &gt; -1 &amp;&amp; !isIE // 判断是否IE的Edge浏览器</span><br><span class="line">  const isIE11 = userAgent.indexOf(<span class="string">'Trident'</span>) &gt; -1 &amp;&amp; userAgent.indexOf(<span class="string">'rv:11.0'</span>) &gt; -1</span><br><span class="line">  <span class="keyword">if</span> (isIE) &#123;</span><br><span class="line">    const reIE = new RegExp(<span class="string">'MSIE (\\d+\\.\\d+);'</span>)</span><br><span class="line">    reIE.test(userAgent)</span><br><span class="line">    const fIEVersion = parseFloat(RegExp[<span class="string">'$1'</span>])</span><br><span class="line">    <span class="keyword">if</span> (fIEVersion === 7) &#123;</span><br><span class="line">      <span class="built_in">return</span> 7</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fIEVersion === 8) &#123;</span><br><span class="line">      <span class="built_in">return</span> 8</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fIEVersion === 9) &#123;</span><br><span class="line">      <span class="built_in">return</span> 9</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fIEVersion === 10) &#123;</span><br><span class="line">      <span class="built_in">return</span> 10</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">return</span> 6 // IE版本&lt;=7</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isEdge) &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'edge'</span> // edge</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isIE11) &#123;</span><br><span class="line">    <span class="built_in">return</span> 11 // IE11</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="literal">false</span> // 不是ie浏览器</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="thousands（每隔三个数一个逗号）"><a href="#thousands（每隔三个数一个逗号）" class="headerlink" title="thousands（每隔三个数一个逗号）"></a>thousands（每隔三个数一个逗号）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 每隔三个数一个逗号</span><br><span class="line"> * @param &#123;string|Number&#125; num</span><br><span class="line"> * @returns &#123;string&#125;</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> thousands(num) &#123;</span><br><span class="line">  const str = typeof num === <span class="string">'number'</span> ? num.toString() : num</span><br><span class="line">  const reg = str.indexOf(<span class="string">'.'</span>) &gt; -1 ? /(\d)(?=(\d&#123;3&#125;)+\.)/g : /(\d)(?=(?:\d&#123;3&#125;)+$)/g</span><br><span class="line">  <span class="built_in">return</span> str.replace(reg, <span class="string">'$1,'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">
+            <p>在之后的开发中，还会陆续把一些常用的工具类方法给集成进来，做个整合。</p>
+          </div>]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>工具</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>如何基于axios实现请求拦截器</title>
+    <url>/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8Eaxios%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E6%8B%A6%E6%88%AA%E5%99%A8/</url>
+    <content><![CDATA[<blockquote>
+<p>在vue项目中，我们通常使用<code>axios</code>与后台进行数据交互，<code>axios</code>是一款基于promise封装的库，可以运行在浏览器端和node环境中。它有很多优秀的特性，例如拦截请求和响应、取消请求、转换json、客户端防御XSRF等。所以vue官方开发组放弃了对其官方库<code>vue-resource</code>的维护，直接推荐我们使用<code>axios</code>库。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>页面发送<code>http</code>请求，很多情况我们要对请求和其响应进行特定的处理；例如每个请求都附带后端返回的<code>token</code>，以及对返回的结果进行统一拦截处理等。如果请求数非常多，这样处理起来会非常的麻烦，程序的优雅性也会大打折扣。在这种情况下，<code>axios</code>为开发者提供了这样一个API：拦截器。拦截器分为<code>请求（request）拦截器</code>和<code>响应（response）拦截器</code>。</p>
+</blockquote>
+<h2 id="文件结构"><a href="#文件结构" class="headerlink" title="文件结构"></a>文件结构</h2><blockquote>
+<p>我们需要在src底下新建一个名为<code>api</code>的文件夹，里面就是放置一些<code>axios</code>的配置和<code>请求api</code>，具体结构如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">├── src                        </span><br><span class="line">│   ├── api                    <span class="comment"># axios配置及api请求</span></span><br><span class="line">│   │   ├── modules            <span class="comment"># 模块化的api请求</span></span><br><span class="line">│   │   │   ├── common.js      <span class="comment"># 对应每个模块的api请求，这里只是一个实例，可根据实际情况自行改造。</span></span><br><span class="line">│   │   ├── methods.js         <span class="comment"># 封装axios请求</span></span><br><span class="line">│   │   ├── index.js           <span class="comment"># 对外抛的方法</span></span><br><span class="line">│   │   ├── request.js         <span class="comment"># axios配置</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="request-js"><a href="#request-js" class="headerlink" title="request.js"></a>request.js</h2><blockquote>
+<p>首先，我们需要在<code>request.js</code>创建一个<code>axios</code>实例，并且实现<code>请求（request）拦截器</code>和<code>响应（response）拦截器</code>。具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">import axios from <span class="string">'axios'</span> // 引入axios插件</span><br><span class="line">import qs from <span class="string">'qs'</span> // 引入qs进行序列化</span><br><span class="line"></span><br><span class="line">// 创建axios实例</span><br><span class="line">const service = axios.create(&#123;</span><br><span class="line">  baseURL: <span class="string">'http://xxx.xxx.xxx.xxx'</span>, // api 的 请求前缀</span><br><span class="line">  timeout: 30000 // 请求超时时间</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// request 拦截器 -- 请求之前</span><br><span class="line">service.interceptors.request.use(</span><br><span class="line">  config =&gt; &#123;</span><br><span class="line">    // Do something</span><br><span class="line">    // 如：添加token，参数序列化操作。</span><br><span class="line">    </span><br><span class="line">    config.headers[<span class="string">'token'</span>] = <span class="string">'xxxxxx'</span></span><br><span class="line">    <span class="keyword">if</span> (config.method === <span class="string">'post'</span> &amp;&amp; config.headers[<span class="string">'Content-Type'</span>] === <span class="string">'application/x-www-form-urlencoded'</span>) &#123;</span><br><span class="line">      config.data = qs.stringify(config.data)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> config</span><br><span class="line">  &#125;,</span><br><span class="line">  error =&gt; &#123;</span><br><span class="line">    // Do something with request error</span><br><span class="line">    console.log(error) // <span class="keyword">for</span> debug</span><br><span class="line">    Promise.reject(error)</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// response 拦截器 -- 请求之后</span><br><span class="line">service.interceptors.response.use(</span><br><span class="line">  response =&gt; &#123;</span><br><span class="line">    // Do something</span><br><span class="line">    // 如 状态码为 0 的时候，<span class="built_in">return</span> 请求结果</span><br><span class="line">    <span class="keyword">if</span> (response.data.code === 0) &#123;</span><br><span class="line">      <span class="built_in">return</span> response.data</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  error =&gt; &#123;</span><br><span class="line">    console.log(<span class="string">'err'</span> + error) // <span class="keyword">for</span> debug</span><br><span class="line">    <span class="built_in">return</span> Promise.reject(error)</span><br><span class="line">  &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">// 抛出axios实例</span><br><span class="line"><span class="built_in">export</span> default service</span><br></pre></td></tr></table></figure>
+
+<h2 id="methods-js"><a href="#methods-js" class="headerlink" title="methods.js"></a>methods.js</h2><blockquote>
+<p>之后，我们需要在<code>methods.js</code>使用<code>request.js</code>中抛出的实例，进行请求的二次封装，具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">import request from <span class="string">'./request'</span></span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @param &#123;Object&#125; params 需要请求携带的参数</span><br><span class="line"> * @param &#123;String&#125; url 请求的接口地址</span><br><span class="line"> */</span><br><span class="line"><span class="keyword">function</span> get(params, url) &#123;</span><br><span class="line">  <span class="built_in">return</span> request(&#123;</span><br><span class="line">    url: url +`?timestamp=<span class="variable">$&#123;new Date().getTime()&#125;</span>`, // 处理IE请求缓存的问题。</span><br><span class="line">    method: <span class="string">'get'</span>,</span><br><span class="line">    params</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/**</span><br><span class="line"> * @param &#123;Object&#125; params 需要请求携带的参数</span><br><span class="line"> * @param &#123;String&#125; url 请求的接口地址</span><br><span class="line"> * @param &#123;String&#125; headersType 请求类型</span><br><span class="line"> * @param &#123;String&#125; responseType 请求返回结果类型</span><br><span class="line"> */</span><br><span class="line"><span class="keyword">function</span> post(params, url, headersType, responseType) &#123;</span><br><span class="line">  <span class="built_in">return</span> request(&#123;</span><br><span class="line">    url: url +`?timestamp=<span class="variable">$&#123;new Date().getTime()&#125;</span>`, // 处理IE请求缓存的问题。</span><br><span class="line">    method: <span class="string">'post'</span>,</span><br><span class="line">    data: params,</span><br><span class="line">    responseType: responseType,</span><br><span class="line">    headers: &#123;</span><br><span class="line">      <span class="string">'Content-Type'</span>: headersType || <span class="string">'application/x-www-form-urlencoded'</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 对外抛出方法</span><br><span class="line"><span class="built_in">export</span> &#123;</span><br><span class="line">  get,</span><br><span class="line">  post</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="接口api规范化管理"><a href="#接口api规范化管理" class="headerlink" title="接口api规范化管理"></a>接口api规范化管理</h2><blockquote>
+<p>在中大型项目中，我们需要涉及到的接口可是说是非常多的，那么如何把接口给管理起来，就是我们前端的必经之路了，以下是我自认为比较有效管理的一种方法，有兴趣的看官可以借鉴。</p>
+</blockquote>
+<blockquote>
+<p>我们可以根据项目的模块来创建管理 api请求接口 ，如，我们有个用户管理模块，那么我们可以在<code>api/modules/</code>底下，新建一个<code>user.js</code>文件，里面具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">import &#123; get, post &#125; from <span class="string">'../axios'</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  getUserList: <span class="keyword">function</span>(params) &#123;</span><br><span class="line">    <span class="built_in">return</span> get(params, <span class="string">'/rat/api/client/list'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  setUserInfo: <span class="keyword">function</span>(params) &#123;</span><br><span class="line">    <span class="built_in">return</span> post(params, <span class="string">'/rat/api/modelPrice/update'</span>, <span class="string">'application/json'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="对外抛出api请求"><a href="#对外抛出api请求" class="headerlink" title="对外抛出api请求"></a>对外抛出api请求</h2><blockquote>
+<p>上述几个文件创建完之后，基本上就算大功告成了，接下来就是如何使用的问题了，我们还有一个<code>index.js</code>未使用，他的具体用法就是对外抛出所有的<code>api</code>请求，具体代码如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 有兴趣的看官可以自行百度一下 require.context 的用法，这里不做过多的阐述。</span><br><span class="line">const modulesFiles = require.context(<span class="string">'./modules'</span>, <span class="literal">true</span>, /\.js$/)</span><br><span class="line"></span><br><span class="line">const modules = modulesFiles.keys().reduce((modules, modulePath) =&gt; &#123;</span><br><span class="line">  const moduleName = modulePath.replace(/^\.\/(.*)\.\w+$/, <span class="string">'$1'</span>)</span><br><span class="line">  const value = modulesFiles(modulePath)</span><br><span class="line">  modules[moduleName] = value.default</span><br><span class="line">  <span class="built_in">return</span> modules</span><br><span class="line">&#125;, &#123;&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  ...modules</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><blockquote>
+<p>我们可以把所有请求全部挂在到<code>Vue.prototype</code>底下，便于全局使用，也可以局部引入，这里主要介绍全局使用的方法：</p>
+</blockquote>
+<blockquote>
+<p>在入口文件<code>main.js</code>中引入：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">import api from <span class="string">'@/api'</span> // 引入api</span><br><span class="line">Vue.prototype.<span class="variable">$api</span> = api</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>之后，我们就可以愉快的进行使用了，完整的使用例子如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 获取列表数据</span><br><span class="line">async <span class="function"><span class="title">getUserList</span></span>() &#123;</span><br><span class="line">  try &#123;</span><br><span class="line">    const res = await this.<span class="variable">$api</span>.user.getUserList(&#123;</span><br><span class="line">      pageNum: 1,</span><br><span class="line">      pageSize: 10</span><br><span class="line">    &#125;)</span><br><span class="line">    <span class="keyword">if</span> (res.data) &#123;</span><br><span class="line">      Do something</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; catch (err) &#123;</span><br><span class="line">    console.log(err)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">
+            <p>在日常开发中，一个api请求的规范化管理，可以很好的体现出整个项目组的水平，各位看官们，有兴趣的话可以在自己的项目中进行实践推广起来。</p>
+          </div>]]></content>
+      <categories>
+        <category>axios</category>
+      </categories>
+      <tags>
+        <tag>axios请求</tag>
+        <tag>axios二次封装</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>npm如何上传自定义插件</title>
+    <url>/npm%E5%A6%82%E4%BD%95%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8F%92%E4%BB%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>在日常开发中，我们通常会通过<code>npm</code>下载各种各样的插件来为项目服务，这篇文章记录了一下如何编写一个插件并且上传到<code>npm</code>上，以<code>vue</code>组件为例。本篇文章省去了一些前置步骤，如如何创建<code>npm</code>账号，这些需要看官们自行去百度。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>刚好最近项目有需要用到一个图片预览插件，看了一下市面上的，都是基于<code>img</code>标签去进行点击预览的，感觉这样太局限性了，所以想写一个通过js方法进行调用的图片预览插件。</p>
+</blockquote>
+<h2 id="新建项目"><a href="#新建项目" class="headerlink" title="新建项目"></a>新建项目</h2><blockquote>
+<p>这里我们采用比较轻量级的<code>webpack-simple</code>脚手架模板来搭建整个项目的框架</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">vue init webpack-simple vue-preview-pictures(项目名)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>编写插件的过程我们这边省略掉，之后完整的目录结构如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200621162432.png" alt=""></p>
+<blockquote>
+<p>在本地调试完之后没问题的话，我们就要开始做一些上传到<code>npm</code>的配置了。</p>
+</blockquote>
+<h2 id="改造成vue插件"><a href="#改造成vue插件" class="headerlink" title="改造成vue插件"></a>改造成vue插件</h2><blockquote>
+<p>在组件的文件夹下创建一个<code>index.js</code>文件，这个文件作用是将组件导出，如我自己的组件<code>src/packages/vue-preview-pictures/index.js</code>，里面具体操作可以根据自己的实际情况来，但是最后我们需要导出的是注册之后的组件。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 引入组件</span><br><span class="line">import xxx from <span class="string">'./xxx.vue'</span></span><br><span class="line"></span><br><span class="line">xxx.install = Vue =&gt; Vue.component(xxx.name, xxx); //这里的name是.vue文件里面定义的</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (typeof window !== <span class="string">'undefined'</span> &amp;&amp; window.Vue) &#123;</span><br><span class="line">  window.Vue.use(xxx);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default xxx</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在与<code>APP.vue</code>同级下创建一个<code>index.js</code>的文件(一个包下可能有多个组件)，导入刚刚写好的<code>index.js</code>组件。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 写好的组件</span><br><span class="line">import xxx from <span class="string">'./packages/xxx/index.js'</span>;</span><br><span class="line"></span><br><span class="line">const components = [</span><br><span class="line">  xxx,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">const install = <span class="keyword">function</span>(Vue, opts = &#123;&#125;) &#123;</span><br><span class="line">  components.map(component =&gt; &#123;</span><br><span class="line">    Vue.component(component.name, component); //到时候项目使用组件名,就是这个component.name</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/* 支持使用标签的方式引入 */</span><br><span class="line"><span class="keyword">if</span> (typeof window !== <span class="string">'undefined'</span> &amp;&amp; window.Vue) &#123;</span><br><span class="line">  install(window.Vue);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  install,</span><br><span class="line">  xxx,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改package-json文件"><a href="#修改package-json文件" class="headerlink" title="修改package.json文件"></a>修改package.json文件</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"name"</span>: <span class="string">"vue-preview-pictures"</span>, // 模块名,不能重复</span><br><span class="line">  <span class="string">"description"</span>: <span class="string">"图片预览组件"</span>,</span><br><span class="line">  <span class="string">"version"</span>: <span class="string">"0.1.4"</span>, // 版本号,每次要更新</span><br><span class="line">  <span class="string">"author"</span>: <span class="string">"kailong321200875 &lt;321200875@qq.com&gt;"</span>,</span><br><span class="line">  <span class="string">"license"</span>: <span class="string">"MIT"</span>, // 开源协议</span><br><span class="line">  <span class="string">"private"</span>: <span class="literal">false</span>, // 因为组件包是公用的，所以private为<span class="literal">false</span></span><br><span class="line">  <span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"dev"</span>: <span class="string">"cross-env NODE_ENV=development webpack-dev-server --open --hot"</span>,</span><br><span class="line">    <span class="string">"build"</span>: <span class="string">"cross-env NODE_ENV=production webpack --progress --hide-modules"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"main"</span>: <span class="string">"dist/vue-preview-pictures.js"</span>, // 配置main结点，如果不配置，我们在其他项目中就不用import XX from <span class="string">'包名'</span>来引用了，只能以包名作为起点来指定相对的路径</span><br><span class="line">  <span class="string">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="string">"vue"</span>: <span class="string">"^2.5.11"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"browserslist"</span>: [</span><br><span class="line">    <span class="string">"&gt; 1%"</span>,</span><br><span class="line">    <span class="string">"last 2 versions"</span>,</span><br><span class="line">    <span class="string">"not ie &lt;= 8"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="string">"babel-core"</span>: <span class="string">"^6.26.0"</span>,</span><br><span class="line">    <span class="string">"babel-helpers"</span>: <span class="string">"^6.24.1"</span>,</span><br><span class="line">    <span class="string">"babel-loader"</span>: <span class="string">"^7.1.2"</span>,</span><br><span class="line">    <span class="string">"babel-preset-env"</span>: <span class="string">"^1.6.0"</span>,</span><br><span class="line">    <span class="string">"babel-preset-stage-3"</span>: <span class="string">"^6.24.1"</span>,</span><br><span class="line">    <span class="string">"cross-env"</span>: <span class="string">"^5.0.5"</span>,</span><br><span class="line">    <span class="string">"css-loader"</span>: <span class="string">"^0.28.7"</span>,</span><br><span class="line">    <span class="string">"file-loader"</span>: <span class="string">"^1.1.4"</span>,</span><br><span class="line">    <span class="string">"node-sass"</span>: <span class="string">"^4.5.3"</span>,</span><br><span class="line">    <span class="string">"sass-loader"</span>: <span class="string">"^6.0.6"</span>,</span><br><span class="line">    <span class="string">"url-loader"</span>: <span class="string">"^2.2.0"</span>,</span><br><span class="line">    <span class="string">"vue-loader"</span>: <span class="string">"^13.0.5"</span>,</span><br><span class="line">    <span class="string">"vue-template-compiler"</span>: <span class="string">"^2.4.4"</span>,</span><br><span class="line">    <span class="string">"webpack"</span>: <span class="string">"^3.6.0"</span>,</span><br><span class="line">    <span class="string">"webpack-dev-server"</span>: <span class="string">"^2.9.1"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  // 指定代码所在的仓库地址</span><br><span class="line">  <span class="string">"repository"</span>: &#123;</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"git"</span>,</span><br><span class="line">    <span class="string">"url"</span>: <span class="string">"git+https://github.com/kailong321200875/vue-preview-pictures"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"bugs"</span>: &#123;</span><br><span class="line">    <span class="string">"url"</span>: <span class="string">"https://github.com/kailong321200875/vue-preview-pictures/issues"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"homepage"</span>: <span class="string">"https://github.com/kailong321200875/vue-preview-pictures#readme"</span>,</span><br><span class="line">  // 指定打包后,包中存在的文件夹</span><br><span class="line">  <span class="string">"files"</span>: [</span><br><span class="line">    <span class="string">"dist"</span>,</span><br><span class="line">    <span class="string">"src"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"keywords"</span>: [</span><br><span class="line">    <span class="string">"vue"</span>,</span><br><span class="line">    <span class="string">"preview"</span>,</span><br><span class="line">    <span class="string">"pictures"</span>,</span><br><span class="line">    <span class="string">"vue-preview-pictures"</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改-gitignore文件"><a href="#修改-gitignore文件" class="headerlink" title="修改.gitignore文件"></a>修改.gitignore文件</h2><blockquote>
+<p>因为要用<code>dist</code>文件夹，所以在<code>.gitignore</code>文件中把<code>dist/</code>去掉。最后长这样</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">.DS_Store</span><br><span class="line">node_modules/</span><br><span class="line">npm-debug.log</span><br><span class="line">yarn-error.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># Editor directories and files</span></span><br><span class="line">.idea</span><br><span class="line">*.suo</span><br><span class="line">*.ntvs*</span><br><span class="line">*.njsproj</span><br><span class="line">*.sln</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改webpack-config-js文件"><a href="#修改webpack-config-js文件" class="headerlink" title="修改webpack.config.js文件"></a>修改webpack.config.js文件</h2><blockquote>
+<p>主要还是改输出部分,打包成自己想要的js文件</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var path = require(<span class="string">'path'</span>)</span><br><span class="line">var webpack = require(<span class="string">'webpack'</span>)</span><br><span class="line">const NODE_ENV = process.env.NODE_ENV</span><br><span class="line"></span><br><span class="line">module.exports = &#123;</span><br><span class="line">  entry: NODE_ENV == <span class="string">'development'</span> ? <span class="string">'./src/main.js'</span> : <span class="string">'./src/index.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'./dist'</span>),</span><br><span class="line">    publicPath: <span class="string">'/dist/'</span>,</span><br><span class="line">    filename: <span class="string">'vue-preview-pictures.js'</span>,</span><br><span class="line">    library: <span class="string">'vue-preview-pictures'</span>,</span><br><span class="line">    libraryTarget: <span class="string">'umd'</span>,</span><br><span class="line">    umdNamedDefine: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  module: &#123;</span><br><span class="line">    rules: [&#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.css$/,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'vue-style-loader'</span>,</span><br><span class="line">          <span class="string">'css-loader'</span></span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.scss$/,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'vue-style-loader'</span>,</span><br><span class="line">          <span class="string">'css-loader'</span>,</span><br><span class="line">          <span class="string">'sass-loader'</span></span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.sass$/,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'vue-style-loader'</span>,</span><br><span class="line">          <span class="string">'css-loader'</span>,</span><br><span class="line">          <span class="string">'sass-loader?indentedSyntax'</span></span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.vue$/,</span><br><span class="line">        loader: <span class="string">'vue-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          loaders: &#123;</span><br><span class="line">            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map</span><br><span class="line">            // the <span class="string">"scss"</span> and <span class="string">"sass"</span> values <span class="keyword">for</span> the lang attribute to the right configs here.</span><br><span class="line">            // other preprocessors should work out of the box, no loader config like this necessary.</span><br><span class="line">            <span class="string">'scss'</span>: [</span><br><span class="line">              <span class="string">'vue-style-loader'</span>,</span><br><span class="line">              <span class="string">'css-loader'</span>,</span><br><span class="line">              <span class="string">'sass-loader'</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="string">'sass'</span>: [</span><br><span class="line">              <span class="string">'vue-style-loader'</span>,</span><br><span class="line">              <span class="string">'css-loader'</span>,</span><br><span class="line">              <span class="string">'sass-loader?indentedSyntax'</span></span><br><span class="line">            ]</span><br><span class="line">          &#125;</span><br><span class="line">          // other vue-loader options go here</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.js$/,</span><br><span class="line">        loader: <span class="string">'babel-loader'</span>,</span><br><span class="line">        exclude: /node_modules/</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.(png|jpg|gif|svg)$/,</span><br><span class="line">        loader: <span class="string">'file-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          name: <span class="string">'[name].[ext]?[hash]'</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.(svg|ttf|eot|woff|woff2)$/,</span><br><span class="line">        loader: <span class="string">'url-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          name: <span class="string">'[name].[ext]?[hash]'</span>,</span><br><span class="line">          <span class="built_in">limit</span>: 999999999</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  resolve: &#123;</span><br><span class="line">    <span class="built_in">alias</span>: &#123;</span><br><span class="line">      <span class="string">'vue$'</span>: <span class="string">'vue/dist/vue.esm.js'</span>,</span><br><span class="line">      <span class="string">'@'</span>: path.resolve(__dirname, <span class="string">'./src'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    extensions: [<span class="string">'*'</span>, <span class="string">'.js'</span>, <span class="string">'.vue'</span>, <span class="string">'.json'</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    historyApiFallback: <span class="literal">true</span>,</span><br><span class="line">    noInfo: <span class="literal">true</span>,</span><br><span class="line">    overlay: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  performance: &#123;</span><br><span class="line">    hints: <span class="literal">false</span></span><br><span class="line">  &#125;,</span><br><span class="line">  devtool: <span class="string">'#eval-source-map'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (process.env.NODE_ENV === <span class="string">'production'</span>) &#123;</span><br><span class="line">  module.exports.devtool = <span class="string">'#source-map'</span></span><br><span class="line">  // http://vue-loader.vuejs.org/en/workflow/production.html</span><br><span class="line">  module.exports.plugins = (module.exports.plugins || []).concat([</span><br><span class="line">    new webpack.DefinePlugin(&#123;</span><br><span class="line">      <span class="string">'process.env'</span>: &#123;</span><br><span class="line">        NODE_ENV: <span class="string">'"production"'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;),</span><br><span class="line">    new webpack.optimize.UglifyJsPlugin(&#123;</span><br><span class="line">      sourceMap: <span class="literal">true</span>,</span><br><span class="line">      compress: &#123;</span><br><span class="line">        warnings: <span class="literal">false</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;),</span><br><span class="line">    new webpack.LoaderOptionsPlugin(&#123;</span><br><span class="line">      minimize: <span class="literal">true</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="本地打包"><a href="#本地打包" class="headerlink" title="本地打包"></a>本地打包</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<h2 id="发布到npm上（注意镜像地址要指向npm的地址）"><a href="#发布到npm上（注意镜像地址要指向npm的地址）" class="headerlink" title="发布到npm上（注意镜像地址要指向npm的地址）"></a>发布到npm上（注意镜像地址要指向npm的地址）</h2><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm login</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>登录自己的<code>npm</code>账号</p>
+</blockquote>
+<blockquote>
+<p>如果出现 Logged in as 你的名字 on <a href="https://registry.npmjs.org/" target="_blank" rel="noopener">https://registry.npmjs.org/</a> 说明，登录成功。如果是 Logged in as 你的名字 on <a href="https://registry.npm.taobao.org/，说明你登录的是淘宝的镜像..后面提交会报403的错误，淘宝源，需要切回到`npmjs`源，输入以下命令：" target="_blank" rel="noopener">https://registry.npm.taobao.org/，说明你登录的是淘宝的镜像..后面提交会报403的错误，淘宝源，需要切回到`npmjs`源，输入以下命令：</a></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm config <span class="built_in">set</span> registry=http://registry.npmjs.org</span><br><span class="line"></span><br><span class="line">// 最后执行</span><br><span class="line">npm publish</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>到这里，我们就可以登录<code>npm</code>，看到我们上传的插件了。我们在项目中也可以愉快的使用<code>npm</code>进行导入了。</p>
+</blockquote>
+<blockquote>
+<p><a href="https://github.com/kailong321200875/vue-preview-pictures" target="_blank" rel="noopener">图片预览插件</a>，这个就是我参考<code>element</code>的图片预览组件进行改造的，有需要的看官可以使用看看。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>npm</category>
+      </categories>
+      <tags>
+        <tag>npm</tag>
+        <tag>自定义插件</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ECMAScript6新特性实践</title>
+    <url>/ECMAScript6%E6%96%B0%E7%89%B9%E6%80%A7%E5%AE%9E%E8%B7%B5/</url>
+    <content><![CDATA[<blockquote>
+<p><code>ES6</code>是一次重大的革新，比起过去的版本，改动比较大，本文仅对常用的<code>API</code>以及语法糖进行讲解。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="let和const"><a href="#let和const" class="headerlink" title="let和const"></a>let和const</h2><blockquote>
+<p>在<code>ES6</code>以前，JS只有<code>var</code>一种声明方式，但是在<code>ES6</code>之后，就多了<code>let</code>跟<code>const</code>这两种方式。用<code>var</code>定义的变量没有块级作用域的概念，而<code>let</code>跟<code>const</code>则会有，因为这三个关键字创建是不一样的，并且<code>const</code>定义完之后是不可重新赋值的常量。</p>
+</blockquote>
+<blockquote>
+<p>区别如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  var a = 10</span><br><span class="line">  <span class="built_in">let</span> b = 20</span><br><span class="line">  const c = 30</span><br><span class="line">&#125;</span><br><span class="line">console.log(a) // 10</span><br><span class="line">console.log(b) // Uncaught ReferenceError: b is not defined</span><br><span class="line">console.log(c) // Uncaught ReferenceError: c is not defined</span><br><span class="line"></span><br><span class="line"><span class="built_in">let</span> d = 40</span><br><span class="line">d = 60</span><br><span class="line">console.log(d) // 60</span><br><span class="line"></span><br><span class="line">const e = 50</span><br><span class="line">e = 70 // VM231:1 Uncaught TypeError: Assignment to constant variable.</span><br></pre></td></tr></table></figure>
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th align="center">var</th>
+<th align="center">let</th>
+<th align="right">const</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>变量提升</td>
+<td align="center">√</td>
+<td align="center">×</td>
+<td align="right">×</td>
+</tr>
+<tr>
+<td>全局变量</td>
+<td align="center">√</td>
+<td align="center">×</td>
+<td align="right">×</td>
+</tr>
+<tr>
+<td>重复声明</td>
+<td align="center">√</td>
+<td align="center">×</td>
+<td align="right">×</td>
+</tr>
+<tr>
+<td>重新赋值</td>
+<td align="center">√</td>
+<td align="center">√</td>
+<td align="right">×</td>
+</tr>
+<tr>
+<td>暂时死区</td>
+<td align="center">×</td>
+<td align="center">√</td>
+<td align="right">√</td>
+</tr>
+<tr>
+<td>块作用域</td>
+<td align="center">×</td>
+<td align="center">√</td>
+<td align="right">√</td>
+</tr>
+<tr>
+<td>只声明不初始化</td>
+<td align="center">√</td>
+<td align="center">√</td>
+<td align="right">×</td>
+</tr>
+</tbody></table>
+<h2 id="类（Class）"><a href="#类（Class）" class="headerlink" title="类（Class）"></a>类（Class）</h2><blockquote>
+<p>在<code>ES6</code>之前，如果我们要生成一个实例对象，传统的方法就是写一个构造函数，例子如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">&#125;</span><br><span class="line">Person.prototype.information = <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">  <span class="built_in">return</span> <span class="string">'My name is '</span> + this.name + <span class="string">', I am '</span> + this.age</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但是在<code>ES6</code>之后，我们只需要写成以下形式：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">class Person &#123;</span><br><span class="line">  constructor(name, age) &#123;</span><br><span class="line">    this.name = name</span><br><span class="line">    this.age = age</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="function"><span class="title">information</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'My name is '</span> + this.name + <span class="string">', I am '</span> + this.age</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="箭头函数（Arrow-function）"><a href="#箭头函数（Arrow-function）" class="headerlink" title="箭头函数（Arrow function）"></a>箭头函数（Arrow function）</h2><blockquote>
+<p>箭头函数表达式的语法比函数表达式更简洁，并且没有自己的<code>this</code>，<code>arguments</code>，<code>super</code>或<code>new.target</code>。这些函数表达式更适用于那些本来需要匿名函数的地方，并且它们不能用作构造函数。</p>
+</blockquote>
+<blockquote>
+<p>在ES6以前，我们写函数一般是：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var list = [1, 2, 3, 4, 5, 6, 7]</span><br><span class="line">var newList = list.map(<span class="keyword">function</span> (item) &#123;</span><br><span class="line">  <span class="built_in">return</span> item * item</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但是在ES6里，我们可以：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const list = [1, 2, 3, 4, 5, 6, 7]</span><br><span class="line">const newList = list.map(item =&gt; item * item)</span><br></pre></td></tr></table></figure>
+
+<h2 id="函数参数默认值（Function-parameter-defaults）"><a href="#函数参数默认值（Function-parameter-defaults）" class="headerlink" title="函数参数默认值（Function parameter defaults）"></a>函数参数默认值（Function parameter defaults）</h2><blockquote>
+<p>在<code>ES6</code>之前，如果我们写函数需要定义初始值的时候，需要这么写：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> config(data) &#123;</span><br><span class="line">  var data = data || <span class="string">'data is empty'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>用函数参数默认值就没有这个问题，写法如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const config = (data = <span class="string">'data is empty'</span>) =&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="模板字符串（Template-string）"><a href="#模板字符串（Template-string）" class="headerlink" title="模板字符串（Template string）"></a>模板字符串（Template string）</h2><blockquote>
+<p>在<code>ES6</code>之前，如果我们要拼接字符串，则需要像这样：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var name = <span class="string">'ming'</span></span><br><span class="line">var age = 24</span><br><span class="line"></span><br><span class="line">var message = <span class="string">'My name is '</span> + name + <span class="string">', I am '</span> + age</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但是在<code>ES6</code>之后，我们只需要写成以下形式：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const name = <span class="string">'ming'</span></span><br><span class="line">const age = 24</span><br><span class="line">const message =`My name is <span class="variable">$&#123;name&#125;</span>, I am <span class="variable">$&#123;age&#125;</span>`</span><br></pre></td></tr></table></figure>
+
+<h2 id="解构赋值（Destructuring-assignment）"><a href="#解构赋值（Destructuring-assignment）" class="headerlink" title="解构赋值（Destructuring assignment）"></a>解构赋值（Destructuring assignment）</h2><blockquote>
+<p>我们通过解构赋值, 可以将属性/值从对象/数组中取出, 赋值给其他变量。比如我们需要交换两个变量的值，在<code>ES6</code>之前我们可能需要：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var a = 10</span><br><span class="line">var b = 20</span><br><span class="line">var temp = a</span><br><span class="line">a = b</span><br><span class="line">b = temp</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但是在<code>ES6</code>里，我们可以这么写：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">let</span> a = 10;</span><br><span class="line"><span class="built_in">let</span> b = 20;</span><br><span class="line">[a, b] = [b, a];</span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展操作符（Spread-operator）"><a href="#扩展操作符（Spread-operator）" class="headerlink" title="扩展操作符（Spread operator）"></a>扩展操作符（Spread operator）</h2><blockquote>
+<p>扩展操作符可以在函数调用/数组构造时, 将数组表达式或者<code>string</code>在语法层面展开；还可以在构造字面量对象时, 将对象表达式按<code>key-value</code>的方式展开。比如在<code>ES5</code>的时候，我们要对一个数组的元素进行相加，在不使用<code>reduce</code>或者<code>reduceRight</code>的场合，我们需要：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> sum(x, y, z) &#123;</span><br><span class="line">  <span class="built_in">return</span> x + y + z;</span><br><span class="line">&#125;</span><br><span class="line">var list = [5, 6, 7]</span><br><span class="line">var total = sum.apply(null, list)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但是如果我们使用扩展操作符，只需要如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const sum = (x, y, z) =&gt; x + y + z</span><br><span class="line">const list = [5, 6, 7]</span><br><span class="line">const total = sum(...list)</span><br></pre></td></tr></table></figure>
+
+<h2 id="对象属性简写（Object-attribute-shorthand）"><a href="#对象属性简写（Object-attribute-shorthand）" class="headerlink" title="对象属性简写（Object attribute shorthand）"></a>对象属性简写（Object attribute shorthand）</h2><blockquote>
+<p>在<code>ES6</code>之前，如果我们要将某个变量赋值为同样名称的对象元素，则需要：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var name = <span class="string">'ming'</span></span><br><span class="line">var age = 24</span><br><span class="line">var obj = &#123;</span><br><span class="line">  name: name,</span><br><span class="line">  age: age</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但是在<code>ES6</code>里，我们可以这么写：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">let</span> name = <span class="string">'ming'</span></span><br><span class="line"><span class="built_in">let</span> age = 24</span><br><span class="line"><span class="built_in">let</span> obj = &#123;</span><br><span class="line">  name,</span><br><span class="line">  age</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Promise"><a href="#Promise" class="headerlink" title="Promise"></a>Promise</h2><blockquote>
+<p><code>Promise</code>是<code>ES6</code>提供的一种异步解决方案，比回调函数更加清晰明了。</p>
+</blockquote>
+<blockquote>
+<p><code>Promise</code>翻译过来就是承诺的意思，这个承诺会在未来有一个确切的答复，并且该承诺有三种状态，分别是：</p>
+</blockquote>
+<blockquote>
+<p>1.等待中（pending）2.完成了 （resolved）3.拒绝了（rejected）</p>
+</blockquote>
+<blockquote>
+<p>这个承诺一旦从等待状态变成为其他状态就永远不能更改状态了，也就是说一旦状态变为<code>resolved</code>后，就不能再次改变</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">  resolve(<span class="string">'success'</span>)</span><br><span class="line">  // 无效</span><br><span class="line">  reject(<span class="string">'reject'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当我们在构造<code>Promise</code>的时候，构造函数内部的代码是立即执行的</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">  console.log(<span class="string">'new Promise'</span>)</span><br><span class="line">  resolve(<span class="string">'success'</span>)</span><br><span class="line">&#125;)</span><br><span class="line">console.log(<span class="string">'finifsh'</span>)</span><br><span class="line">// new Promise -&gt; finifsh</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>Promise</code>实现了链式调用，也就是说每次调用<code>then</code>之后返回的都是一个<code>Promise</code>，并且是一个全新的<code>Promise</code>，原因也是因为状态不可变。如果你在<code>then</code>中 使用了<code>return</code>，那么<code>return</code>的值会被<code>Promise.resolve()</code>包装</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Promise.resolve(1)</span><br><span class="line">  .<span class="keyword">then</span>(res =&gt; &#123;</span><br><span class="line">    console.log(res) // =&gt; 1</span><br><span class="line">    <span class="built_in">return</span> 2 // 包装成 Promise.resolve(2)</span><br><span class="line">  &#125;)</span><br><span class="line">  .<span class="keyword">then</span>(res =&gt; &#123;</span><br><span class="line">    console.log(res) // =&gt; 2</span><br><span class="line">  &#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当然了，<code>Promise</code>也很好地解决了回调地狱的问题，例如：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ajax(url, () =&gt; &#123;</span><br><span class="line">  // 处理逻辑</span><br><span class="line">  ajax(url1, () =&gt; &#123;</span><br><span class="line">    // 处理逻辑</span><br><span class="line">    ajax(url2, () =&gt; &#123;</span><br><span class="line">      // 处理逻辑</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>可以改写成：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ajax(url)</span><br><span class="line">  .<span class="keyword">then</span>(res =&gt; &#123;</span><br><span class="line">    console.log(res)</span><br><span class="line">    <span class="built_in">return</span> ajax(url1)</span><br><span class="line">  &#125;).<span class="keyword">then</span>(res =&gt; &#123;</span><br><span class="line">    console.log(res)</span><br><span class="line">    <span class="built_in">return</span> ajax(url2)</span><br><span class="line">  &#125;).<span class="keyword">then</span>(res =&gt; console.log(res))</span><br></pre></td></tr></table></figure>
+
+<h2 id="for…of"><a href="#for…of" class="headerlink" title="for…of"></a>for…of</h2><blockquote>
+<p><code>for...of</code>语句在可迭代对象（包括 Array，Map，Set，String，TypedArray，arguments 对象等等）上创建一个迭代循环，调用自定义迭代钩子，并为每个不同属性的值执行语句。例子如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const array1 = [<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (const element of array1) &#123;</span><br><span class="line">  console.log(element)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// <span class="string">"a"</span></span><br><span class="line">// <span class="string">"b"</span></span><br><span class="line">// <span class="string">"c"</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p><code>ES6</code>还有很多新的特性，后面还会慢慢的去总结，有兴趣的看官可以自行去网上尝尝鲜。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>ECMAScript</category>
+      </categories>
+      <tags>
+        <tag>es6</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>vue如何实现路由权限控制</title>
     <url>/vue%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E8%B7%AF%E7%94%B1%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6/</url>
     <content><![CDATA[<blockquote>
@@ -361,8 +1583,8 @@
 <p>目前大概有两种思路可以实现路由的权限控制：</p>
 </blockquote>
 <ul>
-<li>通过 <code>router.beforeEach()</code> 路由拦截的方式实现。</li>
-<li>通过 <code>vue-router</code> 官方提供的  <code>addRoutes()</code> 来进行动态路由注入，注意 该方法只有 <code>vue-router</code> 的版本 <code>&gt;= 2.2</code> 才有效。</li>
+<li>通过<code>router.beforeEach()</code>路由拦截的方式实现。</li>
+<li>通过<code>vue-router</code>官方提供的 <code>addRoutes()</code>来进行动态路由注入，注意 该方法只有<code>vue-router</code>的版本<code>&gt;= 2.2</code>才有效。</li>
 </ul>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="路由拦截"><a href="#路由拦截" class="headerlink" title="路由拦截"></a>路由拦截</h3><blockquote>
 <p>这种方式依赖于我们项目的路由表都是事先配置好的，假设我们的路由表有：</p>
@@ -370,7 +1592,7 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const router = new Router(&#123;</span><br><span class="line">  routes: [</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/'</span>,</span><br><span class="line">      redirect: <span class="string">'/index1'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/index1'</span>,</span><br><span class="line">      name: <span class="string">'Index1'</span>,</span><br><span class="line">      component: Index1</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/index2'</span>,</span><br><span class="line">      name: <span class="string">'Index2'</span>,</span><br><span class="line">      component: Index2</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/index3'</span>,</span><br><span class="line">      name: <span class="string">'Index3'</span>,</span><br><span class="line">      component: Index3</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default router</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>在 <code>router/index</code> 中，通过  <code>router.beforeEach()</code> 路由拦截去进行权限判断：</p>
+<p>在<code>router/index</code>中，通过 <code>router.beforeEach()</code>路由拦截去进行权限判断：</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">router.beforeEach((to, from, next) =&gt; &#123;</span><br><span class="line">  // to: 从哪个路由来</span><br><span class="line">  // from: 去哪个路由</span><br><span class="line">  // next：是一个方法，使用路由拦截，必须在后面添加next()，否则路由无法跳转</span><br><span class="line"></span><br><span class="line">  // 假设我们从后台获取的权限为：</span><br><span class="line">  const list = [<span class="string">'index1'</span>, <span class="string">'index2'</span>]</span><br><span class="line"></span><br><span class="line">  // 如果没有匹配到，证明没有权限</span><br><span class="line">  <span class="keyword">if</span> (list.indexOf(to.name) === -1) &#123;</span><br><span class="line">    // next(<span class="string">'/login'</span>);</span><br><span class="line"></span><br><span class="line">    ... //或者执行其他操作</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  //路由拦截可根据项目返回的权限自行调整，这里只是做了一个简单的例子</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
 
@@ -384,7 +1606,7 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// leaf: 是我们用来判断是否唯一的</span><br><span class="line">// component：一般来说后端返回给我们的就是一个路径而已，所以我们需要自行的去加载组件</span><br><span class="line"><span class="built_in">export</span> const routers = [</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'/main'</span>,</span><br><span class="line">    name: <span class="string">'main'</span>,</span><br><span class="line">    leaf: <span class="literal">false</span>,</span><br><span class="line">    component: <span class="string">'pages/main'</span>,</span><br><span class="line">    children: [</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index1'</span>,</span><br><span class="line">        name: <span class="string">'index1'</span>,</span><br><span class="line">        component: <span class="string">'pages/index1'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index2'</span>,</span><br><span class="line">        name: <span class="string">'index2'</span>,</span><br><span class="line">        component: <span class="string">'pages/index2'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index3'</span>,</span><br><span class="line">        name: <span class="string">'index3'</span>,</span><br><span class="line">        component: <span class="string">'pages/index3'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        path: <span class="string">'/main/index4'</span>,</span><br><span class="line">        name: <span class="string">'index4'</span>,</span><br><span class="line">        component: <span class="string">'pages/index4'</span>,</span><br><span class="line">        leaf: <span class="literal">true</span></span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    path: <span class="string">'*'</span>,</span><br><span class="line">    component: <span class="string">'pages/noFind'</span>,</span><br><span class="line">    leaf: <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
 
 <div class="note info">
-            <p>因为后端返回的 <code>component</code> 一般是个字符串，所以我们需要写个方法解析一下路径。</p>
+            <p>因为后端返回的<code>component</code>一般是个字符串，所以我们需要写个方法解析一下路径。</p>
           </div>
 
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param routers 初始数据，为数组格式，一般来说是个空数组</span><br><span class="line"> * @param data 后端返回的路由列表数据</span><br><span class="line"> */</span><br><span class="line"><span class="keyword">function</span> generaMenu(routers, data) &#123;</span><br><span class="line">  data.forEach((item)=&gt;&#123;</span><br><span class="line">    <span class="built_in">let</span> menu = Object.assign(&#123;&#125;,item)</span><br><span class="line">    menu.component = import(`@/<span class="variable">$&#123;menu.component&#125;</span>.vue`)</span><br><span class="line">    <span class="keyword">if</span>(!item.leaf) &#123;</span><br><span class="line">      menu.children = []</span><br><span class="line">      generaMenu(menu.children,item.children)</span><br><span class="line">      menu.redirect = menu.children[0].path // 如果需要重定向的话，可以根据自己的需求进行选择</span><br><span class="line">    &#125;</span><br><span class="line">    routers.push(menu)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -394,12 +1616,12 @@
           </div>
 
 <blockquote>
-<p>这样我们最终就得到了符合路由规则的路由表了。然后通过 <code>addRoutes()</code> 这个方法把路由给注入到路由表里面</p>
+<p>这样我们最终就得到了符合路由规则的路由表了。然后通过<code>addRoutes()</code>这个方法把路由给注入到路由表里面</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">this.<span class="variable">$route</span>.addRoutes(data)</span><br></pre></td></tr></table></figure>
 
 <div class="note warning">
-            <p>注意：因为使用了 <code>addRoutes()</code> 这个方法之后，路由表已经可以认为是不可控的了，也就是说，已经注入的路由，没办法在通过官方给的api删除掉(当然，目前官方也没有提供相应的api)。那当我们A帐号退出之后，B帐号登录进来，也会执行 <code>addRoutes()</code> 这个方法，会一直累加上去，然后控制台上也会有警告，出现了重复的路由，然后我们访问A帐号有，B帐号没有的路由时，发现是可以进行访问的。这显然不符合我们的需求。</p>
+            <p>注意：因为使用了<code>addRoutes()</code>这个方法之后，路由表已经可以认为是不可控的了，也就是说，已经注入的路由，没办法在通过官方给的api删除掉(当然，目前官方也没有提供相应的api)。那当我们A帐号退出之后，B帐号登录进来，也会执行<code>addRoutes()</code>这个方法，会一直累加上去，然后控制台上也会有警告，出现了重复的路由，然后我们访问A帐号有，B帐号没有的路由时，发现是可以进行访问的。这显然不符合我们的需求。</p>
           </div>
 
 <blockquote>
@@ -411,12 +1633,12 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">location.href = <span class="string">'/'</span> //这种相对来说体验就非常差了，相当于重新刷新了页面，显然也是不符合我们的需求</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>还有一种就是重新初始化静态路由表： 首先，我们要对 <code>router/index</code> 进行改造一下：</li>
+<li>还有一种就是重新初始化静态路由表： 首先，我们要对<code>router/index</code>进行改造一下：</li>
 </ul>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">const createRouter = () =&gt; new Router(&#123;</span><br><span class="line">  routes: [</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/'</span>,</span><br><span class="line">      redirect: <span class="string">'/login'</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/login'</span>,</span><br><span class="line">      name: <span class="string">'login'</span>,</span><br><span class="line">      component: Login</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">const router = createRouter()</span><br><span class="line"></span><br><span class="line">//重新实例化一个新的路由表，替换之前的路由表，然后将这个方法导出</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> <span class="function"><span class="title">resetRouter</span></span>() &#123;</span><br><span class="line">  const newRouter = createRouter()</span><br><span class="line">  router.matcher = newRouter.matcher // the relevant part</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>然后，我们在用户退出的时候，重新执行下 <code>resetRouter()</code> 这个方法就可以重新初始化静态路由表，同时也发现B账号进来之后，只能访问对应的路由权限而已。A账号的权限路由已经不存在了。</p>
+<p>然后，我们在用户退出的时候，重新执行下<code>resetRouter()</code>这个方法就可以重新初始化静态路由表，同时也发现B账号进来之后，只能访问对应的路由权限而已。A账号的权限路由已经不存在了。</p>
 </blockquote>
 <h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
 <p>以上就是我对路由权限的一点理解，如果看官们有更好的方案可以评论留言交流一下。</p>
@@ -487,26 +1709,26 @@
 <a id="more"></a>
 
 <h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><blockquote>
-<p>利用 <code>indexOf</code> 来实现，如果 <code>indexOf (val) === -1</code> ，就 <code>push</code> 到新数组</p>
+<p>利用<code>indexOf</code>来实现，如果<code>indexOf (val) === -1</code>，就<code>push</code>到新数组</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> way1(arr) &#123;</span><br><span class="line">  var newArr = [] // 创建新数组</span><br><span class="line">  <span class="keyword">for</span> (var i = 0; i &lt; arr.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (newArr.indexOf(arr[i]) === -1) &#123; // 判断是否有这个值</span><br><span class="line">      newArr.push(arr[i])</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  console.log(newArr)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="方法二"><a href="#方法二" class="headerlink" title="方法二"></a>方法二</h2><blockquote>
-<p>对数组进行排序，之后判断前后是否一致，不一致的话就 <code>push</code> 到新数组</p>
+<p>对数组进行排序，之后判断前后是否一致，不一致的话就<code>push</code>到新数组</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> way2(arr) &#123;</span><br><span class="line">  var oldArr = arr.sort() // 对数组排序</span><br><span class="line">  var res = []</span><br><span class="line">  <span class="keyword">for</span> (var i = 0; i &lt; oldArr.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (oldArr[i] !== res[res.length-1]) &#123;</span><br><span class="line">      res.push(oldArr[i])</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  console.log(res)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="方法三"><a href="#方法三" class="headerlink" title="方法三"></a>方法三</h2><blockquote>
-<p>利用 <code>ES6</code> 的 <code>set</code> 进行数组去重</p>
+<p>利用<code>ES6</code>的<code>set</code>进行数组去重</p>
 </blockquote>
 <div class="note warning">
-            <p><code>new set</code> 之后是一个集合，所以我们需要把他转为数组，可以使用 <code>es6</code> 的扩展运算符</p>
+            <p><code>new set</code>之后是一个集合，所以我们需要把他转为数组，可以使用<code>es6</code>的扩展运算符</p>
           </div>
 
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> way3(arr) &#123;</span><br><span class="line">  var old = new Set(arr)</span><br><span class="line">  var newArr = [...old]</span><br><span class="line">  console.log(arr)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="方法四"><a href="#方法四" class="headerlink" title="方法四"></a>方法四</h2><blockquote>
-<p>创建空的 数组 和 对象 ，将 数组值 当做 对象的键 判断对象上是否有键，没有的话就 <code>push</code> 到空数组</p>
+<p>创建空的 数组 和 对象 ，将 数组值 当做 对象的键 判断对象上是否有键，没有的话就<code>push</code>到空数组</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> way4(arr) &#123;</span><br><span class="line">  var res = []</span><br><span class="line">  var obj = &#123;&#125;</span><br><span class="line">  <span class="keyword">for</span> (var i = 0;i &lt; arr.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!obj[arr[i]]) &#123;</span><br><span class="line">      res.push(arr[i])</span><br><span class="line">      obj[arr[i]] = 1</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  console.log(res)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -516,7 +1738,7 @@
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> way5(arr) &#123;</span><br><span class="line">  var res=[]</span><br><span class="line">  <span class="keyword">for</span> (var i = 0; i &lt; arr.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (arr.indexOf(arr[i]) === i) &#123;</span><br><span class="line">      res.push(arr[i])</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  console.log(res)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="方法六"><a href="#方法六" class="headerlink" title="方法六"></a>方法六</h2><blockquote>
-<p>两个 <code>for</code> 循环进行判断</p>
+<p>两个<code>for</code>循环进行判断</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> way6(arr) &#123;</span><br><span class="line">  var res = []</span><br><span class="line">  <span class="keyword">for</span> (var i = 0; i &lt; arr.length; i++) &#123;</span><br><span class="line">    <span class="keyword">for</span> (var j = i + 1; j &lt; arr.length; j++) &#123;</span><br><span class="line">      <span class="keyword">if</span> (arr[i] === arr[j]) j = ++i</span><br><span class="line">    &#125;</span><br><span class="line">    res.push(arr[i])</span><br><span class="line">  &#125;</span><br><span class="line">  console.log(res)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -541,23 +1763,23 @@
 <a id="more"></a>
 
 <div class="note info">
-            <p>这里我们只提供一个简单的例子，请根据项目情况自行修改调整，这里我们使用了 <code>element</code> 的 <code>upload</code> 组件</p>
+            <p>这里我们只提供一个简单的例子，请根据项目情况自行修改调整，这里我们使用了<code>element</code>的<code>upload</code>组件</p>
           </div>
 
 <h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><blockquote>
-<p>首先，我们需要安装一下 <code>ali-oss</code> 插件，然后在项目中引入</p>
+<p>首先，我们需要安装一下<code>ali-oss</code>插件，然后在项目中引入</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install ali-oss --save</span><br><span class="line"></span><br><span class="line">import OSS from <span class="string">'ali-oss'</span></span><br></pre></td></tr></table></figure>
 
 <h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><blockquote>
-<p>然后在 <code>template</code> 模版中使用 <code>upload</code> 组件，代码如下：</p>
+<p>然后在<code>template</code>模版中使用<code>upload</code>组件，代码如下：</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">  &lt;el-upload</span><br><span class="line">    class=<span class="string">"avatar-uploader"</span></span><br><span class="line">    :show-file-list=<span class="string">"false"</span></span><br><span class="line">    :http-request=<span class="string">"avatarUpload"</span></span><br><span class="line">    accept=<span class="string">"image/png,image/gif,image/jpg,image/jpeg"</span></span><br><span class="line">    action=<span class="string">""</span>&gt;</span><br><span class="line">    &lt;img v-if=<span class="string">"imageUrl"</span> :src=<span class="string">"imageUrl"</span> class=<span class="string">"avatar"</span>&gt;</span><br><span class="line">    &lt;i v-else class=<span class="string">"el-icon-plus avatar-uploader-icon"</span>&gt;&lt;/i&gt;</span><br><span class="line">  &lt;/el-upload&gt;</span><br><span class="line">&lt;/div&gt;</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>然后使用 <code>upload</code> 组件中自定义上传方法 <code>http-request</code></p>
+<p>然后使用<code>upload</code>组件中自定义上传方法<code>http-request</code></p>
 </blockquote>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 自定义上传</span><br><span class="line">async avatarUpload(file) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!this.client) &#123;</span><br><span class="line">    this.client = new OSS(&#123;</span><br><span class="line">      region: <span class="string">'oss-cn-hangzhou'</span>,</span><br><span class="line">      accessKeyId: <span class="string">''</span>, // 阿里云的 AccessKey ID</span><br><span class="line">      accessKeySecret: <span class="string">''</span>, // 阿里云的 Access Key Secret</span><br><span class="line">      bucket: <span class="string">''</span> // 存储空间 Bucket 名称</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  const fileName = `<span class="variable">$&#123;file.file.name&#125;</span>` // 文件名称</span><br><span class="line">  const path = <span class="string">'/imgs/'</span> // 指定存放路径</span><br><span class="line">  try &#123;</span><br><span class="line">    const res = await this.client.multipartUpload(path + fileName, file.file)</span><br><span class="line">    <span class="keyword">if</span> (res.res) &#123;</span><br><span class="line">      // 上传成功之后的操作</span><br><span class="line">      this.imageUrl = res.res.requestUrls[0]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; catch (e) &#123;</span><br><span class="line">    console.log(err)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 自定义上传</span><br><span class="line">async avatarUpload(file) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!this.client) &#123;</span><br><span class="line">    this.client = new OSS(&#123;</span><br><span class="line">      region: <span class="string">'oss-cn-hangzhou'</span>,</span><br><span class="line">      accessKeyId: <span class="string">''</span>, // 阿里云的 AccessKey ID</span><br><span class="line">      accessKeySecret: <span class="string">''</span>, // 阿里云的 Access Key Secret</span><br><span class="line">      bucket: <span class="string">''</span> // 存储空间 Bucket 名称</span><br><span class="line">    &#125;)</span><br><span class="line">  &#125;</span><br><span class="line">  const fileName =`<span class="variable">$&#123;file.file.name&#125;</span>`// 文件名称</span><br><span class="line">  const path = <span class="string">'/imgs/'</span> // 指定存放路径</span><br><span class="line">  try &#123;</span><br><span class="line">    const res = await this.client.multipartUpload(path + fileName, file.file)</span><br><span class="line">    <span class="keyword">if</span> (res.res) &#123;</span><br><span class="line">      // 上传成功之后的操作</span><br><span class="line">      this.imageUrl = res.res.requestUrls[0]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; catch (e) &#123;</span><br><span class="line">    console.log(err)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <div class="note warning">
             <p>accessKeyId、accessKeySecret、bucket 通常是由后端返回回来的，不推荐写死在前端代码中。</p>

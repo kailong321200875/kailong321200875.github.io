@@ -36,7 +36,7 @@
 <meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200330100151.png">
 <meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200330102929.png">
 <meta property="article:published_time" content="2020-03-30T09:21:06.000Z">
-<meta property="article:modified_time" content="2020-04-11T01:50:39.126Z">
+<meta property="article:modified_time" content="2020-07-25T07:19:35.434Z">
 <meta property="article:author" content="Archer">
 <meta property="article:tag" content="vue">
 <meta property="article:tag" content="slot">
@@ -141,17 +141,17 @@
   </li>
         <li class="menu-item menu-item-tags">
 
-    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">22</span></a>
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">40</span></a>
 
   </li>
         <li class="menu-item menu-item-categories">
 
-    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">3</span></a>
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
 
   </li>
         <li class="menu-item menu-item-archives">
 
-    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">8</span></a>
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">22</span></a>
 
   </li>
       <li class="menu-item menu-item-search">
@@ -269,14 +269,14 @@
 <a id="more"></a>
 
 <div class="note info">
-            <p>本文章的内容是基于 <code>vue &gt;= 2.6.0</code>，在 <code>2.6.0</code> 中，官方为具名插槽和作用域插槽引入了一个新的统一的语法 (即 v-slot 指令)。它取代了 <code>slot</code> 和 <code>slot-scope</code> 这两个目前已被废弃但未被移除且仍在文档中的 <code>attribute</code>。所以，旧语法我们这里就不演示了，有兴趣的看官们可以自行百度一下。</p>
+            <p>本文章的内容是基于<code>vue &gt;= 2.6.0</code>，在<code>2.6.0</code>中，官方为具名插槽和作用域插槽引入了一个新的统一的语法 (即 v-slot 指令)。它取代了<code>slot</code>和<code>slot-scope</code>这两个目前已被废弃但未被移除且仍在文档中的<code>attribute</code>。所以，旧语法我们这里就不演示了，有兴趣的看官们可以自行百度一下。</p>
           </div>
 
 <h2 id="匿名插槽"><a href="#匿名插槽" class="headerlink" title="匿名插槽"></a>匿名插槽</h2><blockquote>
 <p>匿名插槽简单点理解就是，在组件中设置一个默认插槽入口，在组件的使用中，填充的内容将会自动填充在默认插槽中。</p>
 </blockquote>
 <blockquote>
-<p>接下来我们来定义一个组件，在组件里面只有一个 <code>slot</code> 标签，也就是我们上面所说的匿名插槽，用来接收外部传进来的模版进行渲染。</p>
+<p>接下来我们来定义一个组件，在组件里面只有一个<code>slot</code>标签，也就是我们上面所说的匿名插槽，用来接收外部传进来的模版进行渲染。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// 定义一个组件</span><br><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;slot&gt;&lt;/slot&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child1'</span></span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
@@ -293,7 +293,7 @@
 <p>顾名思义就是带名字的插槽，假如需要在组件内部预留多个插槽位置，就需要为插槽定义名字，指定插入的位置。</p>
 </blockquote>
 <blockquote>
-<p>首先我们来改造下之前的代码，在组件内部新增 <code>name</code> 分别为 <code>header</code> 和 <code>footer</code> 的插槽。</p>
+<p>首先我们来改造下之前的代码，在组件内部新增<code>name</code>分别为<code>header</code>和<code>footer</code>的插槽。</p>
 </blockquote>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&lt;template&gt;</span><br><span class="line">  &lt;div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"header"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">    &lt;div&gt;</span><br><span class="line">      &lt;slot name=<span class="string">"footer"</span>&gt;&lt;/slot&gt;</span><br><span class="line">    &lt;/div&gt;</span><br><span class="line">  &lt;/div&gt;</span><br><span class="line">&lt;/template&gt;</span><br><span class="line"></span><br><span class="line">&lt;script&gt;</span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  name: <span class="string">'Child1'</span></span><br><span class="line">&#125;</span><br><span class="line">&lt;/script&gt;</span><br></pre></td></tr></table></figure>
 
@@ -304,7 +304,7 @@
 </blockquote>
 <p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200330100151.png" alt=""></p>
 <div class="note warning">
-            <p>需要注意的是，如果使用了 <code>v-slot</code> 就必须配合着 <code>template</code> 来使用，不然会报错。</p>
+            <p>需要注意的是，如果使用了<code>v-slot</code>就必须配合着<code>template</code>来使用，不然会报错。</p>
           </div>
 
 <h2 id="作用域插槽"><a href="#作用域插槽" class="headerlink" title="作用域插槽"></a>作用域插槽</h2><blockquote>
@@ -322,14 +322,14 @@
 <p>这样我们就实现了让插槽内容能够访问子组件中数据，进行模版渲染。</p>
 </blockquote>
 <div class="note warning">
-            <p>需要注意的是，匿名插槽传值只能使用 <code>default</code> 进行接收。具名插槽传值，接收的名字要跟子组件那边定义的一样。</p>
+            <p>需要注意的是，匿名插槽传值只能使用<code>default</code>进行接收。具名插槽传值，接收的名字要跟子组件那边定义的一样。</p>
           </div>
 
 <h2 id="缩写"><a href="#缩写" class="headerlink" title="缩写"></a>缩写</h2><blockquote>
-<p>跟 <code>v-on</code> 和 <code>v-bind</code> 一样，v-slot 也有缩写，即把参数之前的所有内容 (v-slot:) 替换为字符 #。例如 <code>v-slot:header</code> 可以被重写为 <code>#header：</code></p>
+<p>跟<code>v-on</code>和<code>v-bind</code>一样，v-slot 也有缩写，即把参数之前的所有内容 (v-slot:) 替换为字符 #。例如<code>v-slot:header</code>可以被重写为<code>#header：</code></p>
 </blockquote>
 <h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
-<p>关于 <code>vue</code> 插槽的作用，本文章基本上已经概述得差不多了，各位看官们可以自己在项目中去实践下。</p>
+<p>关于<code>vue</code>插槽的作用，本文章基本上已经概述得差不多了，各位看官们可以自己在项目中去实践下。</p>
 </blockquote>
 
     </div>
@@ -482,20 +482,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">22</span>
+        <span class="site-state-item-count">40</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -548,7 +548,7 @@
   <span class="post-meta-item-icon">
     <i class="fa fa-area-chart"></i>
   </span>
-  <span class="post-count">站点总字数：7.1k字</span>
+  <span class="post-count">站点总字数：23.7k字</span>
 </div>
   
   

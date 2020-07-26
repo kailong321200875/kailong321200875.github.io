@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="baidu-site-verification" content="5pQM9dB1uO" />
+<meta name="google-site-verification" content="dY4Uxh6geXuXnQR_3mASUgoRCnXG4gmKcISzY0_3vNM" />
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chenkl.vip","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在日常开发中，我们通常会通过npm下载各种各样的插件来为项目服务，这篇文章记录了一下如何编写一个插件并且上传到npm上，以vue组件为例。本篇文章省去了一些前置步骤，如如何创建npm账号，这些需要看官们自行去百度。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="npm如何上传自定义插件">
+<meta property="og:url" content="https://www.chenkl.vip/npm%E5%A6%82%E4%BD%95%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8F%92%E4%BB%B6/index.html">
+<meta property="og:site_name" content="小小前端搬运工">
+<meta property="og:description" content="在日常开发中，我们通常会通过npm下载各种各样的插件来为项目服务，这篇文章记录了一下如何编写一个插件并且上传到npm上，以vue组件为例。本篇文章省去了一些前置步骤，如如何创建npm账号，这些需要看官们自行去百度。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200621162432.png">
+<meta property="article:published_time" content="2019-02-10T18:53:02.000Z">
+<meta property="article:modified_time" content="2020-07-25T07:19:35.418Z">
+<meta property="article:author" content="Archer">
+<meta property="article:tag" content="npm">
+<meta property="article:tag" content="自定义插件">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200621162432.png">
+
+<link rel="canonical" href="https://www.chenkl.vip/npm%E5%A6%82%E4%BD%95%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8F%92%E4%BB%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>npm如何上传自定义插件 | 小小前端搬运工</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="小小前端搬运工" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小小前端搬运工</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">40</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">22</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.chenkl.vip/npm%E5%A6%82%E4%BD%95%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8F%92%E4%BB%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Archer">
+      <meta itemprop="description" content="种一棵树最好的时间是十年前，其次就是现在。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小小前端搬运工">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          npm如何上传自定义插件
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-02-10 18:53:02" itemprop="dateCreated datePublished" datetime="2019-02-10T18:53:02Z">2019-02-10</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/npm/" itemprop="url" rel="index"><span itemprop="name">npm</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>在日常开发中，我们通常会通过<code>npm</code>下载各种各样的插件来为项目服务，这篇文章记录了一下如何编写一个插件并且上传到<code>npm</code>上，以<code>vue</code>组件为例。本篇文章省去了一些前置步骤，如如何创建<code>npm</code>账号，这些需要看官们自行去百度。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote>
+<p>刚好最近项目有需要用到一个图片预览插件，看了一下市面上的，都是基于<code>img</code>标签去进行点击预览的，感觉这样太局限性了，所以想写一个通过js方法进行调用的图片预览插件。</p>
+</blockquote>
+<h2 id="新建项目"><a href="#新建项目" class="headerlink" title="新建项目"></a>新建项目</h2><blockquote>
+<p>这里我们采用比较轻量级的<code>webpack-simple</code>脚手架模板来搭建整个项目的框架</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vue init webpack-simple vue-preview-pictures(项目名)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>编写插件的过程我们这边省略掉，之后完整的目录结构如下：</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200621162432.png" alt=""></p>
+<blockquote>
+<p>在本地调试完之后没问题的话，我们就要开始做一些上传到<code>npm</code>的配置了。</p>
+</blockquote>
+<h2 id="改造成vue插件"><a href="#改造成vue插件" class="headerlink" title="改造成vue插件"></a>改造成vue插件</h2><blockquote>
+<p>在组件的文件夹下创建一个<code>index.js</code>文件，这个文件作用是将组件导出，如我自己的组件<code>src/packages/vue-preview-pictures/index.js</code>，里面具体操作可以根据自己的实际情况来，但是最后我们需要导出的是注册之后的组件。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 引入组件</span><br><span class="line">import xxx from <span class="string">'./xxx.vue'</span></span><br><span class="line"></span><br><span class="line">xxx.install = Vue =&gt; Vue.component(xxx.name, xxx); //这里的name是.vue文件里面定义的</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (typeof window !== <span class="string">'undefined'</span> &amp;&amp; window.Vue) &#123;</span><br><span class="line">  window.Vue.use(xxx);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default xxx</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在与<code>APP.vue</code>同级下创建一个<code>index.js</code>的文件(一个包下可能有多个组件)，导入刚刚写好的<code>index.js</code>组件。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">// 写好的组件</span><br><span class="line">import xxx from <span class="string">'./packages/xxx/index.js'</span>;</span><br><span class="line"></span><br><span class="line">const components = [</span><br><span class="line">  xxx,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">const install = <span class="keyword">function</span>(Vue, opts = &#123;&#125;) &#123;</span><br><span class="line">  components.map(component =&gt; &#123;</span><br><span class="line">    Vue.component(component.name, component); //到时候项目使用组件名,就是这个component.name</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/* 支持使用标签的方式引入 */</span><br><span class="line"><span class="keyword">if</span> (typeof window !== <span class="string">'undefined'</span> &amp;&amp; window.Vue) &#123;</span><br><span class="line">  install(window.Vue);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">export</span> default &#123;</span><br><span class="line">  install,</span><br><span class="line">  xxx,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改package-json文件"><a href="#修改package-json文件" class="headerlink" title="修改package.json文件"></a>修改package.json文件</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="string">"name"</span>: <span class="string">"vue-preview-pictures"</span>, // 模块名,不能重复</span><br><span class="line">  <span class="string">"description"</span>: <span class="string">"图片预览组件"</span>,</span><br><span class="line">  <span class="string">"version"</span>: <span class="string">"0.1.4"</span>, // 版本号,每次要更新</span><br><span class="line">  <span class="string">"author"</span>: <span class="string">"kailong321200875 &lt;321200875@qq.com&gt;"</span>,</span><br><span class="line">  <span class="string">"license"</span>: <span class="string">"MIT"</span>, // 开源协议</span><br><span class="line">  <span class="string">"private"</span>: <span class="literal">false</span>, // 因为组件包是公用的，所以private为<span class="literal">false</span></span><br><span class="line">  <span class="string">"scripts"</span>: &#123;</span><br><span class="line">    <span class="string">"dev"</span>: <span class="string">"cross-env NODE_ENV=development webpack-dev-server --open --hot"</span>,</span><br><span class="line">    <span class="string">"build"</span>: <span class="string">"cross-env NODE_ENV=production webpack --progress --hide-modules"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"main"</span>: <span class="string">"dist/vue-preview-pictures.js"</span>, // 配置main结点，如果不配置，我们在其他项目中就不用import XX from <span class="string">'包名'</span>来引用了，只能以包名作为起点来指定相对的路径</span><br><span class="line">  <span class="string">"dependencies"</span>: &#123;</span><br><span class="line">    <span class="string">"vue"</span>: <span class="string">"^2.5.11"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"browserslist"</span>: [</span><br><span class="line">    <span class="string">"&gt; 1%"</span>,</span><br><span class="line">    <span class="string">"last 2 versions"</span>,</span><br><span class="line">    <span class="string">"not ie &lt;= 8"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"devDependencies"</span>: &#123;</span><br><span class="line">    <span class="string">"babel-core"</span>: <span class="string">"^6.26.0"</span>,</span><br><span class="line">    <span class="string">"babel-helpers"</span>: <span class="string">"^6.24.1"</span>,</span><br><span class="line">    <span class="string">"babel-loader"</span>: <span class="string">"^7.1.2"</span>,</span><br><span class="line">    <span class="string">"babel-preset-env"</span>: <span class="string">"^1.6.0"</span>,</span><br><span class="line">    <span class="string">"babel-preset-stage-3"</span>: <span class="string">"^6.24.1"</span>,</span><br><span class="line">    <span class="string">"cross-env"</span>: <span class="string">"^5.0.5"</span>,</span><br><span class="line">    <span class="string">"css-loader"</span>: <span class="string">"^0.28.7"</span>,</span><br><span class="line">    <span class="string">"file-loader"</span>: <span class="string">"^1.1.4"</span>,</span><br><span class="line">    <span class="string">"node-sass"</span>: <span class="string">"^4.5.3"</span>,</span><br><span class="line">    <span class="string">"sass-loader"</span>: <span class="string">"^6.0.6"</span>,</span><br><span class="line">    <span class="string">"url-loader"</span>: <span class="string">"^2.2.0"</span>,</span><br><span class="line">    <span class="string">"vue-loader"</span>: <span class="string">"^13.0.5"</span>,</span><br><span class="line">    <span class="string">"vue-template-compiler"</span>: <span class="string">"^2.4.4"</span>,</span><br><span class="line">    <span class="string">"webpack"</span>: <span class="string">"^3.6.0"</span>,</span><br><span class="line">    <span class="string">"webpack-dev-server"</span>: <span class="string">"^2.9.1"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  // 指定代码所在的仓库地址</span><br><span class="line">  <span class="string">"repository"</span>: &#123;</span><br><span class="line">    <span class="string">"type"</span>: <span class="string">"git"</span>,</span><br><span class="line">    <span class="string">"url"</span>: <span class="string">"git+https://github.com/kailong321200875/vue-preview-pictures"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"bugs"</span>: &#123;</span><br><span class="line">    <span class="string">"url"</span>: <span class="string">"https://github.com/kailong321200875/vue-preview-pictures/issues"</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">"homepage"</span>: <span class="string">"https://github.com/kailong321200875/vue-preview-pictures#readme"</span>,</span><br><span class="line">  // 指定打包后,包中存在的文件夹</span><br><span class="line">  <span class="string">"files"</span>: [</span><br><span class="line">    <span class="string">"dist"</span>,</span><br><span class="line">    <span class="string">"src"</span></span><br><span class="line">  ],</span><br><span class="line">  <span class="string">"keywords"</span>: [</span><br><span class="line">    <span class="string">"vue"</span>,</span><br><span class="line">    <span class="string">"preview"</span>,</span><br><span class="line">    <span class="string">"pictures"</span>,</span><br><span class="line">    <span class="string">"vue-preview-pictures"</span></span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改-gitignore文件"><a href="#修改-gitignore文件" class="headerlink" title="修改.gitignore文件"></a>修改.gitignore文件</h2><blockquote>
+<p>因为要用<code>dist</code>文件夹，所以在<code>.gitignore</code>文件中把<code>dist/</code>去掉。最后长这样</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">.DS_Store</span><br><span class="line">node_modules/</span><br><span class="line">npm-debug.log</span><br><span class="line">yarn-error.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># Editor directories and files</span></span><br><span class="line">.idea</span><br><span class="line">*.suo</span><br><span class="line">*.ntvs*</span><br><span class="line">*.njsproj</span><br><span class="line">*.sln</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改webpack-config-js文件"><a href="#修改webpack-config-js文件" class="headerlink" title="修改webpack.config.js文件"></a>修改webpack.config.js文件</h2><blockquote>
+<p>主要还是改输出部分,打包成自己想要的js文件</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line">var path = require(<span class="string">'path'</span>)</span><br><span class="line">var webpack = require(<span class="string">'webpack'</span>)</span><br><span class="line">const NODE_ENV = process.env.NODE_ENV</span><br><span class="line"></span><br><span class="line">module.exports = &#123;</span><br><span class="line">  entry: NODE_ENV == <span class="string">'development'</span> ? <span class="string">'./src/main.js'</span> : <span class="string">'./src/index.js'</span>,</span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, <span class="string">'./dist'</span>),</span><br><span class="line">    publicPath: <span class="string">'/dist/'</span>,</span><br><span class="line">    filename: <span class="string">'vue-preview-pictures.js'</span>,</span><br><span class="line">    library: <span class="string">'vue-preview-pictures'</span>,</span><br><span class="line">    libraryTarget: <span class="string">'umd'</span>,</span><br><span class="line">    umdNamedDefine: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  module: &#123;</span><br><span class="line">    rules: [&#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.css$/,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'vue-style-loader'</span>,</span><br><span class="line">          <span class="string">'css-loader'</span></span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.scss$/,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'vue-style-loader'</span>,</span><br><span class="line">          <span class="string">'css-loader'</span>,</span><br><span class="line">          <span class="string">'sass-loader'</span></span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.sass$/,</span><br><span class="line">        use: [</span><br><span class="line">          <span class="string">'vue-style-loader'</span>,</span><br><span class="line">          <span class="string">'css-loader'</span>,</span><br><span class="line">          <span class="string">'sass-loader?indentedSyntax'</span></span><br><span class="line">        ],</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.vue$/,</span><br><span class="line">        loader: <span class="string">'vue-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          loaders: &#123;</span><br><span class="line">            // Since sass-loader (weirdly) has SCSS as its default parse mode, we map</span><br><span class="line">            // the <span class="string">"scss"</span> and <span class="string">"sass"</span> values <span class="keyword">for</span> the lang attribute to the right configs here.</span><br><span class="line">            // other preprocessors should work out of the box, no loader config like this necessary.</span><br><span class="line">            <span class="string">'scss'</span>: [</span><br><span class="line">              <span class="string">'vue-style-loader'</span>,</span><br><span class="line">              <span class="string">'css-loader'</span>,</span><br><span class="line">              <span class="string">'sass-loader'</span></span><br><span class="line">            ],</span><br><span class="line">            <span class="string">'sass'</span>: [</span><br><span class="line">              <span class="string">'vue-style-loader'</span>,</span><br><span class="line">              <span class="string">'css-loader'</span>,</span><br><span class="line">              <span class="string">'sass-loader?indentedSyntax'</span></span><br><span class="line">            ]</span><br><span class="line">          &#125;</span><br><span class="line">          // other vue-loader options go here</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.js$/,</span><br><span class="line">        loader: <span class="string">'babel-loader'</span>,</span><br><span class="line">        exclude: /node_modules/</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.(png|jpg|gif|svg)$/,</span><br><span class="line">        loader: <span class="string">'file-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          name: <span class="string">'[name].[ext]?[hash]'</span></span><br><span class="line">        &#125;</span><br><span class="line">      &#125;,</span><br><span class="line">      &#123;</span><br><span class="line">        <span class="built_in">test</span>: /\.(svg|ttf|eot|woff|woff2)$/,</span><br><span class="line">        loader: <span class="string">'url-loader'</span>,</span><br><span class="line">        options: &#123;</span><br><span class="line">          name: <span class="string">'[name].[ext]?[hash]'</span>,</span><br><span class="line">          <span class="built_in">limit</span>: 999999999</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    ]</span><br><span class="line">  &#125;,</span><br><span class="line">  resolve: &#123;</span><br><span class="line">    <span class="built_in">alias</span>: &#123;</span><br><span class="line">      <span class="string">'vue$'</span>: <span class="string">'vue/dist/vue.esm.js'</span>,</span><br><span class="line">      <span class="string">'@'</span>: path.resolve(__dirname, <span class="string">'./src'</span>)</span><br><span class="line">    &#125;,</span><br><span class="line">    extensions: [<span class="string">'*'</span>, <span class="string">'.js'</span>, <span class="string">'.vue'</span>, <span class="string">'.json'</span>]</span><br><span class="line">  &#125;,</span><br><span class="line">  devServer: &#123;</span><br><span class="line">    historyApiFallback: <span class="literal">true</span>,</span><br><span class="line">    noInfo: <span class="literal">true</span>,</span><br><span class="line">    overlay: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  performance: &#123;</span><br><span class="line">    hints: <span class="literal">false</span></span><br><span class="line">  &#125;,</span><br><span class="line">  devtool: <span class="string">'#eval-source-map'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (process.env.NODE_ENV === <span class="string">'production'</span>) &#123;</span><br><span class="line">  module.exports.devtool = <span class="string">'#source-map'</span></span><br><span class="line">  // http://vue-loader.vuejs.org/en/workflow/production.html</span><br><span class="line">  module.exports.plugins = (module.exports.plugins || []).concat([</span><br><span class="line">    new webpack.DefinePlugin(&#123;</span><br><span class="line">      <span class="string">'process.env'</span>: &#123;</span><br><span class="line">        NODE_ENV: <span class="string">'"production"'</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;),</span><br><span class="line">    new webpack.optimize.UglifyJsPlugin(&#123;</span><br><span class="line">      sourceMap: <span class="literal">true</span>,</span><br><span class="line">      compress: &#123;</span><br><span class="line">        warnings: <span class="literal">false</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;),</span><br><span class="line">    new webpack.LoaderOptionsPlugin(&#123;</span><br><span class="line">      minimize: <span class="literal">true</span></span><br><span class="line">    &#125;)</span><br><span class="line">  ])</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="本地打包"><a href="#本地打包" class="headerlink" title="本地打包"></a>本地打包</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm run build</span><br></pre></td></tr></table></figure>
+
+<h2 id="发布到npm上（注意镜像地址要指向npm的地址）"><a href="#发布到npm上（注意镜像地址要指向npm的地址）" class="headerlink" title="发布到npm上（注意镜像地址要指向npm的地址）"></a>发布到npm上（注意镜像地址要指向npm的地址）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm login</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>登录自己的<code>npm</code>账号</p>
+</blockquote>
+<blockquote>
+<p>如果出现 Logged in as 你的名字 on <a href="https://registry.npmjs.org/" target="_blank" rel="noopener">https://registry.npmjs.org/</a> 说明，登录成功。如果是 Logged in as 你的名字 on <a href="https://registry.npm.taobao.org/，说明你登录的是淘宝的镜像..后面提交会报403的错误，淘宝源，需要切回到`npmjs`源，输入以下命令：" target="_blank" rel="noopener">https://registry.npm.taobao.org/，说明你登录的是淘宝的镜像..后面提交会报403的错误，淘宝源，需要切回到`npmjs`源，输入以下命令：</a></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">npm config <span class="built_in">set</span> registry=http://registry.npmjs.org</span><br><span class="line"></span><br><span class="line">// 最后执行</span><br><span class="line">npm publish</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>到这里，我们就可以登录<code>npm</code>，看到我们上传的插件了。我们在项目中也可以愉快的使用<code>npm</code>进行导入了。</p>
+</blockquote>
+<blockquote>
+<p><a href="https://github.com/kailong321200875/vue-preview-pictures" target="_blank" rel="noopener">图片预览插件</a>，这个就是我参考<code>element</code>的图片预览组件进行改造的，有需要的看官可以使用看看。</p>
+</blockquote>
+
+    </div>
+
+    <div>
+      
+        <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:20px;">------------- 本 文 结 束 <i class="fa fa-paw"></i> 感 谢 您 的 阅 读 -------------</div>
+  
+</div>
+      
+    </div>
+    
+    
+    
+    
+        <div class="reward-container">
+  <div>只是为了好玩罢了~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Archer 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Archer 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Archer
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.chenkl.vip/npm%E5%A6%82%E4%BD%95%E4%B8%8A%E4%BC%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8F%92%E4%BB%B6/" title="npm如何上传自定义插件">https://www.chenkl.vip/npm如何上传自定义插件/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/npm/" rel="tag"><i class="fa fa-tag"></i> npm</a>
+              <a href="/tags/%E8%87%AA%E5%AE%9A%E4%B9%89%E6%8F%92%E4%BB%B6/" rel="tag"><i class="fa fa-tag"></i> 自定义插件</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/ECMAScript6%E6%96%B0%E7%89%B9%E6%80%A7%E5%AE%9E%E8%B7%B5/" rel="prev" title="ECMAScript6新特性实践">
+      <i class="fa fa-chevron-left"></i> ECMAScript6新特性实践
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8Eaxios%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E6%8B%A6%E6%88%AA%E5%99%A8/" rel="next" title="如何基于axios实现请求拦截器">
+      如何基于axios实现请求拦截器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#新建项目"><span class="nav-number">2.</span> <span class="nav-text">新建项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#改造成vue插件"><span class="nav-number">3.</span> <span class="nav-text">改造成vue插件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改package-json文件"><span class="nav-number">4.</span> <span class="nav-text">修改package.json文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改-gitignore文件"><span class="nav-number">5.</span> <span class="nav-text">修改.gitignore文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#修改webpack-config-js文件"><span class="nav-number">6.</span> <span class="nav-text">修改webpack.config.js文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本地打包"><span class="nav-number">7.</span> <span class="nav-text">本地打包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#发布到npm上（注意镜像地址要指向npm的地址）"><span class="nav-number">8.</span> <span class="nav-text">发布到npm上（注意镜像地址要指向npm的地址）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">9.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Archer"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Archer</p>
+  <div class="site-description" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kailong321200875" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kailong321200875" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:502431556@qq.com" title="E-Mail → mailto:502431556@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/meng-shou-kong-cheng-43/activities" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;meng-shou-kong-cheng-43&#x2F;activities" rel="noopener" target="_blank"><i class="fa fa-fw fa-ioxhost"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-fas fa-heartbeat"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Archer</span>
+  <span class="post-meta-divider">|</span>
+  <span class="post-meta-item-icon">
+    <i class="fa fa-area-chart"></i>
+  </span>
+  <span class="post-count">站点总字数：23.7k字</span>
+</div>
+  
+  
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      访客数<span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>人次
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      总访问量<span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>次
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'e6f2f10abe388d591867',
+      clientSecret: '580aea9e3da136ac529a71232367d1fdf3591926',
+      repo        : 'blogTalk',
+      owner       : 'kailong321200875',
+      admin       : ['kailong321200875'],
+      id          : '91ac99a84d55177c99bb49f4b5356b01',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
+
+<!-- 页面鼠标点击样式 -->
+
+  
+    <script src="/js/src/fireworks.js"></script>
+  
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/kailong321200875/live2d-widget@1.0.1/autoload.js"></script>
+

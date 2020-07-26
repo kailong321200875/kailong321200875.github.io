@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="baidu-site-verification" content="5pQM9dB1uO" />
+<meta name="google-site-verification" content="dY4Uxh6geXuXnQR_3mASUgoRCnXG4gmKcISzY0_3vNM" />
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chenkl.vip","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在js中，肯定不可避免的需要声明变量和函数，js编译器是如何找到这些变量的呢？我们还得对执行上下文有一个进一步的了解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端基础进阶学习(三)--变量对象">
+<meta property="og:url" content="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%89)--%E5%8F%98%E9%87%8F%E5%AF%B9%E8%B1%A1/index.html">
+<meta property="og:site_name" content="小小前端搬运工">
+<meta property="og:description" content="在js中，肯定不可避免的需要声明变量和函数，js编译器是如何找到这些变量的呢？我们还得对执行上下文有一个进一步的了解。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png">
+<meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720165744.png">
+<meta property="article:published_time" content="2020-07-20T16:38:52.000Z">
+<meta property="article:modified_time" content="2020-07-25T07:19:35.443Z">
+<meta property="article:author" content="Archer">
+<meta property="article:tag" content="javaScript">
+<meta property="article:tag" content="前端进阶">
+<meta property="article:tag" content="变量对象">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png">
+
+<link rel="canonical" href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%89)--%E5%8F%98%E9%87%8F%E5%AF%B9%E8%B1%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>前端基础进阶学习(三)--变量对象 | 小小前端搬运工</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="小小前端搬运工" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小小前端搬运工</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">40</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">22</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%89)--%E5%8F%98%E9%87%8F%E5%AF%B9%E8%B1%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Archer">
+      <meta itemprop="description" content="种一棵树最好的时间是十年前，其次就是现在。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小小前端搬运工">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          前端基础进阶学习(三)--变量对象
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-20 16:38:52" itemprop="dateCreated datePublished" datetime="2020-07-20T16:38:52Z">2020-07-20</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/javaScript/" itemprop="url" rel="index"><span itemprop="name">javaScript</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>在js中，肯定不可避免的需要声明变量和函数，js编译器是如何找到这些变量的呢？我们还得对执行上下文有一个进一步的了解。</p>
+</blockquote>
+<a id="more"></a>
+
+<blockquote>
+<p>我们知道，当调用一个函数时（激活），一个新的执行上下文就会被创建。一个执行上下文的生命周期可以分为两个阶段。</p>
+</blockquote>
+<ul>
+<li>创建阶段</li>
+</ul>
+<blockquote>
+<p>在这个阶段中，执行上下文会分别创建<code>变量对象</code>，建立<code>作用域链</code>，以及确定<code>this</code>指向。</p>
+</blockquote>
+<ul>
+<li>代码执行阶段</li>
+</ul>
+<blockquote>
+<p>创建完之后，就会开始执行代码，会完成变量赋值，函数引用，以及执行其他代码。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png" alt=""></p>
+<blockquote>
+<p>从这里我们可以详细的了解执行上下文的重要性，因为其中涉及到了<code>变量对象</code>，<code>作用域链</code>，<code>this</code>等很多极为重要的概念。</p>
+</blockquote>
+<h2 id="变量对象（Variable-Object）"><a href="#变量对象（Variable-Object）" class="headerlink" title="变量对象（Variable Object）"></a>变量对象（Variable Object）</h2><blockquote>
+<p>变量对象的创建，依次经历了几下几个过程。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 这里a为属性名，20是属性值</span><br><span class="line">&#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>建立<code>arguments</code>对象：检查当前上下文中的参数，建立该对象下的属性与属性值。</li>
+<li>检查当前上下文的函数声明，也就是使用<code>function</code>关键字声明的函数。在变量对象中以函数名建立一个属性，属性值为指向该函数所在内存地址的引用。</li>
+<li>检查当前上下文中的变量声明，每找到一个变量声明，就在变量对象中以变量名建立一个属性，属性值为<code>undefined</code></li>
+</ol>
+<div class="note warning">
+            <p>注意：如果变量与函数同名，则在这个阶段，以函数值为准</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">console.log(foo) // ƒ <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line">var foo = 20</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 上面的执行顺序为：</span><br><span class="line"></span><br><span class="line">// 首先将所有函数声明放入变量对象中</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line"></span><br><span class="line">// 其次将所有变量声明放入变量对象中，但是因为foo已经存在同名函数，此时以函数值为准，而不会被undefined覆盖</span><br><span class="line">// var foo = undefined</span><br><span class="line"></span><br><span class="line">// 然后开始执行阶段代码的执行</span><br><span class="line">console.log(foo) // ƒ <span class="function"><span class="title">foo</span></span>() &#123; console.log(<span class="string">'function foo'</span>) &#125;</span><br><span class="line">foo = 200</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720165744.png" alt=""></p>
+<blockquote>
+<p>根据这个规则，理解变量提升就变得十分简单了，在上面规则中我们可以看出，<code>function</code>声明会比<code>var</code>声明优先级更高一点，为了帮助大家更好的理解变量对象，我们结合一些简单的例子来进行探讨。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// demo01</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">test</span></span>() &#123;</span><br><span class="line">  console.log(a)</span><br><span class="line">  console.log(foo())</span><br><span class="line">  </span><br><span class="line">  var a = 1</span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> 2</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span>()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上例中，我们直接从<code>test()</code>的执行上下文开始理解，全局作用域中运行<code>test()</code>时，<code>test()</code>的执行上下文开始创建，为了方便理解，我们用如下的形式来表示：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// 创建过程</span><br><span class="line">testEC = &#123;</span><br><span class="line">  // 变量对象</span><br><span class="line">  VO: &#123;&#125;,</span><br><span class="line">  </span><br><span class="line">  // 作用域链</span><br><span class="line">  scopeChain: &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 因为本文暂时不想起解释作用域链，所以把变量对象专门提出来说明</span><br><span class="line"></span><br><span class="line">// VO 为 Variable Object的缩写，即变量对象</span><br><span class="line">VO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;, // 注：在浏览器的展示中，函数的参数可能并不是放在arguments对象中，这里为了方便理解，我做了这样的处理</span><br><span class="line">  foo: &lt;foo reference&gt; // 表示foo的地址引用</span><br><span class="line">  a: undefined</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>未进入执行阶段之前，变量对象中的属性都不能访问，但是进入执行阶段之后，<code>变量对象</code>转变为了<code>活动对象</code>，里面的属性都能被访问了，然后开始进行执行阶段的操作。</p>
+</blockquote>
+<div class="note info">
+            <p>我们可以简单理解，<code>变量对象</code>和<code>活动对象</code>其实都是同一个对象，只是处于执行上下文的不同生命周期，不过只有处于函数调用栈栈顶的执行上下文的<code>变量对象</code>，才会变成<code>活动对象</code>。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 执行阶段</span><br><span class="line">OV -&gt; AO // Active Object</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;,</span><br><span class="line">  foo: &lt;foo reference&gt;,</span><br><span class="line">  a: 1,</span><br><span class="line">  this: Window</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因此上面的<code>demo01</code>的执行顺序就变成了这样</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">test</span></span>() &#123;</span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> 2</span><br><span class="line">  &#125;</span><br><span class="line">  var a</span><br><span class="line">  console.log(a)</span><br><span class="line">  console.log(foo())</span><br><span class="line">  a = 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span>()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在来一个例子，巩固一下我们的理解</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">// demo02</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">test</span></span>() &#123;</span><br><span class="line">  console.log(foo)</span><br><span class="line">  console.log(bar)</span><br><span class="line">  </span><br><span class="line">  var foo = <span class="string">'Hello'</span></span><br><span class="line">  console.log(foo)</span><br><span class="line">  var bar = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'world'</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'hello'</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">test</span>()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 创建阶段</span><br><span class="line">VO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;,</span><br><span class="line">  foo: &lt;foo reference&gt;,</span><br><span class="line">  bar: undefined</span><br><span class="line">&#125;</span><br><span class="line">// 这里有一个需要注意的地方，var声明的变量与函数同名，以函数为准</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 执行阶段</span><br><span class="line">VO -&gt; AO</span><br><span class="line"></span><br><span class="line">AO = &#123;</span><br><span class="line">  arguments: &#123;...&#125;,</span><br><span class="line">  foo: <span class="string">'Hello'</span>,</span><br><span class="line">  bar: &lt;bar reference&gt;,</span><br><span class="line">  this: Window</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>需要结合上面的知识，仔细对比这个例子中的变量对象从创建阶段到执行阶段的变化，如果你已经理解了，说明变量对象相关的东西都已经难不倒你了。</p>
+</blockquote>
+<h2 id="全局上下文的变量对象"><a href="#全局上下文的变量对象" class="headerlink" title="全局上下文的变量对象"></a>全局上下文的变量对象</h2><blockquote>
+<p>以浏览器中为例，全局对象为<code>window</code>。</p>
+</blockquote>
+<blockquote>
+<p>全局上下文有一个特殊的地方，它的变量对象，就是<code>window</code>对象。而这个特殊，在<code>this</code>指向上也同样使用，<code>this</code>也是指向<code>window</code>。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 以浏览器中为例，全局对象为window</span><br><span class="line">// 全局上下文</span><br><span class="line"></span><br><span class="line">windowEC = &#123;</span><br><span class="line">  VO: window,</span><br><span class="line">  scopeChain: &#123;&#125;,</span><br><span class="line">  this: window</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div class="note warning">
+            <p>除此之外，全局上下文的生命周期，与程序的生命周期一致，只要程序运行不结束，比如关闭掉浏览器窗口，全局上下文就会一直存在。其他所有的上下文环境，都能直接访问全局上下文的属性。</p>
+          </div>
+
+<h2 id="let-const"><a href="#let-const" class="headerlink" title="let/const"></a>let/const</h2><blockquote>
+<p><code>ES6</code>中，新增了使用<code>let/const</code>来声明变量。那么，<code>let/const</code>是否存在变量提升呢？</p>
+</blockquote>
+<blockquote>
+<p>我们来做个试验</p>
+</blockquote>
+<ol>
+<li>我们直接使用一个未定义的变量</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">console.log(e) // Uncaught ReferenceError: e is not defined</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>我们在let之前调用变量</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">console.log(a) // Uncaught ReferenceError: Cannot access <span class="string">'a'</span> before initialization (不能在初始化之前访问a)</span><br><span class="line"><span class="built_in">let</span> a = 10</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这个报错说明了，变量定义了，但是没有初始化</p>
+</blockquote>
+<blockquote>
+<p>所以我们可以得出结论：<code>let/const</code>声明的变量，仍然会提前被收集到变量对象中，但和<code>var</code>不同的是，<code>let/const</code>定义的变量，不会再这个时候给它赋值<code>undefined</code>。因为完全没有赋值，即使变量提升了，我们也不能在赋值之前调用它。这就是我们常说的<code>暂时性死区</code>。</p>
+</blockquote>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>变量提升的现象确实会对我们的代码造成一些负面影响，因此，开发中的好习惯，就是尽量将变量声明放在最前面来写。</p>
+</blockquote>
+
+    </div>
+
+    <div>
+      
+        <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:20px;">------------- 本 文 结 束 <i class="fa fa-paw"></i> 感 谢 您 的 阅 读 -------------</div>
+  
+</div>
+      
+    </div>
+    
+    
+    
+    
+        <div class="reward-container">
+  <div>只是为了好玩罢了~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Archer 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Archer 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Archer
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%89)--%E5%8F%98%E9%87%8F%E5%AF%B9%E8%B1%A1/" title="前端基础进阶学习(三)--变量对象">https://www.chenkl.vip/前端基础进阶学习(三)--变量对象/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/javaScript/" rel="tag"><i class="fa fa-tag"></i> javaScript</a>
+              <a href="/tags/%E5%89%8D%E7%AB%AF%E8%BF%9B%E9%98%B6/" rel="tag"><i class="fa fa-tag"></i> 前端进阶</a>
+              <a href="/tags/%E5%8F%98%E9%87%8F%E5%AF%B9%E8%B1%A1/" rel="tag"><i class="fa fa-tag"></i> 变量对象</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%BA%8C)--%E6%89%A7%E8%A1%8C%E4%B8%8A%E4%B8%8B%E6%96%87/" rel="prev" title="前端基础进阶学习(二)--执行上下文">
+      <i class="fa fa-chevron-left"></i> 前端基础进阶学习(二)--执行上下文
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%9B%9B)--%E4%BD%9C%E7%94%A8%E5%9F%9F%E4%B8%8E%E4%BD%9C%E7%94%A8%E5%9F%9F%E9%93%BE/" rel="next" title="前端基础进阶学习(四)--作用域与作用域链">
+      前端基础进阶学习(四)--作用域与作用域链 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#变量对象（Variable-Object）"><span class="nav-number">1.</span> <span class="nav-text">变量对象（Variable Object）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#全局上下文的变量对象"><span class="nav-number">2.</span> <span class="nav-text">全局上下文的变量对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#let-const"><span class="nav-number">3.</span> <span class="nav-text">let&#x2F;const</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">4.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Archer"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Archer</p>
+  <div class="site-description" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kailong321200875" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kailong321200875" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:502431556@qq.com" title="E-Mail → mailto:502431556@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/meng-shou-kong-cheng-43/activities" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;meng-shou-kong-cheng-43&#x2F;activities" rel="noopener" target="_blank"><i class="fa fa-fw fa-ioxhost"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-fas fa-heartbeat"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Archer</span>
+  <span class="post-meta-divider">|</span>
+  <span class="post-meta-item-icon">
+    <i class="fa fa-area-chart"></i>
+  </span>
+  <span class="post-count">站点总字数：23.7k字</span>
+</div>
+  
+  
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      访客数<span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>人次
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      总访问量<span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>次
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'e6f2f10abe388d591867',
+      clientSecret: '580aea9e3da136ac529a71232367d1fdf3591926',
+      repo        : 'blogTalk',
+      owner       : 'kailong321200875',
+      admin       : ['kailong321200875'],
+      id          : 'c54ab2e78328b8ca3e93d19c3be45fa3',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
+
+<!-- 页面鼠标点击样式 -->
+
+  
+    <script src="/js/src/fireworks.js"></script>
+  
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/kailong321200875/live2d-widget@1.0.1/autoload.js"></script>
+

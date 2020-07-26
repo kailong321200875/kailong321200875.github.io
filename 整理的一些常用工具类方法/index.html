@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="baidu-site-verification" content="5pQM9dB1uO" />
+<meta name="google-site-verification" content="dY4Uxh6geXuXnQR_3mASUgoRCnXG4gmKcISzY0_3vNM" />
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chenkl.vip","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="在日常开发中，我们为了方便代码逻辑的处理，都会封装一些工具类方法来便于我们快速开发，本篇文章就记录了一些我自己整理的具类方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="整理的一些常用工具类方法">
+<meta property="og:url" content="https://www.chenkl.vip/%E6%95%B4%E7%90%86%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E7%B1%BB%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="小小前端搬运工">
+<meta property="og:description" content="在日常开发中，我们为了方便代码逻辑的处理，都会封装一些工具类方法来便于我们快速开发，本篇文章就记录了一些我自己整理的具类方法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2019-05-11T16:27:21.000Z">
+<meta property="article:modified_time" content="2020-06-25T00:38:31.271Z">
+<meta property="article:author" content="Archer">
+<meta property="article:tag" content="javaScript">
+<meta property="article:tag" content="工具">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chenkl.vip/%E6%95%B4%E7%90%86%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E7%B1%BB%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>整理的一些常用工具类方法 | 小小前端搬运工</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="小小前端搬运工" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小小前端搬运工</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">40</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">22</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.chenkl.vip/%E6%95%B4%E7%90%86%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E7%B1%BB%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Archer">
+      <meta itemprop="description" content="种一棵树最好的时间是十年前，其次就是现在。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小小前端搬运工">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          整理的一些常用工具类方法
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-05-11 16:27:21" itemprop="dateCreated datePublished" datetime="2019-05-11T16:27:21Z">2019-05-11</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/javaScript/" itemprop="url" rel="index"><span itemprop="name">javaScript</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>在日常开发中，我们为了方便代码逻辑的处理，都会封装一些工具类方法来便于我们快速开发，本篇文章就记录了一些我自己整理的具类方法。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="oneOf（判断数组中是否存在某个值）"><a href="#oneOf（判断数组中是否存在某个值）" class="headerlink" title="oneOf（判断数组中是否存在某个值）"></a>oneOf（判断数组中是否存在某个值）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param &#123;String|Number&#125; value 要验证的字符串或数值</span><br><span class="line"> * @param &#123;Array&#125; validList 用来验证的列表</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> oneOf(value, validList) &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="built_in">let</span> i = 0; i &lt; validList.length; i++) &#123;</span><br><span class="line">    <span class="keyword">if</span> (value === validList[i]) &#123;</span><br><span class="line">      <span class="built_in">return</span> <span class="literal">true</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="formatTime（时间格式转换）"><a href="#formatTime（时间格式转换）" class="headerlink" title="formatTime（时间格式转换）"></a>formatTime（时间格式转换）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * @param &#123;date&#125; time 需要转换的时间</span><br><span class="line"> * @param &#123;String&#125; fmt 需要转换的格式 如 yyyy-MM-dd、yyyy-MM-dd HH:mm:ss</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> formatTime(time, fmt) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!time) <span class="built_in">return</span> <span class="string">''</span></span><br><span class="line">  <span class="keyword">else</span> &#123;</span><br><span class="line">    const date = new Date(time)</span><br><span class="line">    const o = &#123;</span><br><span class="line">      <span class="string">'M+'</span>: date.getMonth() + 1,</span><br><span class="line">      <span class="string">'d+'</span>: date.getDate(),</span><br><span class="line">      <span class="string">'H+'</span>: date.getHours(),</span><br><span class="line">      <span class="string">'m+'</span>: date.getMinutes(),</span><br><span class="line">      <span class="string">'s+'</span>: date.getSeconds(),</span><br><span class="line">      <span class="string">'q+'</span>: Math.floor((date.getMonth() + 3) / 3),</span><br><span class="line">      <span class="string">'S'</span>: date.getMilliseconds()</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (/(y+)/.<span class="built_in">test</span>(fmt)) fmt = fmt.replace(RegExp.<span class="variable">$1</span>, (date.getFullYear() + <span class="string">''</span>).substr(4 - RegExp.<span class="variable">$1</span>.length))</span><br><span class="line">    <span class="keyword">for</span> (const k <span class="keyword">in</span> o) &#123;</span><br><span class="line">      <span class="keyword">if</span> (new RegExp(<span class="string">'('</span> + k + <span class="string">')'</span>).<span class="built_in">test</span>(fmt)) &#123;</span><br><span class="line">        fmt = fmt.replace(RegExp.<span class="variable">$1</span>, (RegExp.<span class="variable">$1</span>.length === 1) ? (o[k]) : ((</span><br><span class="line">          <span class="string">'00'</span> + o[k]).substr((<span class="string">''</span> + o[k]).length)))</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> fmt</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="toAnyString（生成随机字符串）"><a href="#toAnyString（生成随机字符串）" class="headerlink" title="toAnyString（生成随机字符串）"></a>toAnyString（生成随机字符串）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 生成随机字符串</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> <span class="function"><span class="title">toAnyString</span></span>() &#123;</span><br><span class="line">  const date = new Date()</span><br><span class="line">  const time = date.getTime()</span><br><span class="line">  const str = <span class="string">'xxxxx-xxxxx-4xxxx-yxxxx-xxxxx'</span>.replace(/[xy]/g, (c) =&gt; &#123;</span><br><span class="line">    const r = Math.random() * 16 | 0</span><br><span class="line">    const v = c === <span class="string">'x'</span> ? r : (r &amp; 0x3 | 0x8)</span><br><span class="line">    <span class="built_in">return</span> v.toString(16)</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="built_in">return</span> time + <span class="string">'-'</span> + str</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="deepClone（深拷贝）"><a href="#deepClone（深拷贝）" class="headerlink" title="deepClone（深拷贝）"></a>deepClone（深拷贝）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 对象数组深拷贝</span><br><span class="line"> * @param &#123;Array,Object&#125; <span class="built_in">source</span> 需要深拷贝的对象数组</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> deepClone(<span class="built_in">source</span>) &#123;</span><br><span class="line">  <span class="keyword">if</span> (!<span class="built_in">source</span> &amp;&amp; typeof <span class="built_in">source</span> !== <span class="string">'object'</span>) &#123;</span><br><span class="line">    throw new Error(<span class="string">'error arguments'</span>, <span class="string">'deepClone'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">  const targetObj = source.constructor === Array ? [] : &#123;&#125;</span><br><span class="line">  Object.keys(<span class="built_in">source</span>).forEach(keys =&gt; &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">source</span>[keys] &amp;&amp; typeof <span class="built_in">source</span>[keys] === <span class="string">'object'</span>) &#123;</span><br><span class="line">      targetObj[keys] = deepClone(<span class="built_in">source</span>[keys])</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      targetObj[keys] = <span class="built_in">source</span>[keys]</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="built_in">return</span> targetObj</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="findIndex（查找数组对象的某个下标）"><a href="#findIndex（查找数组对象的某个下标）" class="headerlink" title="findIndex（查找数组对象的某个下标）"></a>findIndex（查找数组对象的某个下标）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 查找数组对象的某个下标</span><br><span class="line"> * @param &#123;Array&#125; ary 查找的数组</span><br><span class="line"> * @param &#123;Functon&#125; fn 判断的方法</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> findIndex(ary, fn) &#123;</span><br><span class="line">  <span class="keyword">if</span> (ary.findIndex) &#123;</span><br><span class="line">    <span class="built_in">return</span> ary.findIndex(fn)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">let</span> index = -1</span><br><span class="line">  ary.some(<span class="keyword">function</span>(item, i, ary) &#123;</span><br><span class="line">    const ret = fn.call(this, item, i, ary)</span><br><span class="line">    <span class="keyword">if</span> (ret) &#123;</span><br><span class="line">      index = i</span><br><span class="line">      <span class="built_in">return</span> ret</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">  <span class="built_in">return</span> index</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="exportFile（下载文件）"><a href="#exportFile（下载文件）" class="headerlink" title="exportFile（下载文件）"></a>exportFile（下载文件）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 下载文件</span><br><span class="line"> * @param &#123;Blob&#125; blobs 文件流</span><br><span class="line"> * @param &#123;name&#125; 文件名</span><br><span class="line"> * @param &#123;fileType&#125; 文件类型</span><br><span class="line"> * @param &#123;<span class="built_in">type</span>&#125; 后缀</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> exportFile(blobs, name, fileType, <span class="built_in">type</span>) &#123;</span><br><span class="line">  const blob = new Blob([blobs], &#123; <span class="built_in">type</span>: fileType &#125;)</span><br><span class="line">  <span class="keyword">if</span> (typeof window.navigator.msSaveBlob !== <span class="string">'undefined'</span>) &#123;</span><br><span class="line">    window.navigator.msSaveBlob(blob, name)</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    const blobURL = window.URL.createObjectURL(blob) // 将blob对象转为一个URL</span><br><span class="line">    const tempLink = document.createElement(<span class="string">'a'</span>) // 创建一个a标签</span><br><span class="line">    tempLink.style.display = <span class="string">'none'</span></span><br><span class="line">    tempLink.href = blobURL</span><br><span class="line">    tempLink.setAttribute(<span class="string">'download'</span>, name) // 给a标签添加下载属性</span><br><span class="line">    <span class="keyword">if</span> (typeof tempLink.download === <span class="string">'undefined'</span>) &#123;</span><br><span class="line">      tempLink.setAttribute(<span class="string">'target'</span>, <span class="string">'_blank'</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    document.body.appendChild(tempLink) // 将a标签添加到body当中</span><br><span class="line">    tempLink.click() // 启动下载</span><br><span class="line">    document.body.removeChild(tempLink) // 下载完毕删除a标签</span><br><span class="line">    window.URL.revokeObjectURL(blobURL)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="param2Obj（截取URL参数）"><a href="#param2Obj（截取URL参数）" class="headerlink" title="param2Obj（截取URL参数）"></a>param2Obj（截取URL参数）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 截取URL参数</span><br><span class="line"> * @param &#123;string&#125; url</span><br><span class="line"> * @returns &#123;Object&#125;</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> param2Obj(url) &#123;</span><br><span class="line">  const search = url.split(<span class="string">'?'</span>)[1]</span><br><span class="line">  <span class="keyword">if</span> (!search) &#123;</span><br><span class="line">    <span class="built_in">return</span> &#123;&#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> JSON.parse(</span><br><span class="line">    <span class="string">'&#123;"'</span> +</span><br><span class="line">      decodeURIComponent(search)</span><br><span class="line">        .replace(/<span class="string">"/g, '\\"</span><span class="string">')</span></span><br><span class="line"><span class="string">        .replace(/&amp;/g, '</span><span class="string">","</span><span class="string">')</span></span><br><span class="line"><span class="string">        .replace(/=/g, '</span><span class="string">":"</span><span class="string">')</span></span><br><span class="line"><span class="string">        .replace(/\+/g, '</span> <span class="string">') +</span></span><br><span class="line"><span class="string">      '</span><span class="string">"&#125;'</span></span><br><span class="line"><span class="string">  )</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="img2Base64（图片地址转base64）"><a href="#img2Base64（图片地址转base64）" class="headerlink" title="img2Base64（图片地址转base64）"></a>img2Base64（图片地址转base64）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 图片地址转base64</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> img2Base64(src) &#123;</span><br><span class="line">  const canvas = document.createElement(<span class="string">'canvas'</span>)</span><br><span class="line">  const ctx = canvas.getContext(<span class="string">'2d'</span>)</span><br><span class="line">  const img = document.createElement(<span class="string">'img'</span>)</span><br><span class="line">  img.crossOrigin = <span class="string">'*'</span></span><br><span class="line">  <span class="built_in">return</span> new Promise((resolve, reject) =&gt; &#123;</span><br><span class="line">    img.onload = () =&gt; &#123;</span><br><span class="line">      const &#123;</span><br><span class="line">        width,</span><br><span class="line">        height</span><br><span class="line">      &#125; = img</span><br><span class="line">      canvas.width = width</span><br><span class="line">      canvas.height = height</span><br><span class="line"></span><br><span class="line">      ctx.drawImage(img, 0, 0)</span><br><span class="line">      const base64 = canvas.toDataURL()</span><br><span class="line"></span><br><span class="line">      resolve(base64)</span><br><span class="line">    &#125;</span><br><span class="line">    img.src = src</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="IEVersion（获取IE浏览器版本）"><a href="#IEVersion（获取IE浏览器版本）" class="headerlink" title="IEVersion（获取IE浏览器版本）"></a>IEVersion（获取IE浏览器版本）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> <span class="function"><span class="title">IEVersion</span></span>() &#123;</span><br><span class="line">  const userAgent = navigator.userAgent // 取得浏览器的userAgent字符串</span><br><span class="line">  const isIE = userAgent.indexOf(<span class="string">'compatible'</span>) &gt; -1 &amp;&amp; userAgent.indexOf(<span class="string">'MSIE'</span>) &gt; -1 // 判断是否IE&lt;11浏览器</span><br><span class="line">  const isEdge = userAgent.indexOf(<span class="string">'Edge'</span>) &gt; -1 &amp;&amp; !isIE // 判断是否IE的Edge浏览器</span><br><span class="line">  const isIE11 = userAgent.indexOf(<span class="string">'Trident'</span>) &gt; -1 &amp;&amp; userAgent.indexOf(<span class="string">'rv:11.0'</span>) &gt; -1</span><br><span class="line">  <span class="keyword">if</span> (isIE) &#123;</span><br><span class="line">    const reIE = new RegExp(<span class="string">'MSIE (\\d+\\.\\d+);'</span>)</span><br><span class="line">    reIE.test(userAgent)</span><br><span class="line">    const fIEVersion = parseFloat(RegExp[<span class="string">'$1'</span>])</span><br><span class="line">    <span class="keyword">if</span> (fIEVersion === 7) &#123;</span><br><span class="line">      <span class="built_in">return</span> 7</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fIEVersion === 8) &#123;</span><br><span class="line">      <span class="built_in">return</span> 8</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fIEVersion === 9) &#123;</span><br><span class="line">      <span class="built_in">return</span> 9</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (fIEVersion === 10) &#123;</span><br><span class="line">      <span class="built_in">return</span> 10</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="built_in">return</span> 6 // IE版本&lt;=7</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isEdge) &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'edge'</span> // edge</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isIE11) &#123;</span><br><span class="line">    <span class="built_in">return</span> 11 // IE11</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="literal">false</span> // 不是ie浏览器</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="thousands（每隔三个数一个逗号）"><a href="#thousands（每隔三个数一个逗号）" class="headerlink" title="thousands（每隔三个数一个逗号）"></a>thousands（每隔三个数一个逗号）</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">/**</span><br><span class="line"> * 每隔三个数一个逗号</span><br><span class="line"> * @param &#123;string|Number&#125; num</span><br><span class="line"> * @returns &#123;string&#125;</span><br><span class="line"> */</span><br><span class="line"><span class="built_in">export</span> <span class="keyword">function</span> thousands(num) &#123;</span><br><span class="line">  const str = typeof num === <span class="string">'number'</span> ? num.toString() : num</span><br><span class="line">  const reg = str.indexOf(<span class="string">'.'</span>) &gt; -1 ? /(\d)(?=(\d&#123;3&#125;)+\.)/g : /(\d)(?=(?:\d&#123;3&#125;)+$)/g</span><br><span class="line">  <span class="built_in">return</span> str.replace(reg, <span class="string">'$1,'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">
+            <p>在之后的开发中，还会陆续把一些常用的工具类方法给集成进来，做个整合。</p>
+          </div>
+    </div>
+
+    <div>
+      
+        <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:20px;">------------- 本 文 结 束 <i class="fa fa-paw"></i> 感 谢 您 的 阅 读 -------------</div>
+  
+</div>
+      
+    </div>
+    
+    
+    
+    
+        <div class="reward-container">
+  <div>只是为了好玩罢了~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Archer 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Archer 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Archer
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.chenkl.vip/%E6%95%B4%E7%90%86%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B8%B8%E7%94%A8%E5%B7%A5%E5%85%B7%E7%B1%BB%E6%96%B9%E6%B3%95/" title="整理的一些常用工具类方法">https://www.chenkl.vip/整理的一些常用工具类方法/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/javaScript/" rel="tag"><i class="fa fa-tag"></i> javaScript</a>
+              <a href="/tags/%E5%B7%A5%E5%85%B7/" rel="tag"><i class="fa fa-tag"></i> 工具</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%A6%82%E4%BD%95%E5%9F%BA%E4%BA%8Eaxios%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E6%8B%A6%E6%88%AA%E5%99%A8/" rel="prev" title="如何基于axios实现请求拦截器">
+      <i class="fa fa-chevron-left"></i> 如何基于axios实现请求拦截器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/git-cz%E5%88%9D%E4%BD%BF%E7%94%A8/" rel="next" title="git-cz初使用">
+      git-cz初使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#oneOf（判断数组中是否存在某个值）"><span class="nav-number">1.</span> <span class="nav-text">oneOf（判断数组中是否存在某个值）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#formatTime（时间格式转换）"><span class="nav-number">2.</span> <span class="nav-text">formatTime（时间格式转换）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#toAnyString（生成随机字符串）"><span class="nav-number">3.</span> <span class="nav-text">toAnyString（生成随机字符串）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#deepClone（深拷贝）"><span class="nav-number">4.</span> <span class="nav-text">deepClone（深拷贝）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#findIndex（查找数组对象的某个下标）"><span class="nav-number">5.</span> <span class="nav-text">findIndex（查找数组对象的某个下标）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#exportFile（下载文件）"><span class="nav-number">6.</span> <span class="nav-text">exportFile（下载文件）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#param2Obj（截取URL参数）"><span class="nav-number">7.</span> <span class="nav-text">param2Obj（截取URL参数）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#img2Base64（图片地址转base64）"><span class="nav-number">8.</span> <span class="nav-text">img2Base64（图片地址转base64）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IEVersion（获取IE浏览器版本）"><span class="nav-number">9.</span> <span class="nav-text">IEVersion（获取IE浏览器版本）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#thousands（每隔三个数一个逗号）"><span class="nav-number">10.</span> <span class="nav-text">thousands（每隔三个数一个逗号）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">11.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Archer"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Archer</p>
+  <div class="site-description" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kailong321200875" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kailong321200875" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:502431556@qq.com" title="E-Mail → mailto:502431556@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/meng-shou-kong-cheng-43/activities" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;meng-shou-kong-cheng-43&#x2F;activities" rel="noopener" target="_blank"><i class="fa fa-fw fa-ioxhost"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-fas fa-heartbeat"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Archer</span>
+  <span class="post-meta-divider">|</span>
+  <span class="post-meta-item-icon">
+    <i class="fa fa-area-chart"></i>
+  </span>
+  <span class="post-count">站点总字数：23.7k字</span>
+</div>
+  
+  
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      访客数<span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>人次
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      总访问量<span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>次
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'e6f2f10abe388d591867',
+      clientSecret: '580aea9e3da136ac529a71232367d1fdf3591926',
+      repo        : 'blogTalk',
+      owner       : 'kailong321200875',
+      admin       : ['kailong321200875'],
+      id          : '00d8bf5420c428ced2b478f96c670e5b',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
+
+<!-- 页面鼠标点击样式 -->
+
+  
+    <script src="/js/src/fireworks.js"></script>
+  
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/kailong321200875/live2d-widget@1.0.1/autoload.js"></script>
+

@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="baidu-site-verification" content="5pQM9dB1uO" />
+<meta name="google-site-verification" content="dY4Uxh6geXuXnQR_3mASUgoRCnXG4gmKcISzY0_3vNM" />
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chenkl.vip","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="我们在学习js的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于this指向理解中，有一种说法：谁调用它，this就指向谁。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端基础进阶学习(七)--this">
+<meta property="og:url" content="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%83)--this/index.html">
+<meta property="og:site_name" content="小小前端搬运工">
+<meta property="og:description" content="我们在学习js的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于this指向理解中，有一种说法：谁调用它，this就指向谁。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png">
+<meta property="article:published_time" content="2020-07-26T15:21:29.000Z">
+<meta property="article:modified_time" content="2020-07-26T08:37:42.917Z">
+<meta property="article:author" content="Archer">
+<meta property="article:tag" content="javaScript">
+<meta property="article:tag" content="前端进阶">
+<meta property="article:tag" content="this">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png">
+
+<link rel="canonical" href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%83)--this/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>前端基础进阶学习(七)--this | 小小前端搬运工</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="小小前端搬运工" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小小前端搬运工</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">40</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">22</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%83)--this/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Archer">
+      <meta itemprop="description" content="种一棵树最好的时间是十年前，其次就是现在。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小小前端搬运工">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          前端基础进阶学习(七)--this
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-26 15:21:29" itemprop="dateCreated datePublished" datetime="2020-07-26T15:21:29Z">2020-07-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/javaScript/" itemprop="url" rel="index"><span itemprop="name">javaScript</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>我们在学习js的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于<code>this</code>指向理解中，有一种说法：谁调用它，<code>this</code>就指向谁。</p>
+</blockquote>
+<a id="more"></a>
+
+<blockquote>
+<p>我们回顾一下执行上下文</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png" alt=""></p>
+<blockquote>
+<p>执行上下文的创建阶段，会分别生成变量对象，建立作用于，确定<code>this</code>指向。其中变量对象与作用于链我们都已经明白了。本文的关键，就是确定<code>this</code>指向。</p>
+</blockquote>
+<blockquote>
+<p>首先，我们需要得出一个非常重要的，并且一定要牢记于心的结论，<code>this的指向，是在函数被调用的时候确定的</code>。也就是执行上下文被创建时确定的。</p>
+</blockquote>
+<blockquote>
+<p>因此，一个函数中的<code>this</code>指向，可以非常灵活。比如下面的例子中，同一个函数由于调用的方式不同，<code>this</code>指向了不一样的对象。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var a = 10</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn() // 10</span><br><span class="line">fn.call(obj) // 20</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>除此之外，<code>在函数执行过程中，this一旦被确定，就不可更改了。</code></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var a = 10</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  this = obj // 这句话试图修改this，运行后会报错</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+
+<h2 id="全局对象中的this"><a href="#全局对象中的this" class="headerlink" title="全局对象中的this"></a>全局对象中的this</h2><blockquote>
+<p>关于全局对象的<code>this</code>，它是一个比较特殊的存在。全局环境中的<code>this</code>，指向它本身。因此，这也相对简单，没有那么多复杂的情况需要考虑。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// 通过this绑定到全局对象</span><br><span class="line">this.a2 = 20</span><br><span class="line"></span><br><span class="line">// 通过声明绑定到变量对象，但在全局环境中，变量对象就是它自身</span><br><span class="line">// var a1 = 10</span><br><span class="line"></span><br><span class="line">// 仅仅只有赋值操作，标识符会隐式绑定到全局对象</span><br><span class="line">a3 = 10</span><br><span class="line"></span><br><span class="line">// 输出结果会全部符合预期</span><br><span class="line">console.log(a1)</span><br><span class="line">console.log(a2)</span><br><span class="line">console.log(a3)</span><br></pre></td></tr></table></figure>
+
+<h2 id="函数中的this"><a href="#函数中的this" class="headerlink" title="函数中的this"></a>函数中的this</h2><blockquote>
+<p>我们有必要通过一些奇怪的例子，来感受一下函数中<code>this</code>的捉摸不定。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// demo01</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// demo02</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  <span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">    console.log(this.a)</span><br><span class="line">  &#125;</span><br><span class="line">  foo()</span><br><span class="line">&#125;</span><br><span class="line">fn()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// demo03</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  c: this.a + 20,</span><br><span class="line">  fn: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.a</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(obj.c)</span><br><span class="line">console.log(obj.fn())</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>分析之前，我们直接了当抛出结论</p>
+</blockquote>
+<blockquote>
+<p>在一个函数上下文中，<code>this</code>由调用者提供，由调用函数的方式来决定。<code>如果调用者函数，被一个对象用有，那么该函数在调用时，内部的this指向该对象。如果函数独立调用，那么该函数内部的this，则指向undefined</code>。但在非严格模式中，当<code>this</code>指向<code>undefined</code>时，它会被自动指向全局对象。</p>
+</blockquote>
+<blockquote>
+<p>想要准确确定<code>this</code>指向，找到函数的调用者以及区分他是否是独立调用十分关键。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">// 为了能够准确判定，我们在函数内部使用严格模式，因为非严格模式会自动指向全局</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  <span class="string">'use strict'</span></span><br><span class="line">  console.log(this)</span><br><span class="line">&#125;</span><br><span class="line">fn() // fn 是调用者，独立调用</span><br><span class="line">window.fn() // fn是调用者，被window所拥有</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上面的简单例子中，<code>fn()</code>作为独立调用者，按照定义的理解，它内部的<code>this</code>指向就是<code>undefined</code>。而<code>window.fn()</code>则因为<code>fn</code>被<code>window</code>所拥有，内部的<code>this</code>就指向了<code>window</code>对象。</p>
+</blockquote>
+<blockquote>
+<p>掌握了这个规则，现在回过头去看看上面的三个例子，通过添加/去除严格模式，你就会发现，原来<code>this</code>已经变得不那么虚无缥缈了。</p>
+</blockquote>
+<blockquote>
+<p>但是我们需要特别注意的是<code>demo03</code>，在里面，对象obj中的c属性使用<code>this.a + 20</code>来计算。这里我们需要明确的一点是，单独的{}不会行程新的作用域，因此这里的<code>this.a</code>，由于并没有作用域的限制，它仍然处于全局作用域中，所以这里的<code>this</code>其实是指向的<code>window对象</code>。</p>
+</blockquote>
+<blockquote>
+<p>那么我们修改一下<code>demo03</code>的代码</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'use strict'</span>;</span><br><span class="line">var a = 20</span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">  var a = 1</span><br><span class="line">  var obj = &#123;</span><br><span class="line">    a: 10,</span><br><span class="line">    c: this.a + 20,</span><br><span class="line">    fn: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      <span class="built_in">return</span> this.a</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> obj.c</span><br><span class="line">&#125;</span><br><span class="line">console.log(foo()) // ?</span><br><span class="line">console.log(window.foo()) // ?</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们可以在浏览器中看到，控制台直接报错。</p>
+</blockquote>
+<div class="note warning">
+            <p>实际开发中，并不推荐这样使用this</p><p>上面多次提到的严格模式，需要大家认真对象，因为实际开发中，现在基本上已经全部采用严格模式了，而最新的ES6，也是默认支持严格模式的。</p>
+          </div>
+
+<blockquote>
+<p>再来看一些容易理解错误的例子，加深一下对调用者与是否独立运行的理解。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var a = 20</span><br><span class="line">var foo = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.a</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(foo.getA()) // 10</span><br><span class="line"></span><br><span class="line">var <span class="built_in">test</span> = foo.getA</span><br><span class="line">console.log(<span class="built_in">test</span>()) // 20</span><br></pre></td></tr></table></figure>
+
+<p><code>foo.getA()</code>中，<code>getA</code>是调用者，他不是独立调用，被对象<code>foo</code>所拥有，因此它的<code>this</code>指向了<code>foo</code>。而<code>test()</code>作为调用者，尽管它与<code>foo.getA</code>的引用相同，但它是独立调用的，因此<code>this</code>指向<code>undefined</code>，在非严格模式下，自动转向全局<code>window</code>。</p>
+<blockquote>
+<p>稍微修改一下代码</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">var a = 20</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">getA</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.a</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var foo = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  getA: getA</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">console.log(foo.getA()) // 10</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>再来一个例子</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> active(fn) &#123;</span><br><span class="line">  fn() // 真实调用者，为独立调用</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  getA: foo</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">active(obj.getA) // 20</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用call，apply显示指定this"><a href="#使用call，apply显示指定this" class="headerlink" title="使用call，apply显示指定this"></a>使用call，apply显示指定this</h2><blockquote>
+<p>js内部提供了一种机制，让我们可以自行手动设置<code>this</code>的指向。它们就是<code>call</code>与<code>apply</code>。所有的函数都具有这两个方法。它们除了参数略有不同之外，其功能完全一样。它们的第一个参数都为<code>this</code>将要指向的对象。</p>
+</blockquote>
+<blockquote>
+<p>如下例子所示。<code>fn</code>并非属于对象<code>obj</code>的方法，但是通过<code>call</code>，我们将<code>fn</code>内部的<code>this</code>绑定为<code>obj</code>，因此就可以使用<code>this.a</code>访问<code>obj</code>的a属性。这就是<code>call/apply</code>的用法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">fn</span></span>() &#123;</span><br><span class="line">  console.log(this.a) // 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn.call(obj)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><code>call</code>与<code>apply</code>后面的参数，都是向将要执行的函数传递参数。其中<code>call</code>以一个一个的形式传递，<code>apply</code>以数组的形式传递。这是他们唯一的不同。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> fn(num1, num2) &#123;</span><br><span class="line">  console.log(this.a + num1 + num2)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn.call(obj, 100, 10) // 130</span><br><span class="line">fn.apply(obj, [20, 10]) // 50</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因为<code>call/apply</code>的存在，js变得更加灵活。也因此他们的使用场景就多种多样。</p>
+</blockquote>
+<h3 id="将类数组对象转为数组"><a href="#将类数组对象转为数组" class="headerlink" title="将类数组对象转为数组"></a>将类数组对象转为数组</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> exam(a, b, c, d, e) &#123;</span><br><span class="line">  // 先看看函数的自带属性 arguments 什么是样子的</span><br><span class="line">  console.log(arguments)</span><br><span class="line">  </span><br><span class="line">  // 使用call/apply将arguments转为数组，返回结果为数组，arguments自身不会改变</span><br><span class="line">  var arg = [].slice.call(arguments)</span><br><span class="line">  </span><br><span class="line">  console.log(arg)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">exam(2, 8, 9, 10, 3)</span><br><span class="line"></span><br><span class="line">/ result:</span><br><span class="line">// &#123; <span class="string">'0'</span>: 2, <span class="string">'1'</span>: 8, <span class="string">'2'</span>: 9, <span class="string">'3'</span>: 10, <span class="string">'4'</span>: 3 &#125;</span><br><span class="line">// [ 2, 8, 9, 10, 3 ]</span><br><span class="line"></span><br><span class="line">// 也常常使用该方法将DOM中的nodelist转换为数组</span><br><span class="line">// [].slice.call(document.getElementsByTagName(<span class="string">'li'</span>))</span><br></pre></td></tr></table></figure>
+
+<h3 id="根据自己的需要灵活修改this指向"><a href="#根据自己的需要灵活修改this指向" class="headerlink" title="根据自己的需要灵活修改this指向"></a>根据自己的需要灵活修改this指向</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">var foo = &#123;</span><br><span class="line">  name: <span class="string">'haha'</span>,</span><br><span class="line">  showName: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(this.name)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var bar = &#123;</span><br><span class="line">  name: <span class="string">'hehe'</span></span><br><span class="line">&#125;</span><br><span class="line">foo.showName.call(bar)</span><br></pre></td></tr></table></figure>
+
+<h3 id="实现继承"><a href="#实现继承" class="headerlink" title="实现继承"></a>实现继承</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 定义父级的构造函数</span><br><span class="line">var Person = <span class="keyword">function</span>(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">  this.gender = [<span class="string">'man'</span>, <span class="string">'woman'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 定义子类的构造函数</span><br><span class="line">var Student = <span class="keyword">function</span>(name, age, high) &#123;</span><br><span class="line">  // use call</span><br><span class="line">  Person.call(this, name, age)</span><br><span class="line">  this.high = high</span><br><span class="line">&#125;</span><br><span class="line">Student.prototype.message = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'name:'</span> + this.name + <span class="string">', age:'</span> + this.age + <span class="string">', high:'</span> + this.high + <span class="string">', gender:'</span> + this.gender[0] + <span class="string">';'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">new Student(<span class="string">'xiaoming'</span>, 12, <span class="string">'180cm'</span>).message() // name:xiaoming, age:12, high:180cm, gender:man;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在向其他执行上下文的传递中，确保this的指向保持不变"><a href="#在向其他执行上下文的传递中，确保this的指向保持不变" class="headerlink" title="在向其他执行上下文的传递中，确保this的指向保持不变"></a>在向其他执行上下文的传递中，确保this的指向保持不变</h3><blockquote>
+<p>如下面例子中，我们期待的是getA被obj调用时，this指向obj，但是由于匿名函数的存在导致了this指向的丢失，在这个匿名函数中this指向了全局，因此我们需要想一些办法找回正确的this指向。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      console.log(this.a)</span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.getA()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>常规的解决办法很简单，就是使用一个变量，将this的引用保存起来。我们常常会用到这个办法，但是我们也要借助上面将到的只是，来判断this是否是在传递中被修改了，如果没有被修改，就没有必要这样使用了。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">    var self = this</span><br><span class="line">    setTimeout(<span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      console.log(self.a)</span><br><span class="line">    &#125;, 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>另外就是借助闭包与apply方法，封装一个bind方法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="built_in">bind</span>(fn, obj) &#123;</span><br><span class="line">  <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> fn.apply(obj, arguments)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">    setTimeout(<span class="built_in">bind</span>(<span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      console.log(this.a)</span><br><span class="line">    &#125;, this), 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">obj.getA()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当然，也可以使用ES5中已经自带的bind方法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">var obj = &#123;</span><br><span class="line">  a: 20,</span><br><span class="line">  getA: <span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">    setTimeout(<span class="function"><span class="title">function</span></span> () &#123;</span><br><span class="line">      console.log(this.a)</span><br><span class="line">    &#125;.<span class="built_in">bind</span>(this), 1000)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>ES6中也常常使用箭头函数的方式来替代这种方案</p>
+          </div>
+
+<h2 id="构造函数与原型方法上的this"><a href="#构造函数与原型方法上的this" class="headerlink" title="构造函数与原型方法上的this"></a>构造函数与原型方法上的this</h2><blockquote>
+<p>在封装对象的时候，我们几乎都会用到this，但是，只有少数人搞明白了在这个过程中的this指向，就算我们理解了原型，也不一定理解到了this。</p>
+</blockquote>
+<blockquote>
+<p>结合下面的例子，几个问题可以思考下。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  // 这里的this指向了谁</span><br><span class="line">  console.log(this)</span><br><span class="line">  </span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  // 这里的this又指向了谁</span><br><span class="line">  console.log(this)</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 上面的2个this，是同一个吗，他们是否指向了原型对象</span><br><span class="line"></span><br><span class="line">var p1 = new Person(<span class="string">'哈哈'</span>, 20)</span><br><span class="line">p1.getName()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们已经知道this是在函数调用过程中确定的，因此，搞明白了new的过程中到底发生了什么就变得十分重要</p>
+</blockquote>
+<blockquote>
+<p>通过new操作符调用构造函数，会经历以下4个阶段</p>
+</blockquote>
+<ol>
+<li>创建一个新的对象</li>
+<li>将构造函数的this指向这个新对象</li>
+<li>指向构造函数的代码，为这个对象添加属性，方法等</li>
+<li>返回新对象</li>
+</ol>
+<blockquote>
+<p>因此，当new操作符调用构造函数时，this其实指向的是这个新创建的对象，最后又将这个对象返回出来，被实例对象p1接收。因此，我们可以说，这个时候，构造函数的this，指向了新的实例对象：p1。</p>
+</blockquote>
+<blockquote>
+<p>而原型上的this就好理解多了，根据上边对函数中this的定义，p1.getName()中的getName为调用者，它被p1所拥有，因此getName中的this，也是指向了p1。</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><blockquote>
+<p>this的指向是非常重要的，不管是在实际开发中还是面试中，出现的概率都是非常高的。</p>
+</blockquote>
+
+    </div>
+
+    <div>
+      
+        <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:20px;">------------- 本 文 结 束 <i class="fa fa-paw"></i> 感 谢 您 的 阅 读 -------------</div>
+  
+</div>
+      
+    </div>
+    
+    
+    
+    
+        <div class="reward-container">
+  <div>只是为了好玩罢了~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Archer 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Archer 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Archer
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%83)--this/" title="前端基础进阶学习(七)--this">https://www.chenkl.vip/前端基础进阶学习(七)--this/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/javaScript/" rel="tag"><i class="fa fa-tag"></i> javaScript</a>
+              <a href="/tags/%E5%89%8D%E7%AB%AF%E8%BF%9B%E9%98%B6/" rel="tag"><i class="fa fa-tag"></i> 前端进阶</a>
+              <a href="/tags/this/" rel="tag"><i class="fa fa-tag"></i> this</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%85%AD)--setTimeout%E4%B8%8E%E5%BE%AA%E7%8E%AF%E9%97%AD%E5%8C%85/" rel="prev" title="前端基础进阶学习(六)--setTimeout与循环闭包">
+      <i class="fa fa-chevron-left"></i> 前端基础进阶学习(六)--setTimeout与循环闭包
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#全局对象中的this"><span class="nav-number">1.</span> <span class="nav-text">全局对象中的this</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#函数中的this"><span class="nav-number">2.</span> <span class="nav-text">函数中的this</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用call，apply显示指定this"><span class="nav-number">3.</span> <span class="nav-text">使用call，apply显示指定this</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#将类数组对象转为数组"><span class="nav-number">3.1.</span> <span class="nav-text">将类数组对象转为数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#根据自己的需要灵活修改this指向"><span class="nav-number">3.2.</span> <span class="nav-text">根据自己的需要灵活修改this指向</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现继承"><span class="nav-number">3.3.</span> <span class="nav-text">实现继承</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在向其他执行上下文的传递中，确保this的指向保持不变"><span class="nav-number">3.4.</span> <span class="nav-text">在向其他执行上下文的传递中，确保this的指向保持不变</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造函数与原型方法上的this"><span class="nav-number">4.</span> <span class="nav-text">构造函数与原型方法上的this</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Archer"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Archer</p>
+  <div class="site-description" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kailong321200875" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kailong321200875" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:502431556@qq.com" title="E-Mail → mailto:502431556@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/meng-shou-kong-cheng-43/activities" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;meng-shou-kong-cheng-43&#x2F;activities" rel="noopener" target="_blank"><i class="fa fa-fw fa-ioxhost"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-fas fa-heartbeat"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Archer</span>
+  <span class="post-meta-divider">|</span>
+  <span class="post-meta-item-icon">
+    <i class="fa fa-area-chart"></i>
+  </span>
+  <span class="post-count">站点总字数：23.7k字</span>
+</div>
+  
+  
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      访客数<span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>人次
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      总访问量<span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>次
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'e6f2f10abe388d591867',
+      clientSecret: '580aea9e3da136ac529a71232367d1fdf3591926',
+      repo        : 'blogTalk',
+      owner       : 'kailong321200875',
+      admin       : ['kailong321200875'],
+      id          : '410ba88e2e71e56e923bc2ba0fd4ad11',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
+
+<!-- 页面鼠标点击样式 -->
+
+  
+    <script src="/js/src/fireworks.js"></script>
+  
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/kailong321200875/live2d-widget@1.0.1/autoload.js"></script>
+
