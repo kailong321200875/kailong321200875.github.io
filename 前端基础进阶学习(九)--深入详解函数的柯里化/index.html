@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="baidu-site-verification" content="5pQM9dB1uO" />
+<meta name="google-site-verification" content="dY4Uxh6geXuXnQR_3mASUgoRCnXG4gmKcISzY0_3vNM" />
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"www.chenkl.vip","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="柯里化是函数的一个高级应用，我们知道，接收函数作为参数的函数，都可以叫做高阶函数。我们常常利用高阶函数来封装一些公共的逻辑。这里的柯里化，其实就是高阶函数的一种特殊用法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端基础进阶学习(九)--深入详解函数的柯里化">
+<meta property="og:url" content="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B9%9D)--%E6%B7%B1%E5%85%A5%E8%AF%A6%E8%A7%A3%E5%87%BD%E6%95%B0%E7%9A%84%E6%9F%AF%E9%87%8C%E5%8C%96/index.html">
+<meta property="og:site_name" content="小小前端搬运工">
+<meta property="og:description" content="柯里化是函数的一个高级应用，我们知道，接收函数作为参数的函数，都可以叫做高阶函数。我们常常利用高阶函数来封装一些公共的逻辑。这里的柯里化，其实就是高阶函数的一种特殊用法。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-09T14:20:04.000Z">
+<meta property="article:modified_time" content="2020-08-09T07:26:33.345Z">
+<meta property="article:author" content="Archer">
+<meta property="article:tag" content="javaScript">
+<meta property="article:tag" content="前端进阶">
+<meta property="article:tag" content="函数的柯里化">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B9%9D)--%E6%B7%B1%E5%85%A5%E8%AF%A6%E8%A7%A3%E5%87%BD%E6%95%B0%E7%9A%84%E6%9F%AF%E9%87%8C%E5%8C%96/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>前端基础进阶学习(九)--深入详解函数的柯里化 | 小小前端搬运工</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="小小前端搬运工" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">小小前端搬运工</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <h1 class="site-subtitle" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</h1>
+      
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签<span class="badge">42</span></a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类<span class="badge">7</span></a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档<span class="badge">24</span></a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="search-pop-overlay">
+  <div class="popup search-popup">
+      <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+  </div>
+</div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B9%9D)--%E6%B7%B1%E5%85%A5%E8%AF%A6%E8%A7%A3%E5%87%BD%E6%95%B0%E7%9A%84%E6%9F%AF%E9%87%8C%E5%8C%96/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Archer">
+      <meta itemprop="description" content="种一棵树最好的时间是十年前，其次就是现在。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="小小前端搬运工">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          前端基础进阶学习(九)--深入详解函数的柯里化
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-09 14:20:04" itemprop="dateCreated datePublished" datetime="2020-08-09T14:20:04Z">2020-08-09</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/javaScript/" itemprop="url" rel="index"><span itemprop="name">javaScript</span></a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>柯里化是函数的一个高级应用，我们知道，接收函数作为参数的函数，都可以叫做高阶函数。我们常常利用高阶函数来封装一些公共的逻辑。这里的柯里化，其实就是高阶函数的一种特殊用法。</p>
+</blockquote>
+<a id="more"></a>
+
+<div class="note info">
+            <p>柯里化是指这样一个函数（假设叫做createCurry），他接收函数A作为参数，运行后能够返回一个新的函数，并且这个新的函数能够处理函数A的剩余参数。</p>
+          </div>
+
+<blockquote>
+<p>如：有一个接收三个参数的函数A</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> A(a, b, c) &#123;</span><br><span class="line">  // <span class="keyword">do</span> something</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>加入，我们有一个已经封装好了的柯里化通用函数createCurry。他接收bar作为参数，能够将A转化为柯里化函数，返回结果就是这个被转化之后的函数。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">var _A = createCurry(A)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>那么_A作为createCurry运行的返回函数，他能够处理A的剩余参数，因此下面的运行结果都是等价的。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">_A(1, 2, 3)</span><br><span class="line">_A(1, 2)(3)</span><br><span class="line">_A(1)(2, 3)</span><br><span class="line">_A(1)(2)(3)</span><br><span class="line">A(1, 2, 3)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>函数A被createCurry转化之后得到柯里化函数_A，_A能够处理A的所有剩余参数。因此柯里化也被称为部分求值。</p>
+</blockquote>
+<blockquote>
+<p>在简单的场景下，可以不用借助柯里化通用式来转化得到柯里化函数，我们凭借眼里自己封装。</p>
+</blockquote>
+<blockquote>
+<p>例如有一个简单的加法函数，他能够将自身的三个参数加起来并返回计算结果。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> add(a, b, c) &#123;</span><br><span class="line">  <span class="built_in">return</span> a + b + c</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>那么add函数的柯里化函数_add则可以如下：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> _add(a) &#123;</span><br><span class="line">  <span class="built_in">return</span> <span class="keyword">function</span>(b) &#123;</span><br><span class="line">    <span class="built_in">return</span> <span class="keyword">function</span>(c) &#123;</span><br><span class="line">      <span class="built_in">return</span> a + b + c</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>下面的运算方式是等价的</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add(1, 2, 3)</span><br><span class="line">_add(1)(2)(3)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当然，靠眼里封装的柯里化函数自由度偏低，柯里化通用式具备更加强大的能力。因此我们需要知道如何去封装这样一个柯里化的通用式。</p>
+</blockquote>
+<blockquote>
+<p>首先通过_add可以看出，柯里化函数的运行过程其实是一个参数的收集过程，我们将每一次传入的参数收集起来，并最里层里面处理。在实现createCurry时，可以借助这个思路来进行封装。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">// 简单实现，参数只能从右到左传递</span><br><span class="line"><span class="keyword">function</span> createCurry(func, args) &#123;</span><br><span class="line">  var arity = func.length</span><br><span class="line">  var args = args || []</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span> <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    var _args = [].slice.call(arguments)</span><br><span class="line">    [].push.apply(_args, args)</span><br><span class="line">    </span><br><span class="line">    // 如果参数个数小于最初的func.length，则递归调用，继续收集参数</span><br><span class="line">    <span class="keyword">if</span> (_args.length &lt; arity) &#123;</span><br><span class="line">      <span class="built_in">return</span> createCCurry.call(this, func, _args)</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    // 参数收集完毕，则执行func</span><br><span class="line">    <span class="built_in">return</span> func.apply(this, _args)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这个createCurry函数的封装借助闭包与递归，实现了一个参数的收集，并在收集完毕之后执行所有参数的一个过程。</p>
+</blockquote>
+<blockquote>
+<p>我们会发现，把函数经过createCurry转化为一个柯里化函数，最后执行结果，不是正好相当于执行函数自身吗？柯里化是不是把简单的问题复杂化了？</p>
+</blockquote>
+<blockquote>
+<p>柯里化确实是把简单的问题复杂化了，但是复杂化的同时，我们使用函数拥有了更加多的自由度。而这里对于函数参数的自由处理，正式柯里化的核心所在。</p>
+</blockquote>
+<blockquote>
+<p>如：如果我们想要验证一串数字是否是正确的手机号，按照普通的思路来做，大家可能是这样封装的</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> checkPhone(phoneNumber) &#123;</span><br><span class="line">  <span class="built_in">return</span> /^1[34578]\d&#123;9&#125;$/.<span class="built_in">test</span>(phoneNumber)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>而如果想要验证是否是邮箱呢？这么封装：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> checkEmail(email) &#123;</span><br><span class="line">  <span class="built_in">return</span> /^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/.<span class="built_in">test</span>(email)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>我们还可能会遇到验证身份证号，验证密码等各种验证信息，因此在实战中，为了统一逻辑，我们就会封装一个更为通用的函数，将用于验证的正则与将要被验证的字符串作为参数传入。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> check(targetString, reg) &#123;</span><br><span class="line">  <span class="built_in">return</span> reg.test(targetString)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>但是这样封装之后，在使用时又稍微麻烦一点，因为会总是输入一串正则，这样就导致了使用时的效率低下。这个时候，我们就可以借助柯里化，在check的基础上再做一层封装，以简化使用。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">var _check = createCurry(check)</span><br><span class="line"></span><br><span class="line">var checkPhone = _check(/^1[34578]\d&#123;9&#125;$/)</span><br><span class="line">var checkEmail = _check(/^(\w)+(\.\w+)*@(\w)+((\.\w+)+)$/)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>最后在使用的时候就会变得更加直观与简洁了</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">checkPhone(<span class="string">'183888888'</span>)</span><br><span class="line">checkEmail(<span class="string">'xxxxx@test.com'</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>继续来思考一个例子。这个例子与map有关。我们之前分析了封装map方法的思考过程。由于我们没有办法确认一个数组在遍历时会执行什么操作，因此我们只能将调用for循环的这个统一逻辑封装起来，而具体的操作则通过参数传入的形式让使用者自定义。这就是map函数。</p>
+</blockquote>
+<blockquote>
+<p>实践中我们常常会发现，在我们的某个项目中，针对某一个数组的操作其实是固定的，也就是说，同样的操作，可能会在项目的不同地方调用很多次。</p>
+</blockquote>
+<blockquote>
+<p>于是，这个时候哦，我们就可以在map函数的基础上，进行二次封装，以简化我们在项目中使用。假如这个在我们项目中会调用多次的操作是将数组的每一项都转为百分比1 –&gt; 100%。</p>
+</blockquote>
+<blockquote>
+<p>普通思维下我们可以这样封装</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> getNewArray(array) &#123;</span><br><span class="line">  <span class="built_in">return</span> array.map(<span class="keyword">function</span>(item) &#123;</span><br><span class="line">    <span class="built_in">return</span> item * 100 + <span class="string">'%'</span></span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">getNewArray([1, 2, 3, 0.12]) // [<span class="string">'100%'</span>, <span class="string">'200%'</span>, <span class="string">'300%'</span>, <span class="string">'12%'</span>]</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>而如果借助柯里化来二次封装这样的逻辑，则会如下实现：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> _map(func, array) &#123;</span><br><span class="line">  <span class="built_in">return</span> array.map(func)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var _getNewArray  = createCurry(_map)</span><br><span class="line"></span><br><span class="line">var getNewArray = _getNewArray(<span class="keyword">function</span>(item) &#123;</span><br><span class="line">  <span class="built_in">return</span> item * 100 + <span class="string">'%'</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">getNewArray([1, 2, 3, 0.12]) // [<span class="string">'100%'</span>, <span class="string">'200%'</span>, <span class="string">'300%'</span>, <span class="string">'12%'</span>]</span><br><span class="line">getNewArray([0.01, 1]) // [<span class="string">'1%'</span>, <span class="string">'100%'</span>]</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果我们的项目中的固定操作是希望对数组进行一个过滤，找出数组中的所有Number类型的数据。借助柯里化思维我们可以这样做。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> _filter(func, array) &#123;</span><br><span class="line">  <span class="built_in">return</span> array.filter(func)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var _find = createCurry(_filter)</span><br><span class="line"></span><br><span class="line">var findNumber = _find(<span class="keyword">function</span>(item) &#123;</span><br><span class="line">  <span class="keyword">if</span> (typeof item === <span class="string">'number'</span>) &#123;</span><br><span class="line">    <span class="built_in">return</span> item</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">findNumber([1, 2, 3, <span class="string">'2'</span>, <span class="string">'3'</span>, 4]) // [1, 2, 3, 4]</span><br><span class="line"></span><br><span class="line">// 当我们继续封装另外的过滤操作时就会变得更加简单</span><br><span class="line">// 找出数字为20的子项</span><br><span class="line">var find20 = _find(<span class="keyword">function</span>(item, i) &#123;</span><br><span class="line">  <span class="keyword">if</span> (typeof item === 20) &#123;</span><br><span class="line">    <span class="built_in">return</span> i</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">find20([1, 2, 3, 30, 20, 100]) // 4</span><br><span class="line"></span><br><span class="line">// 找出数组中大于100的所有数据</span><br><span class="line">var findGreater100  = _find(<span class="keyword">function</span>(item) &#123;</span><br><span class="line">  <span class="keyword">if</span> (item &gt; 100) &#123;</span><br><span class="line">    <span class="built_in">return</span> item</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line">findGreater100([1, 2, 101, 300, 2, 122]) // [101, 300, 122]</span><br></pre></td></tr></table></figure>
+
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><blockquote>
+<p>其实并不建议在任何情况下以炫技为目的去使用柯里化，在了柯里化的实现中，我们知道柯里化虽然具有了更多的自由度，但是同时柯里化通用式里调用了arguments对象，使用了递归与闭包，因此柯里化的自由度是以牺牲了一定的性能为代价换来的，只有在情况变得更复杂时，才是柯里化大显身手的时候。</p>
+</blockquote>
+
+    </div>
+
+    <div>
+      
+        <div>
+  
+    <div style="text-align:center;color: #ccc;font-size:20px;">------------- 本 文 结 束 <i class="fa fa-paw"></i> 感 谢 您 的 阅 读 -------------</div>
+  
+</div>
+      
+    </div>
+    
+    
+    
+    
+        <div class="reward-container">
+  <div>只是为了好玩罢了~</div>
+  <button onclick="var qr = document.getElementById('qr'); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+      
+      <div style="display: inline-block;">
+        <img src="/images/wechatpay.jpg" alt="Archer 微信支付">
+        <p>微信支付</p>
+      </div>
+      
+      <div style="display: inline-block;">
+        <img src="/images/alipay.jpg" alt="Archer 支付宝">
+        <p>支付宝</p>
+      </div>
+
+  </div>
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Archer
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B9%9D)--%E6%B7%B1%E5%85%A5%E8%AF%A6%E8%A7%A3%E5%87%BD%E6%95%B0%E7%9A%84%E6%9F%AF%E9%87%8C%E5%8C%96/" title="前端基础进阶学习(九)--深入详解函数的柯里化">https://www.chenkl.vip/前端基础进阶学习(九)--深入详解函数的柯里化/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/javaScript/" rel="tag"><i class="fa fa-tag"></i> javaScript</a>
+              <a href="/tags/%E5%89%8D%E7%AB%AF%E8%BF%9B%E9%98%B6/" rel="tag"><i class="fa fa-tag"></i> 前端进阶</a>
+              <a href="/tags/%E5%87%BD%E6%95%B0%E7%9A%84%E6%9F%AF%E9%87%8C%E5%8C%96/" rel="tag"><i class="fa fa-tag"></i> 函数的柯里化</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%85%AB)--%E5%87%BD%E6%95%B0%E4%B8%8E%E5%87%BD%E6%95%B0%E5%BC%8F%E7%BC%96%E7%A8%8B/" rel="prev" title="前端基础进阶学习(八)--函数与函数式编程">
+      <i class="fa fa-chevron-left"></i> 前端基础进阶学习(八)--函数与函数式编程
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">1.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Archer"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Archer</p>
+  <div class="site-description" itemprop="description">种一棵树最好的时间是十年前，其次就是现在。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">24</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">42</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kailong321200875" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kailong321200875" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:502431556@qq.com" title="E-Mail → mailto:502431556@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.zhihu.com/people/meng-shou-kong-cheng-43/activities" title="知乎 → https:&#x2F;&#x2F;www.zhihu.com&#x2F;people&#x2F;meng-shou-kong-cheng-43&#x2F;activities" rel="noopener" target="_blank"><i class="fa fa-fw fa-ioxhost"></i></a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → &#x2F;atom.xml"><i class="fa fa-fw fa-rss"></i></a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/zh-cn" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-fas fa-heartbeat"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Archer</span>
+  <span class="post-meta-divider">|</span>
+  <span class="post-meta-item-icon">
+    <i class="fa fa-area-chart"></i>
+  </span>
+  <span class="post-count">站点总字数：29.4k字</span>
+</div>
+  
+  
+  
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      访客数<span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>人次
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      总访问量<span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>次
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+  <script>
+    (function(){
+      var bp = document.createElement('script');
+      var curProtocol = window.location.protocol.split(':')[0];
+      bp.src = (curProtocol === 'https') ? 'https://zz.bdstatic.com/linksubmit/push.js' : 'http://push.zhanzhang.baidu.com/push.js';
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(bp, s);
+    })();
+  </script>
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : 'e6f2f10abe388d591867',
+      clientSecret: '580aea9e3da136ac529a71232367d1fdf3591926',
+      repo        : 'blogTalk',
+      owner       : 'kailong321200875',
+      admin       : ['kailong321200875'],
+      id          : 'c7ed8db60fb20237b43308ebe7b22de9',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
+
+<!-- 页面鼠标点击样式 -->
+
+  
+    <script src="/js/src/fireworks.js"></script>
+  
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/gh/kailong321200875/live2d-widget@1.0.1/autoload.js"></script>
+
