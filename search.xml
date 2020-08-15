@@ -1,6 +1,318 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>前端基础进阶学习(十)--面向对象、构造函数、原型与原型链</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%8D%81)--%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E3%80%81%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E3%80%81%E5%8E%9F%E5%9E%8B%E4%B8%8E%E5%8E%9F%E5%9E%8B%E9%93%BE/</url>
+    <content><![CDATA[<blockquote>
+<p>总结了一下我学习前端以来我遇到了哪些瓶颈，那么面向对象一定是第一个想到的。尽管现在对于面向对象有了一些了解，但是那种似懂非懂的感觉，依然历历在目。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="对象的定义"><a href="#对象的定义" class="headerlink" title="对象的定义"></a>对象的定义</h2><blockquote>
+<p>对象被定义为<code>无序属性的集合，其属性可以包含基本值，对象或者函数</code>。</p>
+</blockquote>
+<blockquote>
+<p>也就是说，在js中，对象无非就是由一些无序的<code>key-value</code>对组成。其中value可以是基本知识，对象或者函数。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 这里的person就是一个对象</span><br><span class="line">var person = &#123;</span><br><span class="line">  name: <span class="string">'Tom'</span>,</span><br><span class="line">  age: 18,</span><br><span class="line">  getName: <span class="function"><span class="title">function</span></span>() &#123;&#125;,</span><br><span class="line">  parent: &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="创建对象"><a href="#创建对象" class="headerlink" title="创建对象"></a>创建对象</h3><blockquote>
+<p>我们可以通过new的方式创建一个对象。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var obj = new Object()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>也可以通过对象字面量的形式创建一个简单的对象。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var obj = &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当想要给我们创建的简单对象添加方法时，可以这样表示</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 可以这样</span><br><span class="line">var person &#123;&#125;</span><br><span class="line">person.name = <span class="string">'Tom'</span></span><br><span class="line">person.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 也可以这样</span><br><span class="line">var person = &#123;</span><br><span class="line">  name: <span class="string">'Tom'</span>,</span><br><span class="line">  getName: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="访问对象的属性和方法"><a href="#访问对象的属性和方法" class="headerlink" title="访问对象的属性和方法"></a>访问对象的属性和方法</h3><blockquote>
+<p>假如我们有一个简单的对象如下</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;</span><br><span class="line">  name: <span class="string">'Tom'</span>,</span><br><span class="line">  age: <span class="string">'20'</span>,</span><br><span class="line">  getName: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>当我们想要访问他的name属性时，可以用如下两种方式访问。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">person.name</span><br><span class="line"></span><br><span class="line">// 或者</span><br><span class="line">person[<span class="string">'name'</span>]</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果想要访问的属性名是一个变量时，常常会使用第二种方式，例如我们要同时访问person的name和age，可以这样写。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[<span class="string">'name'</span>, <span class="string">'age'</span>].forEach(<span class="keyword">function</span>(item) &#123;</span><br><span class="line">  console.log(person[item])</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<h2 id="工厂模式"><a href="#工厂模式" class="headerlink" title="工厂模式"></a>工厂模式</h2><blockquote>
+<p>使用上面的方式创建对象很简单，但是在很多时候并不能满足我们的需求。就以person对象为例，假如在实际开发中，不仅仅需要一个名字叫做Tom的person对象，同时还需要另外一个名为Jake的person对象，虽然他们有很多相似之处，但是我们不得不重复写两次。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var perTom = &#123;</span><br><span class="line">  name: <span class="string">'Tom'</span>,</span><br><span class="line">  age: 20,</span><br><span class="line">  getName: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var perJake = &#123;</span><br><span class="line">  name: <span class="string">'Jake'</span>,</span><br><span class="line">  age: 22,</span><br><span class="line">  getName: <span class="function"><span class="title">fucntion</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>很显然这并不是合理的方式，我们可以使用工厂模式解决这个问题。顾名思义，工厂模式就是我们提供一个模子，然后通过这个模子复制出需要的对象，我们需要多少个，就复制多少个。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var createPerson = <span class="keyword">function</span>(name, age) &#123;</span><br><span class="line">  // 声明一个中间对象，该对象就是工厂模式的模子</span><br><span class="line">  var o = new Object()</span><br><span class="line">  </span><br><span class="line">  // 依次添加我们需要的属性和方法</span><br><span class="line">  o.name = name</span><br><span class="line">  o.age = age</span><br><span class="line">  o.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">return</span> o</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 创建两个实例</span><br><span class="line">var perTom = createPerson(<span class="string">'Tom'</span>, 20)</span><br><span class="line">var perJake = createPerson(<span class="string">'Jake'</span>, 22)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>相信上面的代码并不难理解，也不用把工厂模式看的太过高大上，很显然，工厂模式帮助我们解决了重复代码上的麻烦，让我们可以写很少的代码，就能够创建很多个person对象。但是这里有两个麻烦，我们需要注意。</p>
+</blockquote>
+<blockquote>
+<p>第一个麻烦就是这样处理，我们没有办法识别对象实例的类型。使用instanceof可以识别对象的类型。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var obj = &#123;&#125;</span><br><span class="line">var foo = <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br><span class="line"></span><br><span class="line">console.log(obj instanceof Object) // <span class="literal">true</span></span><br><span class="line">console.log(foo instanceof Fcuntion) // <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因此在工厂模式的基础上，我们需要使用构造函数的方式来解决这个麻烦。</p>
+</blockquote>
+<h2 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h2><blockquote>
+<p>在js中，new关键字可以让一个函数变得与众不同。通过下面的例子，我们来看看new关键字的神奇之处。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">demo</span></span>() &#123;</span><br><span class="line">  console.log(this)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">demo() // window</span><br><span class="line">new demo() // demo</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>很显然，使用new之后，函数内部发生了事情，让this指向改变。</p>
+</blockquote>
+<blockquote>
+<p>我们可以通过代码来理解一下new关键字到底做了什么</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 创建一个构造函数，其实该构造函数与普通函数并无区别</span><br><span class="line">var Person = <span class="keyword">function</span>(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">  this.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 将构造函数以参数的形式传入</span><br><span class="line"><span class="keyword">function</span> New(func) &#123;</span><br><span class="line">  // 声明一个中间对象，该对象为最终返回的实例</span><br><span class="line">  var res = &#123;&#125;</span><br><span class="line">  <span class="keyword">if</span> (func.prototype !== null) &#123;</span><br><span class="line">    // 将实例的原型指向构造函数的原型</span><br><span class="line">    res.__proto__ = func.prototype</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  // ret为构造函数执行的结果，这里通过apply，将构造函数内部的this改为指向res，即为实例对象</span><br><span class="line">  var ret = func.apply(res, Array.prototype.slice.call(arguments, 1))</span><br><span class="line">  </span><br><span class="line">  // 当我们在构造函数中明确指定了返回对象时，那么new的执行结果就是该返回对象</span><br><span class="line">  <span class="keyword">if</span> ((typeof ret === <span class="string">'object'</span> || typeof ret === <span class="string">'function'</span>) &amp;&amp; ret !== null) &#123;</span><br><span class="line">    <span class="built_in">return</span> ret</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  // 如果没有明确指定返回对象，则默认返回res，这个res就是实例对象</span><br><span class="line">  <span class="built_in">return</span> res</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 通过new声明创建实例，这里的p1，实际接收的正是new中返回的res</span><br><span class="line">var p1 = New(Person, <span class="string">'Tom'</span>, 20)</span><br><span class="line">console.log(p1.getName())</span><br><span class="line"></span><br><span class="line">// 当然，这里也可以判断出实例的类型了</span><br><span class="line">console.log(p1 instanceof Person) // <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>JavaScript内部在通过其他的一些特殊处理，将<code>var p1 = New(Person, &#39;Tom&#39;, 20)</code>等效于<code>var p1 = new Person(&#39;Tom&#39;, 20)</code>。就是我们认识的new关键字了。</p>
+          </div>
+
+<blockquote>
+<p>理解了他的原理，那么困扰了无数人的构造函数中this到底指向谁就变得非常简单了。所以，为了能够判断实例与对象的关系，我们就使用构造函数来搞定。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var Person = <span class="keyword">function</span>(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">  this.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var p1 = new Person(<span class="string">'Tom'</span>, 20)</span><br><span class="line">console.log(p1.getName()) // Tom</span><br><span class="line"></span><br><span class="line">console.log(p1 instanceof Person) // <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>关于构造函数，如果你暂时不能够理解new的具体实现，就先记住下面这几个结论吧。</p>
+</blockquote>
+<ul>
+<li>与普通函数相比，构造函数并没有任何特别的地方，首字母大写只是我们约定的小规定，用于区分普通函数</li>
+<li>new 关键字让构造函数具有了与普通函数不同的许多特点，而new的过程中，执行了如下过程<ol>
+<li>声明一个中间对象</li>
+<li>将该中间对象的原型指向构造函数的原型</li>
+<li>将构造函数的this，指向该中间对象</li>
+<li>返回该中间对象，即返回实例对象</li>
+</ol>
+</li>
+</ul>
+<h2 id="原型"><a href="#原型" class="headerlink" title="原型"></a>原型</h2><blockquote>
+<p>虽然构造函数解决了判断实例类型的问题，但是，说到底，还是一个对象的复制过程。跟工厂模式颇有相似之处。也就是说，当我们声明了100个person对象，那么就有100个getName方法被重新生成。</p>
+</blockquote>
+<blockquote>
+<p>这里的每一个getName方法实现的功能其实是一模一样的，但是由于分别属于不同实例，就不得不一直不停的为getName分配空间。这就是工厂模式存在的第二个麻烦。</p>
+</blockquote>
+<blockquote>
+<p>虽然这是不合理的，我们期望的是，既然都是实现同一个功能，那么能不能就让每一个实例对象都访问同一个方法？这就是原型对象要帮我们解决的问题了。</p>
+</blockquote>
+<blockquote>
+<p>我们创建的每一个函数，都可以有一个prototype属性，该属性指向一个对象。这个对象，就是我们这里说的原型。</p>
+</blockquote>
+<blockquote>
+<p>当我们在创建对象时，可以根据自己的需求，选择性的讲一些属性和方法通过prototype属性，挂载在原型对象中。而每一个new出来的实例，都有一个<strong>proto</strong>属性，该属性指向构造函数的原型对象，通过这个属性，让实例对象也能够访问原型对象的方法。因此，当所有的实例都通过<strong>proto</strong>访问到原型对象时，原型对象的方法与属性就变成了共有方法与属性。</p>
+</blockquote>
+<div class="note info">
+            <p>由于每个函数都可以是构造函数，每个对象都可以是原型对象，因此如果在理解原型之初就想的太多太复杂的话，反而会阻碍你的理解，这里我们要学会先简化它们。就单纯的剖析这三者的关系。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 声明构造函数</span><br><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 通过prototype属性，将方法挂载到原型对象上</span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var p1 = new Person(<span class="string">'tim'</span>, 20)</span><br><span class="line">var p2 = new Person(<span class="string">'jak'</span>, 22)</span><br><span class="line">console.log(p1.getName === p2.getName) // <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200815154907.png" alt=""></p>
+<blockquote>
+<p>通过图示我们可以看出，构造函数的prototype与所有实例对象的<strong>proto</strong>都指向原型对象。而原型对象的constructor指向构造函数。</p>
+</blockquote>
+<blockquote>
+<p>除此之外，还可以从图中看出，实例对象实际上对前面我们所说的中间对象的复制，而中间对象的属性与方法都在构造函数中添加。于是根据构造函数与原型的特性，我们就可以将在构造函数中，通过this声明的属性与方法称为私有变量与方法，它们被当前被某一个实例对象所独有。而通过原型声明的属性与方法，我们可以称之为共有属性与方法，它们可以被所有的实例对象访问。</p>
+</blockquote>
+<blockquote>
+<p>当我们访问实例对象中的属性或者方法时，会有限访问实例对象自身的属性和方法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">  this.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'this is constructor.'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var p1 = new Person(<span class="string">'tim'</span>, 10)</span><br><span class="line"></span><br><span class="line">p1.getName() // this is constructor.</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在这个例子中，我们同时在原型与构造函数中都声明了一个getName函数，运行代码的结果表示原型中的访问并没有被访问。</p>
+</blockquote>
+<blockquote>
+<p>我们还可以通过in来判断，一个对象是否拥有某一个属性/方法，无论是该属性/方法存在于实例对象或者原型对象。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var p1 = new Person(<span class="string">'tim'</span>, 10)</span><br><span class="line"></span><br><span class="line">console.log(<span class="string">'name'</span> <span class="keyword">in</span> p1) // <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>in的这种特性最常用的场景之一，就是判断当前页面是否在移动端打开。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">isMobile = <span class="string">'ontouchstart'</span> <span class="keyword">in</span> document</span><br><span class="line">// 很多人喜欢用浏览器UA的方式来判断，但并不是很好的方式</span><br></pre></td></tr></table></figure>
+
+<h3 id="更简单的原型写法"><a href="#更简单的原型写法" class="headerlink" title="更简单的原型写法"></a>更简单的原型写法</h3><blockquote>
+<p>根据前面的例子的写法，如果我们要在原型上添加更多的方法，可以这样写</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">Person</span></span>() &#123;&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br><span class="line">Person.prototype.getAge = <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br><span class="line">Person.prototype.sayHello = <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br><span class="line">... ...</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>除此之外，我们还可以使用更为之简单的写法</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">Person</span></span>() &#123;&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype = &#123;</span><br><span class="line">  constructor: Person,</span><br><span class="line">  getName: <span class="function"><span class="title">function</span></span>() &#123;&#125;,</span><br><span class="line">  getAge: <span class="function"><span class="title">function</span></span>() &#123;&#125;,</span><br><span class="line">  sayHello: <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这种字面量的写法看上去简单很多，但是有一个需要特别注意的地方。<code>Person.prototype = {}</code>实际上是重新创建了一个{}对象并赋值给Person.prototype，这里的{}并不是最初的那个原型对象。因此它里面并不包含constructor属性。为了保证正确性，我们必须在新创建的{}对象中显示的设置constructor的指向。即上面的<code>constructor: Person</code>。</p>
+</blockquote>
+<h2 id="原型链"><a href="#原型链" class="headerlink" title="原型链"></a>原型链</h2><blockquote>
+<p>原型对象其实也是普通的对象。几乎所有的对象都可能是原型对象，也可能是实力对象，而且还可以同时是原型对象与实例对象。这样的一个对象，正是构造原型链的一个节点。因此理解了原型，那么原型链并不是一个多么复杂的概念。</p>
+</blockquote>
+<blockquote>
+<p>我们知道所有的函数都有一个叫做toString的方法。那么这个方法到底是在哪里的呢？</p>
+</blockquote>
+<blockquote>
+<p>先随意声明一个函数</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">add</span></span>() &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>那么我们可以用如下的图来表示这个函数的原型链。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200815160412.png" alt=""></p>
+<blockquote>
+<p>其中add是Function对象的实例。而Function的原型对象同时又是Object的实例。这样就构成了一条原型链。原型链的访问，其实跟作用域链有很大的相似之处，他们都是一次单向的查找过程。因此实例对象能够通过原型链，访问到处于原型链对象上的所有属性与方法。这也是foo最终能够访问到处于Object原型对象上的toString方法的原因。</p>
+</blockquote>
+<blockquote>
+<p>基于原型链的特性，我们可以很轻松的实现<code>继承</code>。</p>
+</blockquote>
+<h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><blockquote>
+<p>我们常常结合构造函数与原型来创建一个对象。因为构造函数与原型的不同特性，分别解决了我们不同的困扰。因此当我们想要实现继承时，就必须根据构造函数与原型的不同而采取不同的策略。</p>
+</blockquote>
+<blockquote>
+<p>我们声明一个Person对象，该对象将作为父级，而子级cPerson将要继承Person的所有属性与方法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>首先我们来看构造函数的继承。在上面我们已经理解了构造函数的本质，它其实是在new内部实现的一个复制过程。而我们在继承时想要的是，就是想父级构造函数中的操作在子级的构造函数中重现一遍即可。我们可以通过call方法来达到目的。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 构造函数继承</span><br><span class="line"><span class="keyword">function</span> cPerson(name, age, job) &#123;</span><br><span class="line">  Person.call(this, name, age)</span><br><span class="line">  this.job = job</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>原型的继承，只需要将子级的原型对象设置为父级的一个实例，加入到原型链中即可。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 继承原型</span><br><span class="line">cPerson.prototype = new Person(name, age)</span><br><span class="line"></span><br><span class="line">// 添加更多的方法</span><br><span class="line">cPerson.prototype.getLive = <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200815161326.png" alt=""></p>
+<blockquote>
+<p>当然关于继承还有更好的方式</p>
+</blockquote>
+<h2 id="更好的继承"><a href="#更好的继承" class="headerlink" title="更好的继承"></a>更好的继承</h2><blockquote>
+<p>假设原型链的终点Object.prototype为原型链的E(end)端，原型链的起点为S(start)端。</p>
+</blockquote>
+<blockquote>
+<p>通过前面原型链的学习我们知道，处于S端的对象，可以通过S -&gt; E的单向查找，访问原型链上的所有方法与属性。因此这给继承提供了理论基础。我们只需要在S端添加新的对象，那么新对象就能够通过原型链访问到父级的方法与属性。因此想要实现继承，是一件非常简单的事情。</p>
+</blockquote>
+<blockquote>
+<p>因为封装一个对象由构造函数与原型共同组成，因此继承也会分别有构造函数的继承与原型的继承。</p>
+</blockquote>
+<blockquote>
+<p>假设我们已经封装好了一个父级对象Person</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var Person = <span class="keyword">function</span>(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Person.prototype.getAge = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.age</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>构造函数的继承比较简单，我们可以借助call/apply来实现。假设我们通过继承封装一个Student的子类对象。那么构造函数可以如下实现。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var Student = <span class="keyword">function</span>(name, age, grade) &#123;</span><br><span class="line">  // 通过call方法还原Person构造函数中的所有处理逻辑</span><br><span class="line">  Person.call(this, name, age)</span><br><span class="line">  this.grade = grade</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 等价于</span><br><span class="line">var Student = <span class="keyword">function</span>(name, age, grade) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">  this.grade = grade</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>原型的继承则稍微需要一点思考。首先我们应该考虑，如何将子类对象的原型加入到原型链中？我们只需要让子类对象的原型，成为父类对象的一个实例，然后通过<strong>proto</strong>就可以访问父类对象的原型，这样就继承了父类原型中的方法与属性了。</p>
+</blockquote>
+<blockquote>
+<p>因此我们可以先封装一个方法，该方法根据父类对象的原型创建一个实例，该实例将会作为子类对象的原型。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">function</span> create(proto, options) &#123;</span><br><span class="line">  // 创建一个空对象</span><br><span class="line">  var tmp = &#123;&#125;</span><br><span class="line"></span><br><span class="line">  // 让这个新的空对象成为父类对象的实例</span><br><span class="line">  tmp.__proto__ = proto</span><br><span class="line"></span><br><span class="line">  // 传入的方法都挂载到新对象上，新的对象将作为子类对象的原型</span><br><span class="line">  Object.defineProperties(tmp, options)</span><br><span class="line">  <span class="built_in">return</span> tmp</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>简单的封装了<code>create</code>对象之后，我们就可以使用该方法来实现原型的继承了。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Student.prototype = create(Person.prototype, &#123;</span><br><span class="line">  // 不要忘了重新指定构造函数</span><br><span class="line">  constructor: &#123;</span><br><span class="line">    value: Student</span><br><span class="line">  &#125;</span><br><span class="line">  getGrade: &#123;</span><br><span class="line">    value: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      <span class="built_in">return</span> this.grade</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>那么我们来验证一下我们这里实现的继承是否正确。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var s1 = new Student(<span class="string">'ming'</span>, 22, 5)</span><br><span class="line"></span><br><span class="line">console.log(s1.getName()) // ming</span><br><span class="line">console.log(s1.getAge()) // 22</span><br><span class="line">console.log(s1.getGrade()) // 5</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>全部能够正常访问，没问题。在ECMAScript5中直接提供了一个Object.create方法来完成我们上面自己封装的create的功能。因此我们可以直接使用Object.create。</p>
+</blockquote>
+<h2 id="属性类型"><a href="#属性类型" class="headerlink" title="属性类型"></a>属性类型</h2><blockquote>
+<p>在上面的继承实现中，使用了一个大家可能不太熟悉的方法<code>defineProperties</code>，并且在定义<code>getGrade</code>时使用了一个很奇怪的方式。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">getGrade: &#123;</span><br><span class="line">  value: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.grade</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这其实是对象中的属性类型。在我们平常的使用中，给对象添加一个属性时，直接使用object.param的方式就可以了，或者直接在对象中挂载。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;</span><br><span class="line">  name: <span class="string">'TOM'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在ECMAScript5中，对每个属性都添加了几个属性类型，来描述这些属性的特点。他们分别是</p>
+</blockquote>
+<ul>
+<li>configurable: 表示该属性是否能被delete删除。当其值为false时，其他的特性也不能被改变。默认值为true</li>
+<li>enumerable: 是否能枚举。也就是是否能被for-in遍历。默认值为true</li>
+<li>writable: 是否能修改值。默认为true</li>
+<li>value: 该属性的具体值是多少。默认为undefined</li>
+<li>get: 当我们通过person.name访问name的值时，get将被调用。该方法可以自定义返回的具体值是多少。get默认值为undefined</li>
+<li>set: 当我们通过person.name = ‘Jake’设置name的值时，set方法将被调用。该方法可以自定义设置值的具体方式。set默认值为undefined</li>
+</ul>
+<div class="note warning">
+            <p>需要注意的是，不能同时设置value、writable 与 get、set的值。</p>
+          </div>
+
+<blockquote>
+<p>我们可以通过Object.defineProperty方法来修改这些属性类型。下面我们用一些简单的例子来演示一下这些属性类型的具体表现。</p>
+</blockquote>
+<h3 id="configurable"><a href="#configurable" class="headerlink" title="configurable"></a>configurable</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 用普通的方式给person对象添加一个name属性，值为TOM</span><br><span class="line">var person = &#123;</span><br><span class="line">  name: <span class="string">'TOM'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 使用delete删除该属性</span><br><span class="line">delete person.name // 返回<span class="literal">true</span> 表示删除成功</span><br><span class="line"></span><br><span class="line">// 通过Object.defineProperty重新添加name属性</span><br><span class="line">// 并设置name的属性类型的configurable为<span class="literal">false</span>，表示不能再用delete删除</span><br><span class="line">Object.defineProperty(person, <span class="string">'name'</span>, &#123;</span><br><span class="line">  configurable: <span class="literal">false</span>,</span><br><span class="line">  value: <span class="string">'Jake'</span> // 设置name属性的值</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 再次delete，已经不能删除了</span><br><span class="line">delete person.name // <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">console.log(person.name) // 值为Jake</span><br><span class="line"></span><br><span class="line">// 试图改变value</span><br><span class="line">person.name = <span class="string">'alex'</span></span><br><span class="line">console.log(person.name) // Jake 改变失败</span><br></pre></td></tr></table></figure>
+
+<h3 id="enumerable"><a href="#enumerable" class="headerlink" title="enumerable"></a>enumerable</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;</span><br><span class="line">  name: <span class="string">'TOM'</span>,</span><br><span class="line">  age: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 使用<span class="keyword">for</span>-in枚举person的属性</span><br><span class="line">var params = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span>(var key <span class="keyword">in</span> person) &#123;</span><br><span class="line">  params.push(key);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 查看枚举结果</span><br><span class="line">console.log(params) // [<span class="string">'name'</span>, <span class="string">'age'</span>]</span><br><span class="line"></span><br><span class="line">// 重新设置name属性的类型，让其不可被枚举</span><br><span class="line">Object.defineProperty(person, <span class="string">'name'</span>, &#123;</span><br><span class="line">  enumerable: <span class="literal">false</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">var params_ = []</span><br><span class="line"><span class="keyword">for</span>(var key <span class="keyword">in</span> person) &#123;</span><br><span class="line">  params_.push(key)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 再次查看枚举结果</span><br><span class="line">console.log(params_) // [<span class="string">'age'</span>]</span><br></pre></td></tr></table></figure>
+
+<h3 id="writable"><a href="#writable" class="headerlink" title="writable"></a>writable</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;</span><br><span class="line">  name: <span class="string">'TOM'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 修改name的值</span><br><span class="line">person.name = <span class="string">'Jake'</span></span><br><span class="line"></span><br><span class="line">// 查看修改结果</span><br><span class="line">console.log(person.name) // Jake 修改成功</span><br><span class="line"></span><br><span class="line">// 设置name的值不能被修改</span><br><span class="line">Object.defineProperty(person, <span class="string">'name'</span>, &#123;</span><br><span class="line">  writable: <span class="literal">false</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 再次试图修改name的值</span><br><span class="line">person.name = <span class="string">'alex'</span></span><br><span class="line"></span><br><span class="line">console.log(person.name) // Jake 修改失败</span><br></pre></td></tr></table></figure>
+
+<h3 id="value"><a href="#value" class="headerlink" title="value"></a>value</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;&#125;</span><br><span class="line"></span><br><span class="line">// 添加一个name属性</span><br><span class="line">Object.defineProperty(person, <span class="string">'name'</span>, &#123;</span><br><span class="line">  value: <span class="string">'TOM'</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">console.log(person.name) // TOM</span><br></pre></td></tr></table></figure>
+
+<h3 id="get-set"><a href="#get-set" class="headerlink" title="get/set"></a>get/set</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;&#125;</span><br><span class="line"></span><br><span class="line">// 通过get与<span class="built_in">set</span>自定义访问与设置name属性的方式</span><br><span class="line">Object.defineProperty(person, <span class="string">'name'</span>, &#123;</span><br><span class="line">  get: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    // 一直返回TOM</span><br><span class="line">    <span class="built_in">return</span> <span class="string">'TOM'</span></span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="built_in">set</span>: <span class="keyword">function</span>(value) &#123;</span><br><span class="line">    // 设置name属性时，返回该字符串，value为新值</span><br><span class="line">    console.log(value + <span class="string">' in set'</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 第一次访问name，调用get</span><br><span class="line">console.log(person.name) // TOM</span><br><span class="line"></span><br><span class="line">// 尝试修改name值，此时<span class="built_in">set</span>方法被调用</span><br><span class="line">person.name = <span class="string">'alex'</span> // alex <span class="keyword">in</span> <span class="built_in">set</span></span><br><span class="line"></span><br><span class="line">// 第二次访问name，还是调用get</span><br><span class="line">console.log(person.name) // TOM</span><br></pre></td></tr></table></figure>
+
+<div class="note info">
+            <p>请尽量同时设置get、set。如果仅仅只设置了get，那么我们将无法设置该属性值。如果仅仅只设置了set，我们也无法读取该属性的值。</p>
+          </div>
+
+<blockquote>
+<p>Object.defineProperty只能设置一个属性的属性特性。当我们想要同时设置多个属性的特性时，需要使用我们之前提到过的Object.defineProperties</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;&#125;</span><br><span class="line"></span><br><span class="line">Object.defineProperties(person, &#123;</span><br><span class="line">  name: &#123;</span><br><span class="line">    value: <span class="string">'Jake'</span>,</span><br><span class="line">    configurable: <span class="literal">true</span></span><br><span class="line">  &#125;,</span><br><span class="line">  age: &#123;</span><br><span class="line">    get: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      <span class="built_in">return</span> this.value || 22</span><br><span class="line">    &#125;,</span><br><span class="line">    <span class="built_in">set</span>: <span class="keyword">function</span>(value) &#123;</span><br><span class="line">      this.value = value</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">person.name // Jake</span><br><span class="line">person.age // 22</span><br></pre></td></tr></table></figure>
+
+<h3 id="读取属性的特性值"><a href="#读取属性的特性值" class="headerlink" title="读取属性的特性值"></a>读取属性的特性值</h3><blockquote>
+<p>我们可以使用Object.getOwnPropertyDescriptor方法读取某一个属性的特性值。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var person = &#123;&#125;</span><br><span class="line"></span><br><span class="line">Object.defineProperty(person, <span class="string">'name'</span>, &#123;</span><br><span class="line">  value: <span class="string">'alex'</span>,</span><br><span class="line">  writable: <span class="literal">false</span>,</span><br><span class="line">  configurable: <span class="literal">false</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">var descripter = Object.getOwnPropertyDescriptor(person, <span class="string">'name'</span>)</span><br><span class="line"></span><br><span class="line">console.log(descripter) // 返回结果如下</span><br><span class="line"></span><br><span class="line">descripter = &#123;</span><br><span class="line">  configurable: <span class="literal">false</span>,</span><br><span class="line">  enumerable: <span class="literal">false</span>,</span><br><span class="line">  value: <span class="string">'alex'</span>,</span><br><span class="line">  writable: <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><blockquote>
+<p>关于面向对象的基础知识大概就是这些了。我从最简单的创建一个对象开始，解释了为什么我们需要构造函数与原型，理解了这其中的细节，有助于我们在实际开发中灵活的组织自己的对象。因为我们并不是所有的场景都会使用构造函数或者原型来创建对象，也许我们需要的对象并不会声明多个实例，或者不用区分对象的类型，那么我们就可以选择更简单的方式。</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>面向对象</tag>
+        <tag>构造函数</tag>
+        <tag>原型</tag>
+        <tag>原型链</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端基础进阶学习(九)--深入详解函数的柯里化</title>
     <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B9%9D)--%E6%B7%B1%E5%85%A5%E8%AF%A6%E8%A7%A3%E5%87%BD%E6%95%B0%E7%9A%84%E6%9F%AF%E9%87%8C%E5%8C%96/</url>
     <content><![CDATA[<blockquote>
