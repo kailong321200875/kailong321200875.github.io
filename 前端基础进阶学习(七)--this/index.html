@@ -25,16 +25,16 @@
     var CONFIG = {"hostname":"www.chenkl.vip","root":"/","scheme":"Mist","version":"7.7.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":true,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="我们在学习js的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于this指向理解中，有一种说法：谁调用它，this就指向谁。">
+  <meta name="description" content="我们在学习JavaScript的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于this指向理解中，有一种说法：谁调用它，this就指向谁。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="前端基础进阶学习(七)--this">
 <meta property="og:url" content="https://www.chenkl.vip/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E4%B8%83)--this/index.html">
 <meta property="og:site_name" content="小小前端搬运工">
-<meta property="og:description" content="我们在学习js的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于this指向理解中，有一种说法：谁调用它，this就指向谁。">
+<meta property="og:description" content="我们在学习JavaScript的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于this指向理解中，有一种说法：谁调用它，this就指向谁。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200720164300.png">
 <meta property="article:published_time" content="2020-07-26T15:21:29.000Z">
-<meta property="article:modified_time" content="2020-07-26T08:37:42.917Z">
+<meta property="article:modified_time" content="2020-08-22T02:52:17.434Z">
 <meta property="article:author" content="Archer">
 <meta property="article:tag" content="javaScript">
 <meta property="article:tag" content="前端进阶">
@@ -262,7 +262,7 @@
 
       
         <blockquote>
-<p>我们在学习js的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于<code>this</code>指向理解中，有一种说法：谁调用它，<code>this</code>就指向谁。</p>
+<p>我们在学习JavaScript的过程中，由于对一些概念理解得不是很清楚，但是又想通过一些方式把它记下来，于是就很容易草率的给这些概念定下一些方便自己记忆的有偏差的结论。比如对于<code>this</code>指向理解中，有一种说法：谁调用它，<code>this</code>就指向谁。</p>
 </blockquote>
 <a id="more"></a>
 
@@ -349,7 +349,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">foo</span></span>() &#123;</span><br><span class="line">  console.log(this.a)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> active(fn) &#123;</span><br><span class="line">  fn() // 真实调用者，为独立调用</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var a = 20</span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 10,</span><br><span class="line">  getA: foo</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">active(obj.getA) // 20</span><br></pre></td></tr></table></figure>
 
 <h2 id="使用call，apply显示指定this"><a href="#使用call，apply显示指定this" class="headerlink" title="使用call，apply显示指定this"></a>使用call，apply显示指定this</h2><blockquote>
-<p>js内部提供了一种机制，让我们可以自行手动设置<code>this</code>的指向。它们就是<code>call</code>与<code>apply</code>。所有的函数都具有这两个方法。它们除了参数略有不同之外，其功能完全一样。它们的第一个参数都为<code>this</code>将要指向的对象。</p>
+<p>JavaScript内部提供了一种机制，让我们可以自行手动设置<code>this</code>的指向。它们就是<code>call</code>与<code>apply</code>。所有的函数都具有这两个方法。它们除了参数略有不同之外，其功能完全一样。它们的第一个参数都为<code>this</code>将要指向的对象。</p>
 </blockquote>
 <blockquote>
 <p>如下例子所示。<code>fn</code>并非属于对象<code>obj</code>的方法，但是通过<code>call</code>，我们将<code>fn</code>内部的<code>this</code>绑定为<code>obj</code>，因此就可以使用<code>this.a</code>访问<code>obj</code>的a属性。这就是<code>call/apply</code>的用法。</p>
@@ -362,7 +362,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> fn(num1, num2) &#123;</span><br><span class="line">  console.log(this.a + num1 + num2)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">var obj = &#123;</span><br><span class="line">  a: 20</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fn.call(obj, 100, 10) // 130</span><br><span class="line">fn.apply(obj, [20, 10]) // 50</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>因为<code>call/apply</code>的存在，js变得更加灵活。也因此他们的使用场景就多种多样。</p>
+<p>因为<code>call/apply</code>的存在，JavaScript变得更加灵活。也因此他们的使用场景就多种多样。</p>
 </blockquote>
 <h3 id="将类数组对象转为数组"><a href="#将类数组对象转为数组" class="headerlink" title="将类数组对象转为数组"></a>将类数组对象转为数组</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> exam(a, b, c, d, e) &#123;</span><br><span class="line">  // 先看看函数的自带属性 arguments 什么是样子的</span><br><span class="line">  console.log(arguments)</span><br><span class="line">  </span><br><span class="line">  // 使用call/apply将arguments转为数组，返回结果为数组，arguments自身不会改变</span><br><span class="line">  var arg = [].slice.call(arguments)</span><br><span class="line">  </span><br><span class="line">  console.log(arg)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">exam(2, 8, 9, 10, 3)</span><br><span class="line"></span><br><span class="line">/ result:</span><br><span class="line">// &#123; <span class="string">'0'</span>: 2, <span class="string">'1'</span>: 8, <span class="string">'2'</span>: 9, <span class="string">'3'</span>: 10, <span class="string">'4'</span>: 3 &#125;</span><br><span class="line">// [ 2, 8, 9, 10, 3 ]</span><br><span class="line"></span><br><span class="line">// 也常常使用该方法将DOM中的nodelist转换为数组</span><br><span class="line">// [].slice.call(document.getElementsByTagName(<span class="string">'li'</span>))</span><br></pre></td></tr></table></figure>
 

@@ -34,7 +34,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200722111606.png">
 <meta property="article:published_time" content="2020-07-22T10:18:52.000Z">
-<meta property="article:modified_time" content="2020-07-25T07:19:35.448Z">
+<meta property="article:modified_time" content="2020-08-22T02:52:27.898Z">
 <meta property="article:author" content="Archer">
 <meta property="article:tag" content="javaScript">
 <meta property="article:tag" content="前端进阶">
@@ -281,7 +281,7 @@
 <p>上面的例子中，首先有执行上下文<code>foo</code>，在<code>foo</code>中定义了函数<code>bar</code>，而通过对外返回<code>bar</code>的方式让<code>bar</code>得以执行。当<code>bar</code>执行时，访问了<code>foo</code>内部的变量a，b。因此这个时候闭包产生了。</p>
 </blockquote>
 <blockquote>
-<p>在之前，我们总结了js的垃圾回收机制，关于垃圾回收机制，有一个重要的行为，那就是，当一个值，在内存中失去引用时，垃圾回收机制会根据特殊的算法找到它，并将其回收，释放内存。</p>
+<p>在之前，我们总结了JavaScript的垃圾回收机制，关于垃圾回收机制，有一个重要的行为，那就是，当一个值，在内存中失去引用时，垃圾回收机制会根据特殊的算法找到它，并将其回收，释放内存。</p>
 </blockquote>
 <blockquote>
 <p>而我们知道，函数的执行上下文，在执行完毕之后，生命周期结束，那么该函数的执行上下文就会失去引用，其占用的内存空间很快就会被垃圾回收器释放。可是闭包的存在，会阻止这一过程。</p>
