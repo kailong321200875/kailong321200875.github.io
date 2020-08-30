@@ -1,6 +1,308 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>前端基础进阶学习(十三)--深入核心，详解事件循环机制</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%8D%81%E4%B8%89)--%E6%B7%B1%E5%85%A5%E6%A0%B8%E5%BF%83%EF%BC%8C%E8%AF%A6%E8%A7%A3%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF%E6%9C%BA%E5%88%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>JavaScript的学习零散而庞杂，事件循环机制(Event Loop)则是最关键的知识点。</p>
+</blockquote>
+<a id="more"></a>
+
+<blockquote>
+<p>事件循环机制从整体上告诉了我们JavaScript代码的执行顺序。在面试中，事件循环机制总是绕不开的话题。特别是ES6中正式加入了promise对象之后，对于新标准中事件循环机制的理解就变得更加重要。</p>
+</blockquote>
+<blockquote>
+<p>在学习事件循环机制之前，我们默认懂得了如下概念：</p>
+</blockquote>
+<ul>
+<li>执行上下文(Execution context)</li>
+<li>函数调用栈(call stack)</li>
+<li>队列数据结构(queue)</li>
+<li>Promise</li>
+</ul>
+<div class="note info">
+            <p>因此chrome浏览器中新标准中的事件循环机制与nodejs类似，因此此处整合nodejs一起理解，其中会介绍到几个nodejs有，但是浏览器中没有的API，我们只需要了解就好，不一定非要知道它是如何使用。比如process.nextTick，setImmediate</p>
+          </div>
+
+<blockquote>
+<p>我们都知道JavaScript的一大特点就是单线程，而这个线程中拥有唯一的一个事件循环。</p>
+</blockquote>
+<blockquote>
+<p>JavaScript代码的执行过程中，除了依靠函数调用栈来搞定函数的执行顺序外，还依靠任务队列(task queue)来搞定另外的一些代码的执行。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200708105534.png" alt=""></p>
+<ul>
+<li>一个线程中，事件循环是唯一的，但是任务队列可以拥有多个。</li>
+<li>任务队列又分为macro-task(宏任务)与micro-task(微任务)，在最新标准中，它们被分别称为task与jobs。</li>
+<li>macro-task大概包括：script(整体代码)，setTimeout，setInterval，setImmediate，I/O，UI，rendering。</li>
+<li>micro-task大概包括：process.nextTick，promise，Object.observe(已废弃)，MutationObserver(html5新特性)。</li>
+<li>setTimeout/Promise等我们称之为任务源，而进入任务队列的是他们指定的具体执行任务。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// setTimeout中的回调函数才是进入任务队列的任务</span><br><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'xxxx'</span>)</span><br><span class="line">&#125;)</span><br><span class="line">// 非常多的人对于setTimeout的理解存在偏差，所以大概说一下误解：</span><br><span class="line">// setTimeout作为一个任务分发器，这个函数会立即执行，而它所要奋发的任务，也就是它的第一个参数，才是延迟执行</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>来自不同任务源的任务会进入到不同的任务队列，其中setTimeout与setInterval是同源的。</li>
+<li>事件循环的顺序，决定了JavaScript代码的执行顺序。它从script(整体代码)开始第一次循环。之后全局上下文进入函数调用栈。直到调用栈清空(只剩全局)，然后执行所有的micro-task。当所有可执行的micro-task执行完毕之后。循环再次从macro-task开始，找到其中一个任务对垒执行完毕，然后在执行所有的micro-task，这样一直循环下去。</li>
+<li>其中每一个任务的执行，无论是macro-task还是micro-task，都是借助函数调用栈来完成。纯文字表述有点干涩，因此，我们通过2个例子，来逐步理解事件循环的具体顺序。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo01</span><br><span class="line">// 为了方便理解，我们以打印出来的字符作为当前的任务名称</span><br><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'timeout1'</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">  console.log(<span class="string">'promise1'</span>)</span><br><span class="line">  <span class="keyword">for</span> (var i = 0; i &lt; 1000; i ++) &#123;</span><br><span class="line">    i == 99 &amp;&amp; resolve()</span><br><span class="line">  &#125;</span><br><span class="line">  console.log(<span class="string">'promise2'</span>)</span><br><span class="line">&#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'then1'</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">console.log(<span class="string">'global1'</span>)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>首先，事件循环从宏任务队列开始，这个时候，宏任务队列中，只有一个script(整体代码)任务。每一个任务的执行顺序，都依靠函数调用栈来搞定，而当遇到任务源时，则会先分发任务到对应的队列中去，所以，上面例子的第一步执行如下如所示。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822164407.png" alt=""></p>
+<blockquote>
+<p>第二步：script任务执行时首先遇到了setTimeout，setTimeout为一个宏任务源，那么他的作用就是讲任务分发到它对应的队列中。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'timeout1'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822164659.png" alt=""></p>
+<blockquote>
+<p>第三步：script执行时遇到Promise实例。Promise构造函数中的第一个参数，是在new的时候执行，因此不会进入任何其他的队列，而是直接在当前任务直接执行，而后续的.then则会被分发到micro-task的Promise队列中去。</p>
+</blockquote>
+<blockquote>
+<p>因此，构造函数执行时，里面的参数进入函数调用栈执行。for循环不会进入任何队列，因此代码会依次执行，所以这里的Promise1和Promise2会依次输出。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822165043.png" alt="promise1入栈执行，这时promise1被最先输出"></p>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822165137.png" alt="resolve在for循环中入栈执行"></p>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822165219.png" alt="构造函数执行完毕的过程中，resolve执行完毕出栈，promise2输出，promise1页出栈，then执行时，Promise任务then1进入对应队列"></p>
+<blockquote>
+<p>script任务继续往下执行，最后只有一句输出了global，然后，全局任务就执行完毕了。</p>
+</blockquote>
+<blockquote>
+<p>第四步：第一个宏任务script执行完毕之后，就开始执行所有的可以执行的微任务。这个时候，微任务中，只有Promise队列中的一个任务then1，因此直接执行就行了，执行结果输出then1，当然，它的执行，也是进入函数调用栈中执行的。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822165539.png" alt="执行所有的微任务"></p>
+<blockquote>
+<p>第五步：当所有的micro-task执行完毕之后，表示第一轮的循环就结束了。这个时候就得开始第二轮的循环。第二轮循环仍然从宏任务macro-task开始。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822165730.png" alt="微任务被清空"></p>
+<blockquote>
+<p>这个时候，我们发现宏任务中，只有在setTimout队列中还要一个timeout1的任务等待执行。因此就直接执行即可。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822165845.png" alt="timeout1入栈执行"></p>
+<blockquote>
+<p>这个时候宏任务队列与微任务队列中都没有任务了，所以代码就不会再输出其他东西了。</p>
+</blockquote>
+<blockquote>
+<p>那么上面这个例子的输出结果就显而易见了。</p>
+</blockquote>
+<blockquote>
+<p>这个例子比较简单，涉及到的队列任务并不多，因此读懂了它还不能全面的了解到事件循环机制的全貌。下面弄了一个复杂点的例子。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// demo02</span><br><span class="line">console.log(<span class="string">'golb1'</span>)</span><br><span class="line"></span><br><span class="line">setTimout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'timeout1'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout1_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'timeout1_promise'</span>)</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout1_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">setImmediate(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'immediate1'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'immediate_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'immediate_promise'</span>)</span><br><span class="line">    resolve()</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log*(<span class="string">'immediate_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob1_nextTick'</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">  console.log(<span class="string">'glob1_promise'</span>)</span><br><span class="line">  resolve()</span><br><span class="line">&#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob1_then'</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'timeout2'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout2_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'timeout2_promise'</span>)</span><br><span class="line">    resolve()</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout2_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob2_nextTick'</span>)</span><br><span class="line">&#125;)</span><br><span class="line">new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">  console.log(<span class="string">'glob2_promise'</span>)</span><br><span class="line">  resolve()</span><br><span class="line">&#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob2_then'</span>)</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">setImmediate(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'immediate2'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'immediate2_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'immediate2_promise'</span>)</span><br><span class="line">    resolve()</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'immediate2_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>第一步：宏任务script首先执行。全局入栈。glob1输出。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822171744.png" alt="script首先执行"></p>
+<blockquote>
+<p>第二步，执行过程遇到setTimeout。setTimeout作为任务分发器，将任务分发到对应的宏任务队列中。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">setTimout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'timeout1'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout1_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'timeout1_promise'</span>)</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout1_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822171900.png" alt="timeout1进入对应队列"></p>
+<blockquote>
+<p>第三步：执行过程遇到setImmediate。setImmediate也是一个宏任务分发器，将任务分发到对应的任务队列中。setImmediate的任务队列会在setTimeout队列的后面执行。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">setImmediate(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'immediate1'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'immediate_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'immediate_promise'</span>)</span><br><span class="line">    resolve()</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log*(<span class="string">'immediate_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822172007.png" alt="进入setImmediate队列"></p>
+<blockquote>
+<p>第四步：执行遇到nextTick，process.nextTick是一个微任务分发器，它会将任务分发到对应的微任务队列中去。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob1_nextTick'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822172106.png" alt="nextTick"></p>
+<blockquote>
+<p>第五步：执行遇到Promise。Promise的then方法会将任务分发到对应的微任务队列中，但是它构造函数中的方法会直接执行。因此，glob1_promise会第二个输出。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">  console.log(<span class="string">'glob1_promise'</span>)</span><br><span class="line">  resolve()</span><br><span class="line">&#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob1_then'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822172625.png" alt="先是函数调用栈的变化"></p>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822172818.png" alt="然后glob1_then任务进入队列"></p>
+<blockquote>
+<p>第六步：执行遇到第二个setTimeout。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'timeout2'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout2_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'timeout2_promise'</span>)</span><br><span class="line">    resolve()</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'timeout2_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822173013.png" alt="timeout2进入对应队列"></p>
+<blockquote>
+<p>第七步：先后遇到nextTick与Promise</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob2_nextTick'</span>)</span><br><span class="line">&#125;)</span><br><span class="line">new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">  console.log(<span class="string">'glob2_promise'</span>)</span><br><span class="line">  resolve()</span><br><span class="line">&#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'glob2_then'</span>)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822173336.png" alt="glob2_nextTick与Promise任务分别进入各自的队列"></p>
+<blockquote>
+<p>第八步：再次遇到setImmediate。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">setImmediate(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  console.log(<span class="string">'immediate2'</span>)</span><br><span class="line">  process.nextTick(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'immediate2_nextTick'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">  new Promise(<span class="keyword">function</span>(resolve) &#123;</span><br><span class="line">    console.log(<span class="string">'immediate2_promise'</span>)</span><br><span class="line">    resolve()</span><br><span class="line">  &#125;).<span class="keyword">then</span>(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    console.log(<span class="string">'immediate2_then'</span>)</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822173439.png" alt="nextTick"></p>
+<blockquote>
+<p>这个时候，script中的代码就执行完毕了，执行过程中，遇到不同的任务分发器，就将任务分发到各自对应的队列中去。接下来，将会执行所有的微任务队列中的任务。</p>
+</blockquote>
+<blockquote>
+<p>其中，nextTick队列会比Promie先执行。nextTick中的可执行任务执行完毕之后，才会开始执行Promise队列中的任务。</p>
+</blockquote>
+<blockquote>
+<p>当所有可执行的微任务执行完毕之后，这一轮循环就表示结束了。下一轮循环继续从宏任务队列开始执行。</p>
+</blockquote>
+<blockquote>
+<p>这个时候，script已经执行完毕，所以就从setTimeout队列开始执行。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822173549.png" alt="第二轮循环初始状态"></p>
+<blockquote>
+<p>setTimeout任务的执行，也依然是借助函数调用栈来完成，并且遇到任务分发器的时候也会将任务分发到对应的队列中去。</p>
+</blockquote>
+<blockquote>
+<p>只有当setTimeout中所有的任务执行完毕之后，才会再次开始执行微任务队列。并且清空所有的可执行微任务。</p>
+</blockquote>
+<blockquote>
+<p>setTiemout队列产生的微任务执行完毕之后，循环则回过头来开始执行setImmediate队列。仍然是先将setImmediate队列中的任务执行完毕，再执行所产生的微任务。</p>
+</blockquote>
+<blockquote>
+<p>当setImmediate队列执行产生的微任务全部执行之后，第二轮循环也就结束了。</p>
+</blockquote>
+<blockquote>
+<p>当然，这些顺序都是v8的一些实现。我们也可以根据上面的规则，来尝试实现一下事件循环的机制。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 用数组模拟一个队列</span><br><span class="line">var tasks = []</span><br><span class="line"></span><br><span class="line">// 模拟一个事件分发器</span><br><span class="line">var addFn1 = <span class="keyword">function</span>(task) &#123;</span><br><span class="line">  tasks.push(task)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 执行所有的任务</span><br><span class="line">var flush = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  tasks.map(<span class="keyword">function</span>(task) &#123;</span><br><span class="line">    task()</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 最后利用setTimeout/或者其他你认为合适的方式丢入事件循环中</span><br><span class="line">setTimeout(<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  flush()</span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line">// 当然，也可以不用丢进事件循环，而是我们自己手动在适当的时机去执行对应的某一个方法</span><br><span class="line"></span><br><span class="line">var dispatch = <span class="keyword">function</span>(name) &#123;</span><br><span class="line">  tasks.map(<span class="keyword">function</span>(item) &#123;</span><br><span class="line">    <span class="keyword">if</span>(item.name == name) &#123;</span><br><span class="line">      item.handler()</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 当然，我们把任务丢进去的时候，多保存一个name即可。</span><br><span class="line">// 这时候，task的格式就如下</span><br><span class="line">demoTask =  &#123;</span><br><span class="line">  name: <span class="string">'demo'</span>,</span><br><span class="line">  handler: <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 于是，一个订阅-通知的设计模式就这样轻松的被实现了</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>这样，我们就模拟了一个任务队列。我们还可以定义另外一个队列，利用上面的各种方式来规定他们的优先级。</p>
+</blockquote>
+<div class="note warning">
+            <p>需要注意的是，这里的执行顺序，或者执行的优先级在不同的场景里由于实现的不同会导致不同的结果，包括node的不同版本，不同浏览器等都有不同的结果。</p>
+          </div>]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>事件循环</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>前端基础进阶学习(十二)--详细图解jQuery对象，以及如何扩展jQuery插件</title>
+    <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%8D%81%E4%BA%8C)--%E8%AF%A6%E7%BB%86%E5%9B%BE%E8%A7%A3jQuery%E5%AF%B9%E8%B1%A1%EF%BC%8C%E4%BB%A5%E5%8F%8A%E5%A6%82%E4%BD%95%E6%89%A9%E5%B1%95jQuery%E6%8F%92%E4%BB%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>随着前端的迅猛发展，另外几种前端框架的崛起，jQuery慢慢变得不再是必须。但是我认为，项目中可以不用，但是仍然建议学。</p>
+</blockquote>
+<a id="more"></a>
+
+<h2 id="jQuery对象"><a href="#jQuery对象" class="headerlink" title="jQuery对象"></a>jQuery对象</h2><blockquote>
+<p>使用jQuery对象时，我们这样写：</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 声明一个jQuery对象</span><br><span class="line">$(<span class="string">'.target'</span>)</span><br><span class="line"></span><br><span class="line">// 获取元素的css属性</span><br><span class="line">$(<span class="string">'.target'</span>).css(<span class="string">'width'</span>)</span><br><span class="line"></span><br><span class="line">// 获取元素的位置信息</span><br><span class="line">$(<span class="string">'.target'</span>).offset()</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在最开始，我们会有许多疑问，比如$是怎么回事？为什么不用new就可以直接声明一个对象？</p>
+</blockquote>
+<blockquote>
+<p>我们直代码来展示并解释</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">;</span><br><span class="line">(<span class="keyword">function</span> (ROOT) &#123;</span><br><span class="line"></span><br><span class="line">  // 构造函数</span><br><span class="line">  var jQuery = <span class="keyword">function</span> (selector) &#123;</span><br><span class="line"></span><br><span class="line">    // 在jQuery中直接返回new过的实例，这里的init是jQuery的真正构造函数</span><br><span class="line">    <span class="built_in">return</span> new jQuery.fn.init(selector)</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  jQuery.fn = jQuery.prototype = &#123;</span><br><span class="line">    constructor: jQuery,</span><br><span class="line"></span><br><span class="line">    version: <span class="string">'1.0.0'</span>,</span><br><span class="line"></span><br><span class="line">    init: <span class="keyword">function</span> (selector) &#123;</span><br><span class="line">      // 在jquery中这里有一个复杂的判断，但是这里我做了简化</span><br><span class="line">      var elem, selector;</span><br><span class="line">      elem = document.querySelector(selector);</span><br><span class="line">      this[0] = elem;</span><br><span class="line"></span><br><span class="line">      // 在jquery中返回一个由所有原型属性方法组成的数组，我们这里简化，直接返回this即可</span><br><span class="line">      // <span class="built_in">return</span> jQuery.makeArray(selector, this);</span><br><span class="line">      <span class="built_in">return</span> this;</span><br><span class="line">    &#125;,</span><br><span class="line"></span><br><span class="line">    // 在原型上添加一堆方法</span><br><span class="line">    toArray: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    get: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    each: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    ready: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    first: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    slice: <span class="function"><span class="title">function</span></span> () &#123; &#125;</span><br><span class="line">    // ... ...</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  jQuery.fn.init.prototype = jQuery.fn;</span><br><span class="line"></span><br><span class="line">  // 实现jQuery的两种扩展方式</span><br><span class="line">  jQuery.extend = jQuery.fn.extend = <span class="keyword">function</span> (options) &#123;</span><br><span class="line"></span><br><span class="line">    // 在jquery源码中会根据参数不同进行很多判断，我们这里就直接走一种方式，所以就不用判断了</span><br><span class="line">    var target = this;</span><br><span class="line">    var copy;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (name <span class="keyword">in</span> options) &#123;</span><br><span class="line">      copy = options[name];</span><br><span class="line">      target[name] = copy;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">return</span> target;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  // jQuery中利用上面实现的扩展机制，添加了许多方法，其中</span><br><span class="line"></span><br><span class="line">  // 直接添加在构造函数上，被称为工具方法</span><br><span class="line">  jQuery.extend(&#123;</span><br><span class="line">    isFunction: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    <span class="built_in">type</span>: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    parseHTML: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    parseJSON: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    ajax: <span class="function"><span class="title">function</span></span> () &#123; &#125;</span><br><span class="line">    // ...</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  // 添加到原型上</span><br><span class="line">  jQuery.fn.extend(&#123;</span><br><span class="line">    queue: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    promise: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    attr: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    prop: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    addClass: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    removeClass: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    val: <span class="function"><span class="title">function</span></span> () &#123; &#125;,</span><br><span class="line">    css: <span class="function"><span class="title">function</span></span> () &#123; &#125;</span><br><span class="line">    // ...</span><br><span class="line">  &#125;)</span><br><span class="line"></span><br><span class="line">  // $符号的由来，实际上它就是jQuery，一个简化的写法，在这里我们还可以替换成其他可用字符</span><br><span class="line">  ROOT.jQuery = ROOT.$ = jQuery;</span><br><span class="line">&#125;)(window);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>在上面代码中，我们封装了一个简化版的jQuery对象，它向我们简单展示了jQuery的整体骨架。</p>
+</blockquote>
+<blockquote>
+<p>在代码中可以看到，jQuery自身对于原型的处理使用了一些巧妙的方式，比如<code>jQuery.fn = jQuery.prototype</code>,<code>jQuery.fn.init.prototype = jQuery.fn</code>等，这几句正是jQuery对象的关键所在。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822100702.png" alt=""></p>
+<h2 id="对象封装分析"><a href="#对象封装分析" class="headerlink" title="对象封装分析"></a>对象封装分析</h2><blockquote>
+<p>在上面的实现中，首先在jQuery构造函数里声明了一个fn属性，并将其指向了原型<code>jQuery.prototype</code>。然后在原型中添加了init方法。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jQuyer.fn = jQuery.prototype = &#123;</span><br><span class="line">  init: <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>之后又将init的原型，指向了jQuery.prototype</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jQuery.fn.init.prototype = jQuery.fn</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>而在构造函数jQuery，返回了init的实例对象</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var jQuery = <span class="keyword">function</span>(selector) &#123;</span><br><span class="line">  // 在jQuery中直接返回new过的实例，这里的init是jQuery的真正构造函数</span><br><span class="line">  <span class="built_in">return</span> new jQuery.fn.init(selector)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>最后对外暴露入口时，将字符<code>$</code>与<code>jQuery</code>对等起来</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">ROOT.jQuery = ROOT.$ = jQuery</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>因此当我们直接使用<code>$(&#39;#test&#39;)</code>创建一个对象时，实际上是创建了一个init的实例，这里的真正构造函数时原型中的init方法。</p>
+</blockquote>
+<div class="note warning">
+            <p>许多对jQuery内部实现不太了解的人，常常会毫无节制使用<code>$()</code>，比如对于同一个元素的不同操作。</p>
+          </div>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var width = parseInt($(<span class="string">'#test'</span>).css(<span class="string">'width'</span>))</span><br><span class="line"><span class="keyword">if</span> (width &gt; 20) &#123;</span><br><span class="line">  $(<span class="string">'#test'</span>).css(<span class="string">'backgroundColor'</span>, <span class="string">'red'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>通过我们上面的分析，我们知道当我们执行<code>$()</code>时，就会重新生成一个init实例对象，因此当我们这样没有节制的使用jQuery是非常不正确的，虽然看上去方便一些，但是对于内存的消耗非常大。正确的做法是既然是同一个对象，那么就用一个变量保存起来后续使用即可。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">var <span class="variable">$test</span> = $(<span class="string">'#test'</span>)</span><br><span class="line">var width = parseInt(<span class="variable">$test</span>.css(<span class="string">'width'</span>))</span><br><span class="line"><span class="keyword">if</span> (width &gt; 20) &#123;</span><br><span class="line">  <span class="variable">$test</span>.css(<span class="string">'backgroundColor'</span>, <span class="string">'red'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="扩展方法分析"><a href="#扩展方法分析" class="headerlink" title="扩展方法分析"></a>扩展方法分析</h2><blockquote>
+<p>在上面的代码中，我们还简单实现了两个扩展方法</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">jQuery.extend = jQuery.fn.extend = <span class="keyword">function</span> (options) &#123;</span><br><span class="line"></span><br><span class="line">  // 在jquery源码中会根据参数不同进行很多判断，我们这里就直接走一种方式，所以就不用判断了</span><br><span class="line">  var target = this;</span><br><span class="line">  var copy;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">for</span> (name <span class="keyword">in</span> options) &#123;</span><br><span class="line">    copy = options[name];</span><br><span class="line">    target[name] = copy;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">return</span> target;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>要理解它的实现，首先要明确知道this指向。</p>
+</blockquote>
+<blockquote>
+<p>传入的参数options为一个<code>key: value</code>模式的对象，我们通过<code>for in</code>遍历options，将key作为jQuery的新属性，value作为该新属性所对应的新方法，分别添加到jQuery方法和jQuery.fn中。</p>
+</blockquote>
+<blockquote>
+<p>也就是说，当我们通过<code>jQuery.extend</code>扩展jQuery时，方法被添加到了jQuery构造函数中，而当我们通过<code>jQuery.fn.extend扩展jQuery</code>时，方法被添加到了jQuery原型中。</p>
+</blockquote>
+<h2 id="被静态方法，工具方法和实例方法"><a href="#被静态方法，工具方法和实例方法" class="headerlink" title="被静态方法，工具方法和实例方法"></a>被静态方法，工具方法和实例方法</h2><blockquote>
+<p>关于封装一个对象。我们之前提到过，在封装对象时，属性和方法可以具体放置的三个位置，并且对于这三个位置的不同做了一个详细的解读。</p>
+</blockquote>
+<p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200822102844.png" alt=""></p>
+<blockquote>
+<p>在实现jQuery扩展方法时，一部分方法需要扩展到构造函数中，一部分方法需要扩展到原型中，当我们通读jQuery源码时，还发现有一些方法在了模块作用域中。</p>
+</blockquote>
+<blockquote>
+<p>这里用一个例子简单区分一下。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">// 模块内部</span><br><span class="line">const a = 20</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span> Person(name, age) &#123;</span><br><span class="line">  this.name = name</span><br><span class="line">  this.age = age</span><br><span class="line">  // 构造函数方法，每声明一个实例，都会重新创建一次，属于实例独有</span><br><span class="line">  this.getName = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">    <span class="built_in">return</span> this.name</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 原型方法，仅在原型创建时声明一次，属于所有实例共享</span><br><span class="line">Person.prototype.getAge = <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">  <span class="built_in">return</span> this.age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 工具方法，直接挂载在构造函数名上，仅声明一次，无法直接访问实例内部属性与方法</span><br><span class="line">Person.each = <span class="function"><span class="title">function</span></span>() &#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如上，each就是一个工具方法，或者说静态方法。</p>
+</blockquote>
+<blockquote>
+<p>工具方法的特性也和工具一词非常贴近，他们与实例的自身属性毫无关联，仅仅只是实现一些通用的功能，我们可以通过<code>$.each</code>与<code>$(&#39;div&#39;).each</code>这2个方法来体会工具方法与实例方法的不同之处。</p>
+</blockquote>
+<blockquote>
+<p>在实际开发中，我们运用到非常多的一个工具库就是<code>lodash.js</code></p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$.ajax()</span><br><span class="line">$.isFunction()</span><br><span class="line">$.each()</span><br><span class="line">... ...</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>放在原型中的方法，在使用时必须创建一个新的实例对象才能访问，因此这样的方法叫做实例方法。也正因为这一点，他的使用成本会比工具方法高一些。但是相比构造函数方法，原型方法更节省内存。</p>
+</blockquote>
+<blockquote>
+<p>所以通过<code>$.extend</code>扩展的方法，其实就是对工具方法的扩展，而通过<code>$.fn.extend</code>扩展的方法，就是对于实例方法的扩展。</p>
+</blockquote>
+<h2 id="jQuery插件的实现"><a href="#jQuery插件的实现" class="headerlink" title="jQuery插件的实现"></a>jQuery插件的实现</h2><blockquote>
+<p>具体也没有什么可以多说的了，大家看了代码就可以明白一切。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">  &lt;head&gt;</span><br><span class="line">    &lt;meta charset=<span class="string">"utf-8"</span>&gt;</span><br><span class="line">    &lt;title&gt;&lt;/title&gt;</span><br><span class="line">    &lt;style <span class="built_in">type</span>=<span class="string">"text/css"</span>&gt;</span><br><span class="line">      <span class="comment">#target,</span></span><br><span class="line">      <span class="comment">#target2 &#123;</span></span><br><span class="line">        width: 50px;</span><br><span class="line">        height: 50px;</span><br><span class="line">        background-color: orange;</span><br><span class="line">        cursor: move;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      <span class="comment">#target2 &#123;</span></span><br><span class="line">        background-color: red;</span><br><span class="line">      &#125;</span><br><span class="line">    &lt;/style&gt;</span><br><span class="line">  &lt;/head&gt;</span><br><span class="line">  &lt;body&gt;</span><br><span class="line">    &lt;div id=<span class="string">"target"</span>&gt;&lt;/div&gt;</span><br><span class="line">    &lt;div id=<span class="string">"target2"</span>&gt;&lt;/div&gt;</span><br><span class="line">  &lt;/body&gt;</span><br><span class="line">  &lt;script src=<span class="string">"http://libs.baidu.com/jquery/2.1.4/jquery.min.js"</span>&gt;&lt;/script&gt;</span><br><span class="line">  &lt;script <span class="built_in">type</span>=<span class="string">"text/javascript"</span>&gt;</span><br><span class="line">    ;</span><br><span class="line">    (<span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">      // 这是一个私有属性，不需要被实例访问</span><br><span class="line">      var transform = getTransform();</span><br><span class="line"></span><br><span class="line">      <span class="keyword">function</span> Drag(selector) &#123;</span><br><span class="line">        // 放在构造函数中的属性，都是属于每一个实例单独拥有</span><br><span class="line">        this.elem = typeof selector == <span class="string">'Object'</span> ? selector : document.getElementById(selector);</span><br><span class="line">        this.startX = 0;</span><br><span class="line">        this.startY = 0;</span><br><span class="line">        this.sourceX = 0;</span><br><span class="line">        this.sourceY = 0;</span><br><span class="line"></span><br><span class="line">        this.init();</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">      // 原型</span><br><span class="line">      Drag.prototype = &#123;</span><br><span class="line">        constructor: Drag,</span><br><span class="line"></span><br><span class="line">        init: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">          // 初始时需要做些什么事情</span><br><span class="line">          this.setDrag();</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        // 稍作改造，仅用于获取当前元素的属性，类似于getName</span><br><span class="line">        getStyle: <span class="keyword">function</span>(property) &#123;</span><br><span class="line">          <span class="built_in">return</span> document.defaultView.getComputedStyle ? document.defaultView.getComputedStyle(this.elem, <span class="literal">false</span>)[</span><br><span class="line">            property] : this.elem.currentStyle[property];</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        // 用来获取当前元素的位置信息，注意与之前的不同之处</span><br><span class="line">        getPosition: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">          var pos = &#123;</span><br><span class="line">            x: 0,</span><br><span class="line">            y: 0</span><br><span class="line">          &#125;;</span><br><span class="line">          <span class="keyword">if</span> (transform) &#123;</span><br><span class="line">            var transformValue = this.getStyle(transform);</span><br><span class="line">            <span class="keyword">if</span> (transformValue == <span class="string">'none'</span>) &#123;</span><br><span class="line">              this.elem.style[transform] = <span class="string">'translate(0, 0)'</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">              var temp = transformValue.match(/-?\d+/g);</span><br><span class="line">              pos = &#123;</span><br><span class="line">                x: parseInt(temp[4].trim()),</span><br><span class="line">                y: parseInt(temp[5].trim())</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (this.getStyle(<span class="string">'position'</span>) == <span class="string">'static'</span>) &#123;</span><br><span class="line">              this.elem.style.position = <span class="string">'relative'</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">              pos = &#123;</span><br><span class="line">                x: parseInt(this.getStyle(<span class="string">'left'</span>) ? this.getStyle(<span class="string">'left'</span>) : 0),</span><br><span class="line">                y: parseInt(this.getStyle(<span class="string">'top'</span>) ? this.getStyle(<span class="string">'top'</span>) : 0)</span><br><span class="line">              &#125;</span><br><span class="line">            &#125;</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="built_in">return</span> pos;</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        // 用来设置当前元素的位置</span><br><span class="line">        setPostion: <span class="keyword">function</span>(pos) &#123;</span><br><span class="line">          <span class="keyword">if</span> (transform) &#123;</span><br><span class="line">            this.elem.style[transform] = <span class="string">'translate('</span> + pos.x + <span class="string">'px, '</span> + pos.y + <span class="string">'px)'</span>;</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            this.elem.style.left = pos.x + <span class="string">'px'</span>;</span><br><span class="line">            this.elem.style.top = pos.y + <span class="string">'px'</span>;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;,</span><br><span class="line"></span><br><span class="line">        // 该方法用来绑定事件</span><br><span class="line">        setDrag: <span class="function"><span class="title">function</span></span>() &#123;</span><br><span class="line">          var self = this;</span><br><span class="line">          this.elem.addEventListener(<span class="string">'mousedown'</span>, start, <span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">          <span class="keyword">function</span> start(event) &#123;</span><br><span class="line">            self.startX = event.pageX;</span><br><span class="line">            self.startY = event.pageY;</span><br><span class="line"></span><br><span class="line">            var pos = self.getPosition();</span><br><span class="line"></span><br><span class="line">            self.sourceX = pos.x;</span><br><span class="line">            self.sourceY = pos.y;</span><br><span class="line"></span><br><span class="line">            document.addEventListener(<span class="string">'mousemove'</span>, move, <span class="literal">false</span>);</span><br><span class="line">            document.addEventListener(<span class="string">'mouseup'</span>, end, <span class="literal">false</span>);</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">function</span> move(event) &#123;</span><br><span class="line">            var currentX = event.pageX;</span><br><span class="line">            var currentY = event.pageY;</span><br><span class="line"></span><br><span class="line">            var distanceX = currentX - self.startX;</span><br><span class="line">            var distanceY = currentY - self.startY;</span><br><span class="line"></span><br><span class="line">            self.setPostion(&#123;</span><br><span class="line">              x: (self.sourceX + distanceX).toFixed(),</span><br><span class="line">              y: (self.sourceY + distanceY).toFixed()</span><br><span class="line">            &#125;)</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">function</span> end(event) &#123;</span><br><span class="line">            document.removeEventListener(<span class="string">'mousemove'</span>, move);</span><br><span class="line">            document.removeEventListener(<span class="string">'mouseup'</span>, end);</span><br><span class="line">            // <span class="keyword">do</span> other things</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      // 私有方法，仅仅用来获取transform的兼容写法</span><br><span class="line">      <span class="keyword">function</span> <span class="function"><span class="title">getTransform</span></span>() &#123;</span><br><span class="line">        var transform = <span class="string">''</span>,</span><br><span class="line">          divStyle = document.createElement(<span class="string">'div'</span>).style,</span><br><span class="line">          transformArr = [<span class="string">'transform'</span>, <span class="string">'webkitTransform'</span>, <span class="string">'MozTransform'</span>, <span class="string">'msTransform'</span>, <span class="string">'OTransform'</span>],</span><br><span class="line"></span><br><span class="line">          i = 0,</span><br><span class="line">          len = transformArr.length;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (; i &lt; len; i++) &#123;</span><br><span class="line">          <span class="keyword">if</span> (transformArr[i] <span class="keyword">in</span> divStyle) &#123;</span><br><span class="line">            <span class="built_in">return</span> transform = transformArr[i];</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">return</span> transform;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      // 一种对外暴露的方式</span><br><span class="line">      window.Drag = Drag;</span><br><span class="line">    &#125;)();</span><br><span class="line"></span><br><span class="line">    // 通过扩展方法将拖拽扩展为jQuery的一个实例方法</span><br><span class="line">    (<span class="keyword">function</span> ($) &#123;</span><br><span class="line">      $.fn.extend(&#123;</span><br><span class="line">        becomeDrag: <span class="keyword">function</span> (selector) &#123;</span><br><span class="line">          new Drag(selector);</span><br><span class="line">          <span class="built_in">return</span> this;   // 注意：为了保证jQuery所有的方法都能够链式访问，每一个方法的最后都需要返回this，即返回jQuery实例</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;)</span><br><span class="line">    &#125;)(jQuery);</span><br><span class="line">    </span><br><span class="line">    // 使用</span><br><span class="line">    $.fn.becomeDrag(<span class="string">'target'</span>);</span><br><span class="line">    $.fn.becomeDrag(<span class="string">'target2'</span>);</span><br><span class="line">  &lt;/script&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>前端进阶</tag>
+        <tag>jQuery</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端基础进阶学习(十一)--面向对象实战之封装拖拽对象</title>
     <url>/%E5%89%8D%E7%AB%AF%E5%9F%BA%E7%A1%80%E8%BF%9B%E9%98%B6%E5%AD%A6%E4%B9%A0(%E5%8D%81%E4%B8%80)--%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E5%AE%9E%E6%88%98%E4%B9%8B%E5%B0%81%E8%A3%85%E6%8B%96%E6%8B%BD%E5%AF%B9%E8%B1%A1/</url>
     <content><![CDATA[<blockquote>
