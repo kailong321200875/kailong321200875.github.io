@@ -1,6 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>JavaScript的几种继承方式</title>
+    <url>/JavaScript%E7%9A%84%E5%87%A0%E7%A7%8D%E7%BB%A7%E6%89%BF%E6%96%B9%E5%BC%8F/</url>
+    <content><![CDATA[<p>JS作为弱类型语言，继承也是其非常强大的特性之一，同时，继承也是面试常问的题目。</p>
+<a id="more"></a>
+
+<h2 id="继承的分类"><a href="#继承的分类" class="headerlink" title="继承的分类"></a>继承的分类</h2><p>javaScript继承可以按照是否使用object函数，将集成分成两部分（Object.create是ES5新增的方法，用来规范化这个函数）。</p>
+<p>其中，原型链继承和原型式继承有一样的优缺点，构造函数继承与寄生式继承也相互对应。寄生组合继承基于Object.create，同时优化了组合继承，成为了完美的继承方式。ES6 Class Extends的结果与寄生组合继承基本一致，但是实现方案又略有不同。</p>
+<p><img src="https://pic2.zhimg.com/80/v2-005cadd6c25c74a8278bcce368b28301_720w.jpg" alt=""></p>
+<h2 id="原型链继承"><a href="#原型链继承" class="headerlink" title="原型链继承"></a>原型链继承</h2><p>构造函数、原型和实例之间的关系：每个构造函数都有一个原型对象，原型对象都包含一个指向构造函数的指针，而实例都包含一个原型对象的指针。</p>
+<p>继承的本质就是<code>复制，即重写原型对象，代之以一个新类型的实例。</code></p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.property = <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line">SuperType.prototype.getSuperValue = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.property</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.subProperty = <span class="literal">false</span></span><br><span class="line">&#125;</span><br><span class="line">SubType.prototype.getSubValue = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.subProperty</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 关键，创建SuperType的实例，让Subtype.prototype指向这个实例</span></span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType()</span><br><span class="line"><span class="built_in">console</span>.dir(SuperType)</span><br><span class="line"><span class="keyword">var</span> inst1 = <span class="keyword">new</span> SuperType()</span><br><span class="line"><span class="keyword">var</span> inst2 = <span class="keyword">new</span> SubType()</span><br><span class="line"><span class="built_in">console</span>.log(inst2.getSuperValue()) <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>父类方法可以服用</li>
+</ul>
+<h3 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>父类的引用属性会被所有子类实例共享，多个实例对引用类型的操作会被篡改（代码如下）</li>
+<li>子类构建实例时不能向父类传递参数</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.colors = [<span class="string">'red'</span>, <span class="string">'blue'</span>, <span class="string">'green'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType()</span><br><span class="line"></span><br><span class="line"><span class="comment">// 多个实例共享父类的引用（上面的 new SuperType()）</span></span><br><span class="line"><span class="keyword">var</span> instance1 = <span class="keyword">new</span> SubType()</span><br><span class="line">instance1.colors.push(<span class="string">'black'</span>)</span><br><span class="line"><span class="built_in">console</span>.log(instance1.colors) <span class="comment">// ['red', 'blue', 'green', 'black']</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> instance2 = <span class="keyword">new</span> SubType()</span><br><span class="line"><span class="built_in">console</span>.log(instance2.colors) <span class="comment">// ['red', 'blue', 'green', 'black']</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="构造函数继承"><a href="#构造函数继承" class="headerlink" title="构造函数继承"></a>构造函数继承</h2><p>使用父类的构造函数来增强子类实例，等同于复制父类的实例给子类（不使用原型）</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.colors = [<span class="string">'red'</span>, <span class="string">'green'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 构造函数继承</span></span><br><span class="line"><span class="comment">/// 使得每个实例都会复制得到自己独有的一份属性</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 将父对象的构造函数绑定在子对象上</span></span><br><span class="line">  SuperType.call(<span class="keyword">this</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> inst1 = <span class="keyword">new</span> SubType()</span><br><span class="line"><span class="built_in">console</span>.log(inst1)</span><br></pre></td></tr></table></figure>
+
+<p>核心代码是<code>SuperType.call(this)</code>，创建子类实例时调用SuperType构造函数，于是SubType的每个实例都会将SuperType中的属性复制一份，<code>解决了原型链继承中多实例相互影响的问题。</code></p>
+<h3 id="优点（和原型链继承完全反过来）"><a href="#优点（和原型链继承完全反过来）" class="headerlink" title="优点（和原型链继承完全反过来）"></a>优点（和原型链继承完全反过来）</h3><ul>
+<li>父类的引用属性不会被共享</li>
+<li>子类构建实例时可以向父类传递参数</li>
+</ul>
+<h3 id="缺点-1"><a href="#缺点-1" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>只能继承父类的实例属性和方法，不能继承原型属性/方法</li>
+<li>无法实现复用，每个子类都有父类的实例函数的副本，影响性能</li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="comment">// 父类原型链上的方法</span></span><br><span class="line">SuperType.prototype.getColor = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.color</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(inst1.getColor()) <span class="comment">// TypeError: inst1.getColor is not a function</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="组合继承（上面两种结合起来）"><a href="#组合继承（上面两种结合起来）" class="headerlink" title="组合继承（上面两种结合起来）"></a>组合继承（上面两种结合起来）</h2><p>组合上述两种方法就是组合继承。用原型链实现对原型属性和方法的继承，用借用构造函数技术来实现实例属性的继承。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.name = name</span><br><span class="line">  <span class="keyword">this</span>.colors = [<span class="string">'red'</span>, <span class="string">'blue'</span>, <span class="string">'green'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SuperType.prototype.getName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.name</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 1.构造函数来复制父类的属性给SubType实例</span></span><br><span class="line">  <span class="comment">// 第二次调用SuperType()</span></span><br><span class="line">  SuperType.call(<span class="keyword">this</span>, name)</span><br><span class="line">  <span class="keyword">this</span>.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2.原型继承</span></span><br><span class="line"><span class="comment">// 第一次调用SuperType()</span></span><br><span class="line">SubType.prototype = <span class="keyword">new</span> SuperType()</span><br><span class="line"><span class="comment">// 手动挂上构造器，指向自己的构造函数SubType</span></span><br><span class="line">SubType.prototype.constructor = SubType</span><br><span class="line">SubType.prototype.getAge = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> inst1 = <span class="keyword">new</span> SubType(<span class="string">'Asuna'</span>, <span class="number">20</span>)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'inst1'</span>, inst1) <span class="comment">// inst1 SubType &#123;name: "Asuna", colors: Array(3), age: 20&#125;</span></span><br><span class="line"><span class="built_in">console</span>.log(inst1.getName(), inst1.getAge()) <span class="comment">// Asuna 20</span></span><br><span class="line"><span class="built_in">console</span>.log(inst1 <span class="keyword">instanceof</span> SubType, inst1 <span class="keyword">instanceof</span> SuperType) <span class="comment">// true true</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="优点-1"><a href="#优点-1" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>父类的方法可以被复用</li>
+<li>父类的引用属性不会被共享</li>
+<li>子类构建实例时可以向父类传递参数</li>
+</ul>
+<h3 id="缺点（对照注释）"><a href="#缺点（对照注释）" class="headerlink" title="缺点（对照注释）"></a>缺点（对照注释）</h3><ul>
+<li>第一次调用SuperType()：给SubType.prototype写入两个属性name, color</li>
+<li>第二次调用SuperType()：给inst1写入两个属性name, color</li>
+</ul>
+<p>实例对象inst1上的两个属性就屏蔽了其他原型对象SubType.prototype的两个同名属性。所以，组合模式的缺点就是在使用子类创建实例对象时，其原型中会存在两份想通的父类实例的属性/方法。这种被覆盖的情况造成了性能上的浪费。</p>
+<h2 id="原型式继承（浅拷贝）"><a href="#原型式继承（浅拷贝）" class="headerlink" title="原型式继承（浅拷贝）"></a>原型式继承（浅拷贝）</h2><p>我们举个例子，比如，现在有一个对象，叫做“中国人”，还有一个对象，叫做“医生”</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> Chinese = &#123;</span><br><span class="line">  nation: <span class="string">'中国'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> Doctor = &#123;</span><br><span class="line">  career: <span class="string">'医生'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们怎样才能让“医生”去继承“中国人”，也就是说，我们怎样才能生成一个“中国医生”的对象？</p>
+<p>这里要注意，这两个对象都是普通对象，不是构造函数，所以无法使用构造函数方法实现继承。</p>
+<p>可以用<code>object()</code>方法，利用一个<code>空对象作为中介</code>，将某个对象直接复制给空对象构造函数的原型。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ES5中存在Object.create()的方法，能覆盖下面这个方法</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  F.prototype = obj</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> F()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>object()</code>本质上是对传入其中的对象执行了一次<code>浅拷贝</code>，将构造函数F的原型直接指向传入的对象。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">  name: <span class="string">'Nicholas'</span>,</span><br><span class="line">  friends: [<span class="string">'Shelby'</span>, <span class="string">'Court'</span>, <span class="string">'Van'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> anotherPerson = object(person)</span><br><span class="line">anotherPerson.name = <span class="string">'Greg'</span></span><br><span class="line">anotherPerson.friends.push(<span class="string">'Rob'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> yetAnotherPerson = object(person)</span><br><span class="line">yetAnotherPerson.name = <span class="string">'Linda'</span></span><br><span class="line">yetAnotherPerson.friends.push(<span class="string">'Barbie'</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">console</span>.log(person.friends) <span class="comment">// ['Shelby', 'Court', 'Van', 'Rob', 'Barbie']</span></span><br></pre></td></tr></table></figure>
+
+<p>ECMAScript 5 通过新增 Object.create() 方法规范化了原型式继承。这个方法接收两个参数:一个用作新对象原型的对象和(可选的)一个为新对象定义额外属性的对象。在传入一个参数的情况下， Object.create()与 object()方法的行为相同。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> yetAnotherPerson = object(person)</span><br><span class="line"><span class="comment">//  =&gt; </span></span><br><span class="line"><span class="keyword">var</span> yetAnotherPerson = <span class="built_in">Object</span>.create(person)</span><br></pre></td></tr></table></figure>
+
+<h3 id="优点-2"><a href="#优点-2" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>父类方法可以复用</li>
+</ul>
+<h3 id="缺点-2"><a href="#缺点-2" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>原型链继承多个实例的引用类型属性指向想同，存在篡改的可能</li>
+<li>子类构建实例时不能向父类传递参数</li>
+</ul>
+<h2 id="寄生式继承（能附加一些方法）"><a href="#寄生式继承（能附加一些方法）" class="headerlink" title="寄生式继承（能附加一些方法）"></a>寄生式继承（能附加一些方法）</h2><p>使用原型式继承获得一份目标对象的浅拷贝，然后增强了这个浅拷贝的能力。</p>
+<p><code>优缺点其实和原型式继承一样</code>，寄生式继承说白了就是能在拷贝来的对象上加点方法，也就是所谓增强能力。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">object</span>(<span class="params">obj</span>) </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">function</span> <span class="title">F</span>(<span class="params"></span>) </span>&#123;&#125;</span><br><span class="line">  F.prototype = obj</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> F()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">createAnother</span>(<span class="params">original</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 通过调用函数创建一个新对象</span></span><br><span class="line">  <span class="keyword">let</span> clone = object(original)</span><br><span class="line">  <span class="comment">// 以某种方式来增强这个对象</span></span><br><span class="line">  clone.getName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'我有了getName方法：'</span> + <span class="keyword">this</span>.name)</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> clone</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> person = &#123;</span><br><span class="line">  name: <span class="string">'Asuna'</span>,</span><br><span class="line">  friends: [<span class="string">'Kirito'</span>, <span class="string">'Yuuki'</span>, <span class="string">'Sinon'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> inst1 = createAnother(person)</span><br><span class="line"><span class="keyword">var</span> inst2 = createAnother(person)</span><br></pre></td></tr></table></figure>
+
+<h3 id="优点-3"><a href="#优点-3" class="headerlink" title="优点"></a>优点</h3><ul>
+<li>父类方法可以复用</li>
+</ul>
+<h3 id="缺点-3"><a href="#缺点-3" class="headerlink" title="缺点"></a>缺点</h3><ul>
+<li>原型链继承多个实例的引用类型属性指向想通，存在篡改的可能</li>
+<li>子类构建实例时不能向父类传递参数</li>
+</ul>
+<h2 id="寄生组合继承（最优方案）"><a href="#寄生组合继承（最优方案）" class="headerlink" title="寄生组合继承（最优方案）"></a>寄生组合继承（最优方案）</h2><p>组合继承有会两次调用父类的构造函数而造成浪费的缺点，寄生组合继承就可以解决这个问题。</p>
+<p>核心在于<code>inheritPrototype(subType, superType)</code>，让子类的prototype指向父类原型的拷贝，这样就不会调用父类的构造函数，进而引发内存的浪费问题。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">inheritPrototype</span>(<span class="params">subType, superType</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 修正子类原型对象指针，指向父类原型的一个副本，用object()也可以</span></span><br><span class="line">  subType.prototype = <span class="built_in">Object</span>.create(superType.prototype)</span><br><span class="line">  <span class="comment">// 增强对象，弥补因重写原型而丢失的默认的constructor属性</span></span><br><span class="line">  subType.prototype.constructor = subType</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SuperType</span>(<span class="params">name</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">this</span>.name = name</span><br><span class="line">  <span class="keyword">this</span>.colors = [<span class="string">'red'</span>, <span class="string">'blue'</span>, <span class="string">'green'</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SuperType.prototype.getColors = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.colors</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">SubType</span>(<span class="params">name, age</span>) </span>&#123;</span><br><span class="line">  SuperType.call(<span class="keyword">this</span>, name)</span><br><span class="line">  <span class="keyword">this</span>.age = age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">inheritPrototype(SubType, SuperType)</span><br><span class="line"></span><br><span class="line">SubType.prototype.getAge = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">this</span>.age</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> inst1 = <span class="keyword">new</span> SubType(<span class="string">"Asuna"</span>, <span class="number">20</span>)</span><br><span class="line"><span class="keyword">var</span> inst2 = <span class="keyword">new</span> SubType(<span class="string">"Krito"</span>, <span class="number">21</span>)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'inst1'</span>, inst1)</span><br><span class="line"><span class="built_in">console</span>.log(<span class="string">'inst2'</span>, inst2)</span><br></pre></td></tr></table></figure>
+
+<h2 id="ES6-extends"><a href="#ES6-extends" class="headerlink" title="ES6 extends"></a>ES6 extends</h2><p>虽然 ES6 引入了关键字 class，但是底层仍然是基于原型的实现。class 只是语法糖，使得在 JavaScript 模拟类的代码更为简洁。</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(name) &#123;</span><br><span class="line">    <span class="keyword">this</span>.name = name</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 原型方法</span></span><br><span class="line">  <span class="comment">// 即Person.prototype.getName = function() &#123;&#125;</span></span><br><span class="line">  <span class="comment">// 下面可以简写为getName() &#123;&#125;</span></span><br><span class="line">  getName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Person：'</span>, <span class="keyword">this</span>.name)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Gamer</span> <span class="keyword">extends</span> <span class="title">Person</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(name, age) &#123;</span><br><span class="line">    <span class="comment">// 子类中存在构造函数，则需要在使用this之前先调用super()</span></span><br><span class="line">    <span class="keyword">super</span>(name)</span><br><span class="line">    <span class="keyword">this</span>.age = age</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> asuna = <span class="keyword">new</span> Gamer(<span class="string">'Asuna'</span>, <span class="number">20</span>)</span><br><span class="line">asuna.getName() <span class="comment">// 成功访问到父类的方法</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="super实现原理"><a href="#super实现原理" class="headerlink" title="super实现原理"></a>super实现原理</h3><p>就是将继承的那个父类对象在子类中调用，比如super.call(this)实现将父类中的属性(父类的方法是通过原型链来继承，实例都可以共享这个方法)在子类中声明。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>ES6 Class extends 是ES5继承的语法糖</li>
+<li>js的继承除了构造函数之外都基于原型链构建的</li>
+<li>函数声明和类声明的区别</li>
+<li>函数声明会提升，类声明不会。首先需要声明你的类，然后才能访问它</li>
+<li>可以用寄生组合继承实现ES6 Class extends，但是还是会有细微的差别</li>
+<li>ES6的继承有所不同，实质上是先创建父类的实例对象this，然后在调用子类的构造函数修改this，因为子类没有自己的this对象，所以必须先调用父类的super()方法，否则新建实例报错。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>javaScript</category>
+      </categories>
+      <tags>
+        <tag>javaScript</tag>
+        <tag>类的继承</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>网络协议</title>
+    <url>/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>作为一名开发人员我们经常会听到<code>HTTP协议、TCP/IP协议、UDP协议、Socket、Socket长连接、Socket连接池</code>等字眼，然而它们之前的关系、区别及原理并不是所有人都能理解清楚。</p>
+<a id="more"></a>
+
+<h2 id="七层网络模型"><a href="#七层网络模型" class="headerlink" title="七层网络模型"></a>七层网络模型</h2><p>首先从<code>网络通信</code>的分层模型讲起：七层模型，也叫做<code>OSI（Open System Interconnection）模型。</code>自下往上分为：物理层、数据链路层、网络层、传输层、会话层、表示层和应用层。所有有关通信的都离不开它，下面这张图片介绍了各层所对应的一些协议和硬件</p>
+<p><a href="https://mmbiz.qpic.cn/mmbiz_png/zPh0erYjkib04MJu2FFB1pfhibicFLhvj5sRgG4HLKpKC1JPnG1TJJQvKPHK8x8AUIV1YNILz2n6iaicibCRslmXmZnQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" target="_blank" rel="noopener"></a></p>
+<p>通过上图，我们知道IP协议对应于网络层，TCP、UDP协议对应于传输层，而HTTP协议对应于应用层</p>
+<h2 id="TCP和UDP连接"><a href="#TCP和UDP连接" class="headerlink" title="TCP和UDP连接"></a>TCP和UDP连接</h2><p>关于传输层TCP、UDP协议可能我们平时遇见的会比较多，有人说TCP是安全的，UDP是不安全的，UDP传输比TCP快，那为什么呢？我们先从TCP的连接建立的过程开始分析，然后解释UDP和TCP的区别。</p>
+<h3 id="TCP的三次握手和四次分手"><a href="#TCP的三次握手和四次分手" class="headerlink" title="TCP的三次握手和四次分手"></a>TCP的三次握手和四次分手</h3><p>我们知道TCP建立连接需要经过三次握手，而断开连接需要经过四次分手，那三次握手和四次分手分别做了什么和如何进行的。</p>
+<p><a href="https://mmbiz.qpic.cn/mmbiz_jpg/zPh0erYjkib04MJu2FFB1pfhibicFLhvj5s1kFe9PvPuoOIAGy5fHyh7fFmC3Ahx8I4d3B67MVdiaXQk2RP8xQRmiag/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1" target="_blank" rel="noopener"></a></p>
+<p>第一次握手：建立连接。客户端发送连接请求报文段，将SYN位置为1，Sequence Number为x；然后，客户端进入<code>SYN_SEND</code>状态，等待服务器的确认。</p>
+<p>第二次握手：服务器收到客户端的SYN报文段，需要对这个SYN报文段进行确认，设置Acknowledgment Number 为x + 1(Sequence Number + 1)；同时，自己还要发送SYN请求信息，将SYN位置为1，Sequence Number为y；服务器端讲上述所有信息放到一个报文段（即SYN + ACK报文段）中，一并发送给客户端，此时服务器进入<code>SYN_RECV</code>状态。</p>
+<p>第三次握手：客户端收到服务器的SYN + ACK报文段。然后将Acknowlegdment Number设置为y + 1，向服务器发送ACK报文段，这个报文段发送完毕之后，客户端和服务器端都进入了<code>ESTABLISHED</code>状态，完成TCP三次握手。</p>
+<p>完成了三次握手，客户端和服务端就可以开始传送数据。以上就是TCP三次握手的总体介绍。通信结束客户端和服务端就断开连接，需要经过四次分手确认。</p>
+<p>第一次分手：主机1（可以是客户端，也可以是服务端），设置Sequence Number 和 Acknowlegment Number，向主机2发送一个FIN报文段；此时主机1进入<code>FIN_WAIT_1</code>状态；这表示主机1没有数据要发送给主机2了</p>
+<p>第二次分手：主机2收到了主机1发送的FIN报文段，向主机1回一个ACK报文段，Acknowlegment Number为Sequence Number加1；主机1进入<code>FIN_WAIT_2</code>状态；主机2告诉主机1，我“同意”你的关闭请求</p>
+<p>第三次分手：主机2向主机1发送FIN报文段，请求关闭连接，同时主机2进入<code>LAST_ACK</code>状态</p>
+<p>第四次分手：主机1收到主机2发送的FIN报文段，向主机2发送ACK报文段，然后主机1进入<code>TIME_WAIT</code>状态；主机2收到主机1的ACK报文段以后，就关闭连接；此时，主机1等待2MSL后依然没有收到回复，则证明Server端已正常关闭，那么，主机1也可以关闭连接了。</p>
+<p>可以看到一次TCP请求的链接及关闭至少进行了七次通信，这还不包括数据的通信，而UDP不需要3次握手和4次分手。</p>
+<h2 id="TCP和UDP的区别"><a href="#TCP和UDP的区别" class="headerlink" title="TCP和UDP的区别"></a>TCP和UDP的区别</h2><ol>
+<li>TCP是面向链接的，虽然说网络的不安全不稳定特性决定了多少次握手都不能保证连接的可靠性，但是TCP的三次握手在最低限度上（实际上也很大程度上）保证了连接的可靠性；而UDP不是面向连接的，UDP传送数据前并不与对方建立连接，对接收到的数据也不发送确认信号，发送端不知道数据是否会正确接收，当然也不用重发，所以说UDP是无连接的、不可靠的一种数据传输协议。</li>
+<li>也正由于1所说的特点，使得UDP的开销更小数据传输速率更高，因为不必进行收发数据的确认，所以UDP的实时性更好。知道了TCP和UDP的区别，就不难理解为何采用TCP传输协议的MSN比采用UDP的QQ传输文件慢了，但并不能说QQ的通信是不安全的，因为程序员可以手动对UDP的数据收发进行验证，比如发送方对每个数据包进行编号然后由接收方进行验证，即使是这样，UDP因为在底层协议的封装上没有采用类似TCP的“三次握手”而实现了TCP所无法达到的传输效率。</li>
+</ol>
+<h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><p>关于传输层我们会经常听到一些问题</p>
+<ol>
+<li>TCP服务器最大并发连接数是多少？</li>
+</ol>
+<p>关于TCP服务器最大并发连接数有一种误解就是“因为端口号上限为65535，所以TCP服务器理论上的可承载的最大并发连接数也是65535”。首先需要理解一条TCP连接的组成部分：<code>客户端IP、客户端端口、服务端IP、服务端端口</code>。所以对于TCP服务端进程来说，他可以同时连接的客户端数量并不受限于可用端口号，理论上一个服务器的一个端口能建立的连接数是<code>全球的IP数 * 每台机器的端口数</code>。实际上并发连接数受限于linux可打开文件数，这个数是可以配置的，可以非常大，所以实际上受限于系统性能。通过<code>#ulimit -n</code>查看服务的最大文件句柄数，通过<code>ulimit -n xxx</code>修改，xxx是你想要能打开的数量，也可以通过修改系统参数：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#vi &#x2F;etc&#x2F;security&#x2F;limits.conf</span><br><span class="line">*  soft  nofile  65536</span><br><span class="line">*  hard  nofile  65536</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>为什么<code>TIME_WAIT</code>状态还需要等待<code>2MSL</code>后才能返回到<code>CLOSED</code>状态？</li>
+</ol>
+<p>这是因为虽然双方都同意关闭连接了，而且握手的4个报文也都协调和发送完毕，按理可以直接回到CLOSED状态（就好比<code>SYN_SEND</code>状态到<code>ESTABLISH</code>状态那样）；但是因为我们必须要假想网络是不可靠的，你无法保证你最后发送的ACK报文会一定被对方收到，因此对方处于<code>LAST_ACK</code>状态下的<code>Socket</code>可能会因为超时未收到<code>ACK</code>报文，而重发<code>FIN</code>报文，所以这个<code>TIME_WAIT</code>状态的作用就是用来重发可能丢失的<code>ACK</code>报文。</p>
+<ol start="3">
+<li><code>TIME_WAIT</code>状态还需要等待<code>2MSL</code>后才能返回到<code>CLOSED</code>状态会产生什么问题？</li>
+</ol>
+<p>通信双方简历TCP连接后，主动关闭连接的一方就会进入<code>TIME_WAIT</code>状态，<code>TIME_WAIT</code>状态维持时间是两个MSL时间长度，也就是在1-4分钟，Windows操作系统就是四分钟。进入<code>TIME_WAIT</code>状态的一般情况下是客户端，一个<code>TIME_WAIT</code>状态的连接就占用了一个本地端口。一台机器上端口号数量的上限是65536个，如果在同一台机器上进行压力测试模拟上完的客户请求，并且循环与服务端进行短连接通信，那么这台机器将产生4000个左右的<code>TIME_WAIT</code> Socket，后续的短连接就会产生<code>address already in use: connect</code>的异常。</p>
+<h2 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h2><p>关于TCP/IP和HTTP协议的关系，网络有一段比较容易理解的介绍：“我们在传输数据时，可以只使用（传输层）TCP/IP协议，但是那样的话，如果没有应用层，便无法识别数据内容。如果想要使传输的数据有意义，则必须使用到应用层协议。应用层协议有很多，比如HTTP、FTP、TELENT等，也可以自己定义应用层协议。”</p>
+<p>HTTP协议即超文本传送协议，是Web联网的基础，也是手机联网常用的协议之一。Web使用HTTP协议作为应用层协议，以封装HTTP文本信息，然后使用TCP/IP做传输层协议将它发到网上。</p>
+<p>由于HTTP在每次请求结束后都会主动释放连接，因此HTTP连接是一种“短连接”，要保持客户端程序的在线状态，需要不断地向服务器发起连接请求。通常的做法是即使不需要获得任何数据，客户端也保持每隔一段固定的时间向服务器发送一次“保持连接”的请求，服务器在收到该请求后对客户端进行回复，表明知道客户端“在线”。若服务器长时间无法收到客户端的请求，则认为客户端“下线”，若客户端长时间无法收到服务器的回复，则认为网络已经断开。</p>
+]]></content>
+      <categories>
+        <category>网络协议</category>
+      </categories>
+      <tags>
+        <tag>网络协议</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>前端有哪些异步</title>
     <url>/%E5%89%8D%E7%AB%AF%E6%9C%89%E5%93%AA%E4%BA%9B%E5%BC%82%E6%AD%A5/</url>
     <content><![CDATA[<p>我们知道<code>JavaScript</code>是单线程，不像<code>Java</code>等语言是多线程的，所以一般情况下，js代码是一行一行执行的，但是某些时候需要用异步来提升性能，比如说一个网络请求需要服务端返回数据30s，js不可能一直等待服务器返回再执行其他代码，这时候js就会跳过这个过程，继续往下执行，直到没有代码要执行了，这时候后端返回数据了，js再接着执行返回数据之后的代码。这个过程就是一个异步。</p>
