@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://www.chenkl.vip/"/>
-  <updated>2021-03-28T01:33:29.410Z</updated>
+  <updated>2021-04-10T02:20:39.940Z</updated>
   <id>https://www.chenkl.vip/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>MVC、MVP、MVVM</title>
+    <link href="https://www.chenkl.vip/MVC%E3%80%81MVP%E3%80%81MVVM/"/>
+    <id>https://www.chenkl.vip/MVC%E3%80%81MVP%E3%80%81MVVM/</id>
+    <published>2021-04-09T10:09:44.000Z</published>
+    <updated>2021-04-10T02:20:39.940Z</updated>
+    
+    <content type="html"><![CDATA[<p>MVC、MVP、MVVM都是常见的软件架构设计模式，它通过分离关注点来改进代码的组织方式。不同于设计模式，只是为了解决一类问题而总结出的抽象方法，一种架构模式往往使用了多种设计模式。</p><a id="more"></a><p>要了解MVC、MVP、MVVM，就要知道他们的相同点和不同点。不同部分是C（Controller）、P（Presenter）、VM（View-Model），而相同的部分则是MV（Model-View）。</p><h2 id="MVC"><a href="#MVC" class="headerlink" title="MVC"></a>MVC</h2><p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/MVC.png" alt=""></p><p><img src="https://www.ruanyifeng.com/blogimg/asset/2015/bg2015020105.png" alt=""></p><p>MVC分为三个模块，Model(数据层、模型层)，View(视图层)，Controller(控制器)。模块之间的依赖关系如下：</p><ul><li>Model：对外暴露函数调用接口和事件接口，不依赖Controller和View</li><li>View：对外暴露用户触发事件接口，并监听Model数据变化触发的事件，依赖于Model</li><li>Controller：监听View的用户事件，并对Model的接口了如指掌，依赖于Model和View</li></ul><p>数据流回路流程如下：</p><ul><li>用户与View交互，触发用户事件</li><li>Controller监听到用户事件，调用Model接口，改变Model层的数据</li><li>Model层数据变化触发相应的事件，将新的数据传递给View层，View做出改变，用户得到反馈</li></ul><p>简单点理解就是：</p><ul><li>View传送指令到Controller</li><li>Controller完成业务逻辑后，要求Model改变状态</li><li>Model将新的数据发送到View，用户得到反馈</li><li>所有通信都是单向的</li></ul><h2 id="MVP"><a href="#MVP" class="headerlink" title="MVP"></a>MVP</h2><p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/MVP.png" alt=""></p><p><img src="https://www.ruanyifeng.com/blogimg/asset/2015/bg2015020109.png" alt=""></p><p>MVP分为三个模块，Model(数据层，模型层)，View(视图层)，Presenter，模块之间的依赖关系如下：</p><ul><li>Model：对外暴露函数调用接口和事件，不依赖于Presenter和View</li><li>View：对外暴露函数调用接口和用户触发事件接口，不依赖于Presenter和Model</li><li>Presenter：监听View和Model的事件，并对他们的接口了如指掌，所以依赖于Model和View</li></ul><p>数据流回路流程如下：</p><ul><li>用户与View交互，触发用户事件</li><li>Presenter监听到用户事件，调用Model接口，改变View层的数据</li><li>Model层数据变化触发相应的事件，事件被Presenter层监听到，调用View暴露函数调用接口，View做出改变，用户得到反馈</li></ul><p>简单理解就是：</p><ul><li>各部分之间的通信都是双向的</li><li>View与Model不发生联系，都通过Presenter传递</li><li>View非常薄，不部署任何业务逻辑，称为”被动视图”（Passive View），即没有任何主动性，而 Presenter非常厚，所有逻辑都部署在那里。</li></ul><h2 id="MVVM"><a href="#MVVM" class="headerlink" title="MVVM"></a>MVVM</h2><p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/MVVM.png" alt=""></p><p><img src="https://www.ruanyifeng.com/blogimg/asset/2015/bg2015020110.png" alt=""></p><p>MVP分为三个模块，Model(数据层，模型层)，View(视图层)，ViewModel(视图-模型)，模块之间的依赖关系如下：</p><ul><li>Model：对外暴露函数调用接口和事件接口，不依赖 ViewModel 和 View</li><li>View：箭筒用户交互事件，然后调用ViewModel的响应逻辑，同时将子级的显示状态与ViewModel的状态绑定在一起，所以依赖于ViewModel</li><li>ViewModel：监听Model的事件，并对Model的接口了如指掌，依赖于Model。同时向View暴露响应逻辑的调用接口，以及所有的状态数据，并不依赖于View</li></ul><p>数据流回路流程如下：</p><ul><li>用户与View交互，触发用户事件</li><li>View层调用起ViewModel层的响应逻辑的接口</li><li>ViewModel层的响应逻辑处理完后，调用Model接口，改变Model层的数据</li><li>Model层数据变化触发相应的事件，被ViewModel监听到，并更新ViewModel的数据状态</li><li>ViewModel层的数据状态改变会引起View的状态改变，View做出改变，用户得到反馈</li></ul><p>它采用双向绑定（data-binding）：View的变动，自动反映在 ViewModel</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul><li>MVC: Controller 作为 View 层和 Model 层之间的连接点，连接 View -&gt; Model 之间的通信，Model 层的数据更新后会通知 View 层的视图更新并反馈给用户。View 和 Model 之间的强耦合度会加大调试时的难度。</li><li>MVP: Presenter 承接起了 View 和 Model 之间的双向通信，View 与 Model 不发生联系，降低了耦合度且方便单元测试。</li><li>MVVM: ViewModel 中构建了一组状态数据，作为 View 状态的抽象，通过双向数据绑定使 ViewModel 中的状态数据与 View 的显示状态保持一致，这样 View 的显示状态变化会自动更新 ViewModel 的状态数据，ViewModel 状态数据的变化也会自动同步 View 的显示状态。</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;MVC、MVP、MVVM都是常见的软件架构设计模式，它通过分离关注点来改进代码的组织方式。不同于设计模式，只是为了解决一类问题而总结出的抽象方法，一种架构模式往往使用了多种设计模式。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="软件架构设计模式" scheme="https://www.chenkl.vip/categories/%E8%BD%AF%E4%BB%B6%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/"/>
+    
+    
+      <category term="MVC" scheme="https://www.chenkl.vip/tags/MVC/"/>
+    
+      <category term="MVP" scheme="https://www.chenkl.vip/tags/MVP/"/>
+    
+      <category term="MVVM" scheme="https://www.chenkl.vip/tags/MVVM/"/>
+    
+  </entry>
   
   <entry>
     <title>JavaScript的几种继承方式</title>
@@ -546,33 +573,6 @@
       <category term="gitlab" scheme="https://www.chenkl.vip/tags/gitlab/"/>
     
       <category term="邮件配置" scheme="https://www.chenkl.vip/tags/%E9%82%AE%E4%BB%B6%E9%85%8D%E7%BD%AE/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Gitlab私有化仓库如何汉化</title>
-    <link href="https://www.chenkl.vip/Gitlab%E7%A7%81%E6%9C%89%E5%8C%96%E4%BB%93%E5%BA%93%E5%A6%82%E4%BD%95%E6%B1%89%E5%8C%96/"/>
-    <id>https://www.chenkl.vip/Gitlab%E7%A7%81%E6%9C%89%E5%8C%96%E4%BB%93%E5%BA%93%E5%A6%82%E4%BD%95%E6%B1%89%E5%8C%96/</id>
-    <published>2020-06-19T14:59:16.000Z</published>
-    <updated>2020-07-25T07:19:35.400Z</updated>
-    
-    <content type="html"><![CDATA[<blockquote><p>之前讲到了如何基于<code>gitlab</code>搭建公司内部私有仓库，这篇文章主要讲如何进行<code>gitlab</code>的汉化操作。</p></blockquote><a id="more"></a><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><blockquote><p>对于如何搭建<code>gitlab</code>的私有仓库，可以参考我之前写的 <a href="https://www.chenkl.vip/%E5%9F%BA%E4%BA%8EGitlab%E6%90%AD%E5%BB%BA%E5%85%AC%E5%8F%B8%E7%BA%A7%E5%86%85%E9%83%A8%E7%A7%81%E6%9C%89%E4%BB%93%E5%BA%93/#more">基于Gitlab搭建公司级内部私有仓库</a>，本篇文章主要讲如何进行<code>gitlab</code>的汉化。</p></blockquote><h2 id="准备环境"><a href="#准备环境" class="headerlink" title="准备环境"></a>准备环境</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如何没有当前目录，可以自行创建一个，或者可以放到自己想放的地方</span></span><br><span class="line"><span class="built_in">cd</span> /data/src/</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://gitlab.com/xhang/gitlab.git</span><br></pre></td></tr></table></figure><blockquote><p>如果提示<code>git: command not found</code>，我们需要先进行安装<code>git</code></p></blockquote><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum -y install git</span><br><span class="line"></span><br><span class="line">git <span class="built_in">clone</span> https://gitlab.com/xhang/gitlab.git</span><br></pre></td></tr></table></figure><h2 id="停止gitlab"><a href="#停止gitlab" class="headerlink" title="停止gitlab"></a>停止gitlab</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gitlab-ctl stop</span><br></pre></td></tr></table></figure><h2 id="汉化操作"><a href="#汉化操作" class="headerlink" title="汉化操作"></a>汉化操作</h2><h3 id="查看改汉化补丁版本"><a href="#查看改汉化补丁版本" class="headerlink" title="查看改汉化补丁版本"></a>查看改汉化补丁版本</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">cat gitlab/VERSION</span><br><span class="line"></span><br><span class="line"><span class="comment"># 10.7.3</span></span><br></pre></td></tr></table></figure><h3 id="获取gitlab汉化包"><a href="#获取gitlab汉化包" class="headerlink" title="获取gitlab汉化包"></a>获取gitlab汉化包</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> gitlab/</span><br><span class="line"></span><br><span class="line">git diff origin/10-7-stable origin/10-7-stable-zh &gt; /tmp/10.7.diff</span><br></pre></td></tr></table></figure><h3 id="更新补丁到gitlab中"><a href="#更新补丁到gitlab中" class="headerlink" title="更新补丁到gitlab中"></a>更新补丁到gitlab中</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">yum -y install patch</span><br><span class="line"></span><br><span class="line"><span class="built_in">cd</span> /tmp/</span><br><span class="line"></span><br><span class="line">patch -d/opt/gitlab/embedded/service/gitlab-rails -p1 &lt; 10.7.diff</span><br></pre></td></tr></table></figure><h3 id="重新配置gitlab"><a href="#重新配置gitlab" class="headerlink" title="重新配置gitlab"></a>重新配置gitlab</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">gitlab-ctl reconfigure</span><br><span class="line"></span><br><span class="line">gitlab-ctl start</span><br></pre></td></tr></table></figure><blockquote><p>不出意外的话，我们重新打开<code>gitlab地址</code>，出现以下页面，就说明我们汉化成功了。</p></blockquote><p><img src="https://sanyuanda.oss-cn-hangzhou.aliyuncs.com/imgs/QQ%E5%9B%BE%E7%89%8720200619152022.png" alt=""></p><h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><div class="note info">            <p><code>gitlab</code>的汉化操作算是比较简单的，有兴趣的看官可以自行去实践一下。一般来说不会遇到什么大问题的。</p>          </div>]]></content>
-    
-    <summary type="html">
-    
-      &lt;blockquote&gt;
-&lt;p&gt;之前讲到了如何基于&lt;code&gt;gitlab&lt;/code&gt;搭建公司内部私有仓库，这篇文章主要讲如何进行&lt;code&gt;gitlab&lt;/code&gt;的汉化操作。&lt;/p&gt;
-&lt;/blockquote&gt;
-    
-    </summary>
-    
-    
-      <category term="gitlab" scheme="https://www.chenkl.vip/categories/gitlab/"/>
-    
-    
-      <category term="gitlab" scheme="https://www.chenkl.vip/tags/gitlab/"/>
-    
-      <category term="gitlab汉化" scheme="https://www.chenkl.vip/tags/gitlab%E6%B1%89%E5%8C%96/"/>
     
   </entry>
   
